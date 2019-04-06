@@ -2,5 +2,22 @@
   "name": "nodemw-semi-server",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "GPLv3"
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build": "babel lib -d dist",
+    "start": "yarn run build && nodemon dist/index.js 8000",
+    "serve": "node dist/index.js"
+  },
+  "dependencies": {
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "nodemon": "^1.18.10"
+  },
+  "nodemonConfig": {
+    "verbose": false
+  }
 }

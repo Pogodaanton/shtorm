@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import AppBar from '@material-ui/core/AppBar'
-import Typography from '@material-ui/core/Typography'
-import Toolbar from '@material-ui/core/Toolbar'
+import { AppBar, Typography, Toolbar, Button } from '@material-ui/core'
 
 export default class index extends Component {
   render () {
     return (
       <AppBar
+        id='page-header'
         position='static'
         color='primary'
       >
@@ -29,6 +28,9 @@ export default class index extends Component {
               />
             </Switch>
           </Typography>
+          <Button color='inherit'>
+            Edit Config
+          </Button>
         </Toolbar>
       </AppBar>
     )

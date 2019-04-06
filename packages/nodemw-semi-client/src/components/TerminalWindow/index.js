@@ -10,10 +10,13 @@ const cache = new CellMeasurerCache({
 
 export default class index extends Component {
   static propTypes = {
-    rows: PropTypes.array.isRequired
+    rows: PropTypes.array.isRequired,
+    height: PropTypes.number,
+    disableTransition: PropTypes.bool
   }
 
-  List = React.createRef()
+  List = createRef()
+  AutoSizer = createRef()
 
   componentDidUpdate = () => {
     this.List.current.forceUpdate()
@@ -50,19 +53,28 @@ export default class index extends Component {
 
   render () {
     return (
-      <div className='terminal-window'>
-        <AutoSizer>
+      <div
+        className='terminal-window'
+        style={{
+          height: this.props.height,
+          transitionDuration: this.props.disableTransition ? '0s' : '.2s'
+        }}
+      >
+        <AutoSizer ref={this.AutoSizer}>
           {({ height, width }) => {
             this.terminalWidth = width
             return (
               <List
                 ref={this.List}
                 width={width}
-                height={height}
+                height={this.props.height - 10}
                 rowCount={this.props.rows.length}
                 deferredMeasurementCache={cache}
                 rowHeight={cache.rowHeight}
                 rowRenderer={this.rowRenderer}
+                style={{
+                  marginTop: 5
+                }}
               />
             )
           }}

@@ -29,10 +29,4 @@ window.__webpackStatusStyleFunction__ = status => ({
   transform: status.event === 'ok' ? 'translateY(-110%)' : 'translateY(0%)'
 })
 
-console.log({
-  elem: window.__webpackStatusElem__,
-  colors: window.__webpackStatusColors__,
-  func: window.__webpackStatusStyleFunction__
-})
-
 require('webpack-dev-server-status-bar')

@@ -1,5 +1,5 @@
 import React, { Component, Fragment, createRef } from 'react'
-import { Paper, Grid, Typography, Button } from '@material-ui/core'
+import { Paper, Typography, Button } from '@material-ui/core'
 import LineWeightIcon from '@material-ui/icons/LineWeight'
 import ClearAllIcon from '@material-ui/icons/ClearAll'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'

@@ -10,9 +10,9 @@ html, body, #root, .content {
 
 .content {
   padding: 10px 15px;
-
-  .fill-space { height: 100%; }
 }
+
+.fill-space { flex-grow: 1 }
 
 .paper {
   padding: 10px 15px;

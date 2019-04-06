@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { AppBar, Typography, Toolbar, Button } from '@material-ui/core'
+import { AppBar, Typography, Toolbar, IconButton, Tooltip } from '@material-ui/core'
+import BuildIcon from '@material-ui/icons/Build'
 
 export default class index extends Component {
   render () {
@@ -28,9 +29,12 @@ export default class index extends Component {
               />
             </Switch>
           </Typography>
-          <Button color='inherit'>
-            Edit Config
-          </Button>
+          <div className='fill-space' />
+          <Tooltip title='Edit bot configs'>
+            <IconButton color='inherit'>
+              <BuildIcon />
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
     )

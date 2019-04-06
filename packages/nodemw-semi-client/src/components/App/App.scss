@@ -16,4 +16,23 @@ html, body, #root, .content {
 
 .paper {
   padding: 10px 15px;
+
+  &.paper-window {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    > header {
+      display: flex;
+      align-items: center;
+      padding: 6px 15px;
+
+      > .spacing { flex-grow: 1; }
+      > svg { margin-right: 10px; }
+    }
+  }
+}
+
+.js-focus-visible :focus:not(.focus-visible) {
+  outline: none;
 }

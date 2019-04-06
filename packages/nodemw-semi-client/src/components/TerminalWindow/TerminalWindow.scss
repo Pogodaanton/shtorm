@@ -2,6 +2,8 @@
   background: black;
   font-family: "Lucida Console", Monaco, monospace;
   width: 100%;
+  flex-grow: 1;
+  padding: 5px 0px;
 
   .terminal-item {
     font-size: 15px;

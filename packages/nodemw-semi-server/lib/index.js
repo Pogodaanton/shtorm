@@ -12,9 +12,9 @@ io.on('connection', (client) => {
 })
 
 interceptStdout((msg) => {
-  io.emit('log_message', { type: 'DEBUG', timestamp: new Date().toLocaleTimeString(), msg: msg })
+  io.emit('log_message', { type: 'DEBUG', timestamp: new Date().getTime(), msg: msg })
   return msg
 }, (errMsg) => {
-  io.emit('log_message', { type: 'ERROR', timestamp: new Date().toLocaleTimeString(), msg: errMsg })
+  io.emit('log_message', { type: 'ERROR', timestamp: new Date().getTime(), msg: errMsg })
   return errMsg
 })

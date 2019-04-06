@@ -32,14 +32,6 @@ var config = {
       }
     ]
   },
-  devServer: {
-    stats: 'errors-only',
-    contentBase: 'src/',
-    progress: true,
-    compress: true,
-    historyApiFallback: true,
-    port: 3000
-  },
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
@@ -48,13 +40,25 @@ var config = {
   ]
 }
 
+var devConfig = {
+  devtool: 'source-map',
+  devServer: {
+    stats: 'errors-only',
+    contentBase: 'src/',
+    progress: true,
+    compress: true,
+    historyApiFallback: true,
+    port: 3000
+  }
+}
+
 module.exports = (env, argv) => {
   var cfg = config
   const isDevServer = process.argv.some(s => s.match(/webpack-dev-server$/))
 
   if (isDevServer) {
-    // Loading webpack-dev-server-status-bar w/ custom config
-    cfg.entry.main.push('./configs/status-bar.js')
+    cfg = Object.assign(config, devConfig) // Appending config specific for dev
+    cfg.entry.main.push('./configs/status-bar.js') // Loading webpack-dev-server-status-bar w/ custom config
   }
 
   return cfg

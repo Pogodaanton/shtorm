@@ -17,8 +17,9 @@ window.__webpackStatusColors__ = {
  */
 window.__webpackStatusStyleFunction__ = status => ({
   border: `${status.event === 'close' ? '5px' : '2px'} solid ${status.color}`,
-  position: 'absolute',
+  position: 'fixed',
   top: '0px',
+  zIndex: 10000,
   width: `${status.progress}vw`,
   content: status.event,
   pointerEvents: 'none',

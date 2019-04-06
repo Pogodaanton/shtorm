@@ -1,0 +1,10 @@
+.terminal-window {
+  background: black;
+  font-family: "Lucida Console", Monaco, monospace;
+  width: 100%;
+
+  .terminal-item {
+    font-size: 15px;
+    padding: 5px 15px;
+  }
+}

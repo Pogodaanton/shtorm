@@ -1,13 +1,8 @@
-import React, { Component } from 'react'
-import { Typography, Paper } from '@material-ui/core'
+import { Component } from 'react'
+import './home.scss'
 
 export default class index extends Component {
   render () {
-    return (
-      <Paper className='paper-center'>
-        <Typography variant='h4'>Lorem Ipsum</Typography>
-        <Typography variant='body1'>Dolor sit amet</Typography>
-      </Paper>
-    )
+    return null
   }
 }

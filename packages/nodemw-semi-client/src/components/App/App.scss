@@ -1,7 +1,19 @@
-.content {
-  padding: 10px 15px;
+html, body, #root, .content {
+  height: 100%;
 }
 
-.paper-center {
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  padding: 10px 15px;
+
+  .fill-space { height: 100%; }
+}
+
+.paper {
   padding: 10px 15px;
 }

@@ -1,14 +1,20 @@
-var http = require('http').Server();
-var io = require('socket.io')(http);
-var port = process.argv[2]
+import { Server } from 'http'
+import socketIo from 'socket.io'
+import interceptStdout from 'intercept-stdout'
 
-io.on('connection', function(socket){
-  console.log('a user connected');
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
-});
+const io = socketIo(Server())
+const port = process.argv[2]
 
-http.listen(port, function(){
-  console.log('listening on *:' + port);
-});
+io.listen(port)
+io.on('connection', (client) => {
+  client.on('disconnect', () => {})
+  client.on('disconnect', () => {})
+})
+
+interceptStdout((msg) => {
+  io.emit('log_message', { type: 'DEBUG', timestamp: new Date().toLocaleTimeString(), msg: msg })
+  return msg
+}, (errMsg) => {
+  io.emit('log_message', { type: 'ERROR', timestamp: new Date().toLocaleTimeString(), msg: errMsg })
+  return errMsg
+})

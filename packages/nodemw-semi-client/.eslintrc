@@ -1,0 +1,28 @@
+{
+  "parser": "babel-eslint",
+  "plugins": [
+    "react"
+  ],
+  "extends": [
+    "standard",
+    "plugin:react/recommended",
+    "standard-react"
+  ],
+  "rules": {
+    "react/jsx-max-props-per-line": [
+      1,
+      {
+        "maximum": 1,
+        "when": "always"
+      }
+    ],
+    "react/jsx-closing-bracket-location": [
+      2,
+      "line-aligned"
+    ],
+    "react/jsx-first-prop-new-line": [
+      2,
+      "multiline-multiprop"
+    ]
+  }
+}

@@ -121,6 +121,7 @@ export default class index extends Component {
           <Button
             color='primary'
             onClick={this.emptyList}
+            disabled={terminalHeight <= 0}
           >
             <ClearAllIcon />
               Empty

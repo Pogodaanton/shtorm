@@ -9,13 +9,17 @@
     "serve": "node dist/index.js"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
     "intercept-stdout": "^0.1.2",
+    "lowdb": "^1.0.0",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3",
     "@babel/node": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/preset-env": "^7.4.3",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
@@ -27,6 +31,9 @@
     "nodemon": "^1.18.10"
   },
   "nodemonConfig": {
-    "verbose": false
+    "verbose": false,
+    "ignore": [
+      "db"
+    ]
   }
 }

@@ -1,0 +1,13 @@
+@import '../variables.scss';
+.paper.paper-config {
+  height: calc(100% - #{$terminal-header-height} - 5px);
+
+  .bot-config-select-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    opacity: .5;
+  }
+}

@@ -1,3 +1,5 @@
 {
-  "socketAdress": "localhost:8000"
+  "prefix": "http://",
+  "socketAdress": "localhost:8000",
+  "apiAdress": "/api/v1/"
 }

@@ -6,6 +6,7 @@ import Header from '../Header'
 import Home from '../Home'
 import NotFound from '../NotFound'
 import Terminal from '../Terminal'
+import BotConfigs from '../BotConfigs'
 import './App.scss'
 
 // const App = () => <div>Hello World!</div>
@@ -19,12 +20,24 @@ class App extends Component {
         <Grid
           container
           className='content'
+          justify='center'
+          alignContent='stretch'
+          spacing={16}
         >
           <Switch>
             <Route
               exact
               path='/'
               component={Home}
+            />
+            <Route
+              path='/configs'
+              component={BotConfigs}
+              exact
+            />
+            <Route
+              path='/configs/:id'
+              component={BotConfigs}
             />
             <Route
               path='/'

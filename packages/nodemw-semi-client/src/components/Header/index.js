@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { AppBar, Typography, Toolbar, IconButton, Tooltip } from '@material-ui/core'
-import BuildIcon from '@material-ui/icons/Build'
+import { AppBar, Typography, Toolbar } from '@material-ui/core'
+import { Build, Home } from '@material-ui/icons'
+import HeaderLink from './HeaderLink'
+import './Header.scss'
 
 export default class index extends Component {
   render () {
@@ -24,17 +26,34 @@ export default class index extends Component {
                 component={() => 'Dashboard'}
               />
               <Route
+                path='/configs'
+                component={() => 'Bot configs'}
+              />
+              <Route
                 path='/'
                 component={() => '404: Not found'}
               />
             </Switch>
           </Typography>
           <div className='fill-space' />
-          <Tooltip title='Edit bot configs'>
-            <IconButton color='inherit'>
-              <BuildIcon />
-            </IconButton>
-          </Tooltip>
+          <Switch>
+            <Route
+              path='/configs'
+              component={() => <HeaderLink
+                icon={Home}
+                to='/'
+                tooltip='Go back to Dashboard'
+              />}
+            />
+            <Route
+              path='/'
+              component={() => <HeaderLink
+                icon={Build}
+                to='/configs'
+                tooltip='Edit bot configs'
+              />}
+            />
+          </Switch>
         </Toolbar>
       </AppBar>
     )

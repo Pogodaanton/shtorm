@@ -92,13 +92,13 @@ export default class index extends Component {
   onHandleMouseUp = (e) => {
     if (this.state.isDraggingHeader) {
       const { terminalHeight, setDesiredTerminalHeight } = this.context
-      document.removeEventListener('mousemove', this.onHandleMouseMove)
       if (terminalHeight > 10) setDesiredTerminalHeight(terminalHeight)
-
-      this.setState({
-        isDraggingHeader: false
-      })
     }
+
+    document.removeEventListener('mousemove', this.onHandleMouseMove)
+    this.setState({
+      isDraggingHeader: false
+    })
   }
 
   render () {
@@ -106,7 +106,10 @@ export default class index extends Component {
     const { terminalHeight } = this.context
     return (
       <Paper className='paper paper-window paper-terminal'>
-        <header ref={this.header}>
+        <header
+          id='terminalHeader'
+          ref={this.header}
+        >
           <LineWeightIcon />
           <Typography variant='h6'>Terminal</Typography>
           <div className='spacing' />

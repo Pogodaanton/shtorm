@@ -91,7 +91,10 @@ export default class index extends Component {
 
   onHandleMouseUp = (e) => {
     if (this.state.isDraggingHeader) {
+      const { terminalHeight, setDesiredTerminalHeight } = this.context
       document.removeEventListener('mousemove', this.onHandleMouseMove)
+      if (terminalHeight > 10) setDesiredTerminalHeight(terminalHeight)
+
       this.setState({
         isDraggingHeader: false
       })

@@ -53,10 +53,11 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-**/yarn.lock
+yarn.lock
 
 # compiled folders
 dist
+db
 
 # dotenv environment variables file
 .env

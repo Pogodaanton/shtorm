@@ -3,7 +3,7 @@ import FileSync from 'lowdb/adapters/FileSync'
 
 class ConfigController {
   constructor () {
-    this.adapter = new FileSync('db/nodemw-configs.json')
+    this.adapter = new FileSync('db/nodemw-db.json')
     this.db = low(this.adapter)
     this.db.defaults({ configs: [] }).write()
   }

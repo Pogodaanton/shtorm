@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { Grid, Paper, Snackbar } from '@material-ui/core'
-import { MultiContext } from '../MultiContext'
 import BotConfigEditor from './BotConfigEditor'
 import BotConfigSelect from './BotConfigSelect'
 import BotConfigList from './BotConfigList'
@@ -9,8 +8,6 @@ import Api from '../Api'
 import './BotConfigs.scss'
 
 export default class BotConfigs extends Component {
-  static contextType = MultiContext
-
   state = {
     configList: [],
     configListLoaded: false,
@@ -24,7 +21,6 @@ export default class BotConfigs extends Component {
 
   componentDidMount = () => {
     this.getAllConfigs()
-    this.context.setTerminalHeight(0)
   }
 
   getAllConfigs = () => {

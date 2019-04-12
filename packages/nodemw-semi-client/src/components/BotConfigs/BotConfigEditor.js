@@ -16,6 +16,7 @@ export default class BotConfigEditor extends Component {
   }
 
   static getDerivedStateFromProps = (props, lastState, b, c) => {
+    console.log('updating')
     if (typeof props.config !== 'object') return null
     if (props.config.name === lastState.key) return null
     if (lastState.saveState === 'Save' && !window.confirm('You have unsaved changes. Are you sure you want to leave?')) return null

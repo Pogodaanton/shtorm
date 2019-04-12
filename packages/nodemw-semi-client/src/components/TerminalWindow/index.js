@@ -18,9 +18,11 @@ export default class index extends Component {
   List = createRef()
   AutoSizer = createRef()
 
-  componentDidUpdate = () => {
-    this.List.current.forceUpdate()
-    this.List.current.forceUpdateGrid()
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps.disableTransition !== this.props.disableTransition) {
+      this.List.current.forceUpdate()
+      this.List.current.forceUpdateGrid()
+    }
   }
 
   rowRenderer = ({
@@ -61,7 +63,7 @@ export default class index extends Component {
         }}
       >
         <AutoSizer ref={this.AutoSizer}>
-          {({ height, width }) => {
+          {({ width }) => {
             this.terminalWidth = width
             return (
               <List

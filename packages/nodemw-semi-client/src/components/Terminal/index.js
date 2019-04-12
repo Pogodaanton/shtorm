@@ -1,17 +1,22 @@
 import React, { Component, Fragment, createRef } from 'react'
+import { withRouter } from 'react-router-dom'
 import { Paper, Typography, Button } from '@material-ui/core'
 import LineWeightIcon from '@material-ui/icons/LineWeight'
 import ClearAllIcon from '@material-ui/icons/ClearAll'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import ExpandLessIcon from '@material-ui/icons/ExpandLess'
 import TerminalWindow from '../TerminalWindow'
+import PropTypes from 'prop-types'
 import { MultiContext } from '../MultiContext'
 import io from 'socket.io-client'
 import config from '../../config.json'
 import './Terminal.scss'
 
-export default class index extends Component {
+class Terminal extends Component {
   static contextType = MultiContext
+  static propTypes = {
+    location: PropTypes.object
+  }
 
   state = {
     terminalLines: [],
@@ -20,12 +25,24 @@ export default class index extends Component {
 
   socket = io(config.socketAdress)
 
-  componentWillMount = () => {
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps !== this.props && prevProps.location.pathname !== this.props.location.pathname) this.checkMinify()
+  }
+
+  checkMinify = () => {
+    const minifyLocation = 'configs'
+    if (this.props.location.pathname.substr(1, minifyLocation.length) === minifyLocation) this.context.setTerminalHeight(0)
+    else this.context.setTerminalHeight(this.context.desiredTerminalHeight)
+  }
+
+  componentDidMount = () => {
     this.socket.on('connect', () => this.addLine({ msg: `Connected to socket. (${config.socketAdress})` }))
     this.socket.on('log_message', this.addLine)
 
     document.addEventListener('mousedown', this.onHandleMouseDown)
     document.addEventListener('mouseup', this.onHandleMouseUp)
+
+    this.checkMinify()
   }
 
   componentWillUnmount = () => {
@@ -142,3 +159,5 @@ export default class index extends Component {
     )
   }
 }
+
+export default withRouter(Terminal)

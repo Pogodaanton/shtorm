@@ -1,16 +1,10 @@
 import React, { Component } from 'react'
 import { List, ListItem, ListItemIcon, ListItemText, Divider, CircularProgress } from '@material-ui/core'
 import { Add, Dns } from '@material-ui/icons'
-import axios from 'axios'
-import Api from '../Api'
 import PropTypes from 'prop-types'
 
 export default class BotConfigList extends Component {
-  // static contextType = MultiContext
   static propTypes = {
-    configList: PropTypes.array,
-    selectedConfig: PropTypes.string,
-    configListLoaded: PropTypes.bool,
     onListItemSelect: PropTypes.func.isRequired
   }
 
@@ -32,17 +26,6 @@ export default class BotConfigList extends Component {
   }
 
   static getDerivedStateFromProps = (props, oldState) => {
-    /*
-    if (props.selectedConfig === oldState.selectedConfig || !oldState.configListLoaded) return null
-
-    const { configList } = oldState
-    const { selectedConfig } = props
-    if (configList.findIndex((item) => item === selectedConfig) < 0) {
-      configList.unshift(selectedConfig)
-    }
-
-    return { selectedConfig, configList }
-    */
     return { configList: props.configList, selectedConfig: props.selectedConfig, configListLoaded: props.configListLoaded }
   }
 

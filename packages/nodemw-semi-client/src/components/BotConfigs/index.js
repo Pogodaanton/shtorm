@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Grid, Paper, Snackbar } from '@material-ui/core'
+import { Grid, Paper } from '@material-ui/core'
 import BotConfigEditor from './BotConfigEditor'
 import BotConfigSelect from './BotConfigSelect'
 import BotConfigList from './BotConfigList'
@@ -12,11 +12,7 @@ export default class BotConfigs extends Component {
     configList: [],
     configListLoaded: false,
     currentConfig: null,
-    selectedConfig: null,
-    snackbar: {
-      msg: '',
-      isOpen: false
-    }
+    selectedConfig: null
   }
 
   componentDidMount = () => {
@@ -67,7 +63,7 @@ export default class BotConfigs extends Component {
   }
 
   render () {
-    const { configList, configListLoaded, currentConfig, selectedConfig, snackbar } = this.state
+    const { configList, configListLoaded, currentConfig, selectedConfig } = this.state
     return (
       <Fragment>
         <Grid
@@ -103,18 +99,6 @@ export default class BotConfigs extends Component {
             /> : <BotConfigSelect />}
           </Paper>
         </Grid>
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center'
-          }}
-          open={snackbar.isOpen}
-          autoHideDuration={6000}
-          ContentProps={{
-            'aria-describedby': 'message-id'
-          }}
-          message={snackbar.msg}
-        />
       </Fragment>
     )
   }

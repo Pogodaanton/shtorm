@@ -15,14 +15,33 @@ export default class index extends Component {
     disableTransition: PropTypes.bool
   }
 
+  resizeTimer = null
   List = createRef()
   AutoSizer = createRef()
 
-  componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.disableTransition !== this.props.disableTransition) {
+  forceUpdate = () => {
+    if (typeof this.List.current !== 'undefined') {
+      cache.clearAll()
       this.List.current.forceUpdate()
       this.List.current.forceUpdateGrid()
     }
+  }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps.disableTransition !== this.props.disableTransition) this.forceUpdate()
+  }
+
+  componentDidMount = () => {
+    window.addEventListener('resize', this.onWindowResize)
+  }
+
+  componentWillUnmount = () => {
+    window.removeEventListener('resize', this.onWindowResize)
+  }
+
+  onWindowResize = (e) => {
+    if (this.resizeTimer) clearTimeout(this.resizeTimer)
+    this.resizeTimer = setTimeout(this.forceUpdate, 200)
   }
 
   rowRenderer = ({

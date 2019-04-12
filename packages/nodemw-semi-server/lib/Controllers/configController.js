@@ -17,7 +17,7 @@ class ConfigController {
   }
 
   requestConfig = (req, res) => {
-    const data = this.getConfig(req.query.id)
+    const data = this.getConfig(req.query.name)
     if (data) {
       return res.status(200).send({
         success: true,
@@ -40,12 +40,69 @@ class ConfigController {
     })
   }
 
-  getAllConfigs = () => {
-    return this.db.get('configs').value()
+  requestSaveConfig = (req, res) => {
+    const { key, config } = req.body
+
+    if (typeof config !== 'object') {
+      return res.status(400).send({
+        success: false,
+        message: 'Config is required or is in wrong format!'
+      })
+    }
+
+    if (!config.name || !key) {
+      return res.status(400).send({
+        success: false,
+        message: 'Name is required!'
+      })
+    }
+
+    const configs = this.db.get('configs')
+    const existingConfig = configs.find({ name: key })
+
+    if (!existingConfig.value()) configs.unshift({ ...req.body }).write()
+    else existingConfig.assign({ ...config }).write()
+
+    return res.status(201).send({
+      success: true,
+      message: 'Config successfully saved!',
+      data: req.body
+    })
   }
 
-  getConfig = (configName = '') => {
-    return this.db.get('configs').find({ key: configName }).value()
+  requestDeleteConfig = (req, res) => {
+    const { key } = req.body
+
+    if (!key) {
+      return res.status(400).send({
+        success: false,
+        message: 'Name is required!'
+      })
+    }
+
+    if (!this.getConfig(key)) {
+      return res.status(410).send({
+        success: false,
+        message: 'Name not found in database!'
+      })
+    }
+
+    this.db.get('configs')
+      .remove({ name: key })
+      .write()
+
+    return res.status(201).send({
+      success: true,
+      message: 'Config successfully removed!'
+    })
+  }
+
+  getAllConfigs = () => {
+    return this.db.get('configs').map(({ name }) => { return { name, fromServer: true } }).value()
+  }
+
+  getConfig = (name = '') => {
+    return this.db.get('configs').find({ name }).value()
   }
 }
 

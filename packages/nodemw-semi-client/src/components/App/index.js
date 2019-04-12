@@ -36,7 +36,7 @@ class App extends Component {
               exact
             />
             <Route
-              path='/configs/:id'
+              path='/configs/:name'
               component={BotConfigs}
             />
             <Route

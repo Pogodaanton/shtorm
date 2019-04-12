@@ -1,3 +1,5 @@
+@import '../variables.scss';
+
 html, body, #root, .content {
   height: 100%;
   overflow-x: hidden;
@@ -11,6 +13,7 @@ html, body, #root, .content {
 
 .content {
   padding: 10px 15px;
+  max-height: 100%;
 }
 
 .fill-space { flex-grow: 1 }
@@ -36,4 +39,10 @@ html, body, #root, .content {
 
 .js-focus-visible :focus:not(.focus-visible) {
   outline: none;
+}
+
+@media (min-width: 600px) {
+  .content {
+    max-height: calc(100vh - #{$terminal-header-height + 64px});
+  }
 }

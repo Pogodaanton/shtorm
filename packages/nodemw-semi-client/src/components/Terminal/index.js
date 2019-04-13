@@ -12,7 +12,7 @@ import config from '../../config.json'
 import './Terminal.scss'
 import DefaultGridContainer from '../DefaultGridContainer/index'
 
-const minTerminalHeight = 53
+let minTerminalHeight = 53
 export default class Terminal extends Component {
   static contextType = TerminalContext
   state = {

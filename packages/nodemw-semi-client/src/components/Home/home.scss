@@ -1,5 +1,8 @@
 .paper.paper-preset-selector {
+  display: flex;
+  flex-direction: column;
   overflow: auto;
+  position: relative;
   padding: {
     top: 15px;
     bottom: 15px;
@@ -16,5 +19,15 @@
       margin-right: 10px;
       &:last-child { margin-right: 0; }
     }
+  }
+
+  .preset-selector-presets {
+    flex-grow: 1;
+  }
+
+  > a {
+    position: absolute;
+    right: 20px;
+    bottom: 15px
   }
 }

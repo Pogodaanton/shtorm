@@ -1,16 +1,31 @@
 import React, { Component } from 'react'
-import { Paper, Typography, Divider, Chip, Avatar } from '@material-ui/core'
+import { Link } from 'react-router-dom'
+import { Paper, Typography, Divider, Chip, Avatar, Fab } from '@material-ui/core'
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile'
+import AddIcon from '@material-ui/icons/Add'
+import PropTypes from 'prop-types'
 import NoPresets from './NoPresets'
 import Api from '../Api/index'
 import axios from 'axios'
 import './home.scss'
 import DefaultGridItem from '../DefaultGridItem/index'
+import AddPreset from '../AddPreset'
 
 export default class index extends Component {
+  static propTypes = {
+    history: PropTypes.object.isRequired
+  }
+
   state = {
+    location: {},
     presets: [],
     scripts: []
+  }
+
+  static getDerivedStateFromProps = (nextProps, prevState) => {
+    if (typeof prevState.location.pathname === 'undefined' || nextProps.location.pathname !== prevState.location.pathname) {
+      return { location: nextProps.location }
+    } else return null
   }
 
   componentDidMount = () => {
@@ -20,7 +35,6 @@ export default class index extends Component {
   getAllPresets = () => {
     axios.get(Api.getApiUrl('getAllPresets'))
       .then((res) => {
-        console.log(res)
         if (Api.axiosCheckResponse(res)) {
           const { presets, scripts } = res.data.data
           this.setState({ presets, scripts })
@@ -30,7 +44,7 @@ export default class index extends Component {
   }
 
   render () {
-    const { presets, scripts } = this.state
+    const { presets, scripts, location } = this.state
 
     return (
       <DefaultGridItem name='home'>
@@ -55,7 +69,15 @@ export default class index extends Component {
           <div className='preset-selector-presets'>
             {presets.length > 0 ? presets.map(({ name }, index) => null) : <NoPresets />}
           </div>
+          <Fab
+            color='primary'
+            component={Link}
+            to='/add'
+          >
+            <AddIcon />
+          </Fab>
         </Paper>
+        {(typeof location.pathname !== 'undefined' && location.pathname === '/add') && <AddPreset history={this.props.history} />}
       </DefaultGridItem>
     )
   }

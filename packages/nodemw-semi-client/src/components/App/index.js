@@ -25,6 +25,10 @@ class App extends Component {
                 component={Home}
               />
               <Route
+                path='/add'
+                component={Home}
+              />
+              <Route
                 path='/configs'
                 component={BotConfigs}
                 exact

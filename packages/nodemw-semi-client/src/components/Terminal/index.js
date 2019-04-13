@@ -1,38 +1,29 @@
 import React, { Component, Fragment, createRef } from 'react'
-import { withRouter } from 'react-router-dom'
 import { Paper, Typography, Button } from '@material-ui/core'
+import { TerminalContext } from '../../contexts/TerminalContext'
 import LineWeightIcon from '@material-ui/icons/LineWeight'
 import ClearAllIcon from '@material-ui/icons/ClearAll'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import ExpandLessIcon from '@material-ui/icons/ExpandLess'
+import DefaultGridItem from '../DefaultGridItem/index'
 import TerminalWindow from '../TerminalWindow'
-import PropTypes from 'prop-types'
-import { MultiContext } from '../MultiContext'
 import io from 'socket.io-client'
 import config from '../../config.json'
 import './Terminal.scss'
+import DefaultGridContainer from '../DefaultGridContainer/index'
 
-class Terminal extends Component {
-  static contextType = MultiContext
-  static propTypes = {
-    location: PropTypes.object
-  }
-
+export default class Terminal extends Component {
+  static contextType = TerminalContext
   state = {
+    isOpened: false,
     terminalLines: [],
     isDraggingHeader: false
   }
 
+  headerRef = createRef()
   socket = io(config.socketAdress)
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps !== this.props && prevProps.location.pathname !== this.props.location.pathname) this.checkMinify()
-  }
-
-  checkMinify = () => {
-    const minifyLocation = 'configs'
-    if (this.props.location.pathname.substr(1, minifyLocation.length) === minifyLocation) this.context.setTerminalHeight(0)
-    else this.context.setTerminalHeight(this.context.desiredTerminalHeight)
   }
 
   componentDidMount = () => {
@@ -41,8 +32,6 @@ class Terminal extends Component {
 
     document.addEventListener('mousedown', this.onHandleMouseDown)
     document.addEventListener('mouseup', this.onHandleMouseUp)
-
-    this.checkMinify()
   }
 
   componentWillUnmount = () => {
@@ -90,14 +79,13 @@ class Terminal extends Component {
   }
 
   mouseDownCapture = { y: 0 }
-  header = createRef()
 
   onHandleMouseMove = (e) => {
     const { y, terminalHeight } = this.mouseDownCapture
     const { clientY } = e
 
     const differenceY = y - clientY
-    const boundaryTop = window.innerHeight - (document.getElementById('page-header').clientHeight + this.header.current.clientHeight + 15)
+    const boundaryTop = window.innerHeight - (document.getElementById('page-header').clientHeight + this.headerRef.current.clientHeight + 15)
     const newTerminalSize = Math.max(Math.min(terminalHeight + differenceY, boundaryTop), 0)
     this.context.setTerminalHeight(newTerminalSize)
 
@@ -119,45 +107,52 @@ class Terminal extends Component {
   }
 
   render () {
-    const { terminalLines, isDraggingHeader } = this.state
-    const { terminalHeight } = this.context
+    const { isOpened, terminalLines } = this.state
+    const gridContainerStyle = {
+      flexBasis: this.context.terminalHeight
+    }
+
     return (
-      <Paper className='paper paper-window paper-terminal'>
-        <header
-          id='terminalHeader'
-          ref={this.header}
-        >
-          <LineWeightIcon />
-          <Typography variant='h6'>Terminal</Typography>
-          <div className='spacing' />
-          <Button
-            onClick={this.toggleTerminal}
-          >
-            {terminalHeight > 0 ? <Fragment>
-              <ExpandMoreIcon />
-                Close
-            </Fragment> : <Fragment>
-              <ExpandLessIcon />
-                Open
-            </Fragment> }
-          </Button>
-          <Button
-            color='primary'
-            onClick={this.emptyList}
-            disabled={terminalHeight <= 0}
-          >
-            <ClearAllIcon />
-              Empty
-          </Button>
-        </header>
-        <TerminalWindow
-          rows={terminalLines}
-          height={terminalHeight}
-          disableTransition={isDraggingHeader}
-        />
-      </Paper>
+      <DefaultGridContainer
+        name='terminal'
+        style={gridContainerStyle}
+      >
+        <DefaultGridItem name='terminal'>
+          <Paper className='paper paper-window paper-terminal'>
+            <header
+              id='terminalHeader'
+              ref={this.headerRef}
+            >
+              <LineWeightIcon />
+              <Typography variant='h6'>Terminal</Typography>
+              <div className='spacing' />
+              <Button
+                onClick={this.toggleTerminal}
+              >
+                {isOpened ? <Fragment>
+                  <ExpandMoreIcon />
+                  Close
+                </Fragment> : <Fragment>
+                  <ExpandLessIcon />
+                  Open
+                </Fragment> }
+              </Button>
+              <Button
+                color='primary'
+                onClick={this.emptyList}
+                disabled={isOpened}
+              >
+                <ClearAllIcon />
+                Empty
+              </Button>
+            </header>
+            <TerminalWindow
+              rows={terminalLines}
+              disableTransition
+            />
+          </Paper>
+        </DefaultGridItem>
+      </DefaultGridContainer>
     )
   }
 }
-
-export default withRouter(Terminal)

@@ -5,22 +5,42 @@ html, body, #root, .content {
   overflow-x: hidden;
 }
 
+
 #root {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
+
 .content {
-  padding: 10px 15px;
+  position: relative;
   max-height: 100%;
+  padding: 10px 15px;
+
+  &.content-flex {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grid-container-main {
+    height: 0px;
+    flex-grow: 1;
+    overflow: hidden;
+
+    > div > .paper {
+      padding: 10px 15px;
+      &.paper-config-list { padding: 10px; }
+    }
+
+    > div, > div .paper {
+      height: calc(100% - 10px);
+    }
+  }
 }
 
-.fill-space { flex-grow: 1 }
-
 .paper {
-  padding: 10px 15px;
-
+  /*
   &.paper-window {
     display: flex;
     flex-direction: column;
@@ -35,14 +55,23 @@ html, body, #root, .content {
       > svg { margin-right: 10px; }
     }
   }
+  */
 }
 
-.js-focus-visible :focus:not(.focus-visible) {
-  outline: none;
+.fill-space { flex-grow: 1 }
+.js-focus-visible :focus:not(.focus-visible) { outline: none; }
+
+.spotlight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: .5;
 }
 
 @media (min-width: 600px) {
   .content {
-    max-height: calc(100vh - #{$terminal-header-height + 64px});
+    // max-height: calc(100vh - #{$terminal-header-height + 64px});
+    max-height: calc(100vh - 64px);
   }
 }

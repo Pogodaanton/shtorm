@@ -62,5 +62,9 @@ db
 # dotenv environment variables file
 .env
 
+# Old code & folders
+*.old
+**.old.**
+
 # next.js build output
 .next

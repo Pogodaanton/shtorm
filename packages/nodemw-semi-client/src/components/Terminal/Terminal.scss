@@ -1,14 +1,23 @@
 @import '../variables.scss';
-.paper.paper-terminal {
-  padding: 0;
-  position: absolute;
-  width: calc(100% - 30px);
-  bottom: 0;
-  z-index: 1000;
+.content .grid-container-terminal .grid-item-terminal {
+  padding-bottom: 0;
 
-  > header {
-    height: $terminal-header-height;
-    cursor: row-resize;
-    user-select: none;
+  .paper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    > header {
+      height: $terminal-header-height;
+      cursor: row-resize;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      padding: 6px 15px;
+
+      > .spacing { flex-grow: 1; }
+      > svg { margin-right: 10px; }
+    }
   }
 }

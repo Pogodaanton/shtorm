@@ -1,8 +1,10 @@
 .terminal-window {
+  display: flex;
+  flex-direction: column;
   background: black;
+  height: 100%;
   font-family: "Lucida Console", Monaco, monospace;
   width: 100%;
-  transition: height .2s;
 
   .terminal-item {
     font-size: 15px;

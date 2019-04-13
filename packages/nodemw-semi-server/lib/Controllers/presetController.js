@@ -1,16 +1,17 @@
 import DatabaseController from './databaseController'
+import ScriptController from './scriptController'
 
-class ConfigController {
+class PresetController {
   constructor () {
-    this.db = DatabaseController.getDatabase('configs')
+    this.db = DatabaseController.getDatabase('presets')
   }
 
-  requestConfig = (req, res) => {
-    const data = this.getConfig(req.query.name)
+  requestPreset = (req, res) => {
+    const data = this.getPreset(req.query.name)
     if (data) {
       return res.status(200).send({
         success: true,
-        message: 'Config successfully requested.',
+        message: 'Preset successfully requested.',
         data
       })
     } else {
@@ -21,21 +22,24 @@ class ConfigController {
     }
   }
 
-  requestAllConfigs = (req, res) => {
+  requestAllPresets = (req, res) => {
     return res.status(200).send({
       success: true,
-      message: 'Configs successfully requested.',
-      data: this.getAllConfigs()
+      message: 'Presets successfully requested.',
+      data: {
+        presets: this.getAllPresets(),
+        scripts: ScriptController.getAllScripts()
+      }
     })
   }
 
-  requestSaveConfig = (req, res) => {
+  requestSavePreset = (req, res) => {
     const { key, config } = req.body
 
     if (typeof config !== 'object') {
       return res.status(400).send({
         success: false,
-        message: 'Config is required or is in wrong format!'
+        message: 'Preset is required or is in wrong format!'
       })
     }
 
@@ -46,19 +50,19 @@ class ConfigController {
       })
     }
 
-    const existingConfig = this.db.find({ name: key })
+    const existingPreset = this.db.find({ name: key })
 
-    if (!existingConfig.value()) this.db.unshift({ ...req.body }).write()
-    else existingConfig.assign({ ...config }).write()
+    if (!existingPreset.value()) this.db.unshift({ ...req.body }).write()
+    else existingPreset.assign({ ...config }).write()
 
     return res.status(201).send({
       success: true,
-      message: 'Config successfully saved!',
+      message: 'Preset successfully saved!',
       data: req.body
     })
   }
 
-  requestDeleteConfig = (req, res) => {
+  requestDeletePreset = (req, res) => {
     const { key } = req.body
 
     if (!key) {
@@ -68,7 +72,7 @@ class ConfigController {
       })
     }
 
-    if (!this.getConfig(key)) {
+    if (!this.getPreset(key)) {
       return res.status(410).send({
         success: false,
         message: 'Name not found in database!'
@@ -81,18 +85,18 @@ class ConfigController {
 
     return res.status(201).send({
       success: true,
-      message: 'Config successfully removed!'
+      message: 'Preset successfully removed!'
     })
   }
 
-  getAllConfigs = () => {
-    return this.db.map(({ name }) => { return { name, fromServer: true } }).value()
+  getAllPresets = () => {
+    return this.db.map(({ name, logo, configName }) => { return { name, logo, configName } }).value()
   }
 
-  getConfig = (name = '') => {
+  getPreset = (name = '') => {
     return this.db.find({ name }).value()
   }
 }
 
-const configController = new ConfigController()
-export default configController
+const presetController = new PresetController()
+export default presetController

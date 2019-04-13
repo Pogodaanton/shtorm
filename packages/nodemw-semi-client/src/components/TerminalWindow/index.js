@@ -19,6 +19,10 @@ export default class index extends Component {
   List = createRef()
   AutoSizer = createRef()
 
+  state = {
+    height: 0
+  }
+
   forceUpdate = () => {
     if (typeof this.List.current !== 'undefined') {
       cache.clearAll()
@@ -28,7 +32,7 @@ export default class index extends Component {
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.disableTransition !== this.props.disableTransition) this.forceUpdate()
+    if (prevProps.disableTransition !== this.props.disableTransition) this.onWindowResize()
   }
 
   componentDidMount = () => {
@@ -74,31 +78,22 @@ export default class index extends Component {
 
   render () {
     return (
-      <div
-        className='terminal-window'
-        style={{
-          height: this.props.height,
-          transitionDuration: this.props.disableTransition ? '0s' : '.2s'
-        }}
-      >
-        <AutoSizer ref={this.AutoSizer}>
-          {({ width }) => {
-            this.terminalWidth = width
-            return (
-              <List
-                ref={this.List}
-                width={width}
-                height={this.props.height - 10}
-                rowCount={this.props.rows.length}
-                deferredMeasurementCache={cache}
-                rowHeight={cache.rowHeight}
-                rowRenderer={this.rowRenderer}
-                style={{
-                  marginTop: 5
-                }}
-              />
-            )
-          }}
+      <div className='terminal-window' >
+        <AutoSizer>
+          {({ width, height }) => (
+            <List
+              ref={this.List}
+              width={width}
+              height={height - 10}
+              rowCount={this.props.rows.length}
+              deferredMeasurementCache={cache}
+              rowHeight={cache.rowHeight}
+              rowRenderer={this.rowRenderer}
+              style={{
+                marginTop: 5
+              }}
+            />
+          )}
         </AutoSizer>
       </div>
     )

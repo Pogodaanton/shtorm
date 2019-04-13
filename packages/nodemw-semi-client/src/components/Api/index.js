@@ -1,6 +1,11 @@
 import config from '../../config.json'
 
 class Api {
+  axiosCheckResponse (res) {
+    if (typeof res !== 'undefined' && typeof res.data !== 'undefined' && typeof res.data.data !== 'undefined') return true
+    return false
+  }
+
   axiosErrorHandler (err) {
     let errMsg = err.toString()
     if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined' && typeof err.response.data.message !== 'undefined') {

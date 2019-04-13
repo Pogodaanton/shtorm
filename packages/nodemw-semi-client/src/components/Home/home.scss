@@ -1,0 +1,20 @@
+.paper.paper-preset-selector {
+  overflow: auto;
+  padding: {
+    top: 15px;
+    bottom: 15px;
+  }
+
+  > * {
+    margin-bottom: 10px;
+    &:last-child { margin-bottom: 0; }
+  }
+  > h5 { margin-bottom: 0; }
+
+  .preset-selector-scripts {
+    > span, .preset-selector-scripts-chip {
+      margin-right: 10px;
+      &:last-child { margin-right: 0; }
+    }
+  }
+}

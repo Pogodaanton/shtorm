@@ -33,7 +33,12 @@ export default class BotConfigs extends Component {
         if (typeof res.data.data === 'undefined' || !res.data.success) throw new Error('Wrong answer received!')
         this.setState({ currentConfig: { ...res.data.data, saveState: 'Saved' } })
       })
-      .catch(Api.axiosErrorHandler)
+      .catch((err) => {
+        if (err.response.status === 410) {
+          this.setState({ currentConfig: null })
+          this.getAllConfigs()
+        } else Api.axiosErrorHandler(err)
+      })
   }
 
   updateConfigList = (exception) => {

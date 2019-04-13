@@ -12,6 +12,7 @@ import config from '../../config.json'
 import './Terminal.scss'
 import DefaultGridContainer from '../DefaultGridContainer/index'
 
+const minTerminalHeight = 53
 export default class Terminal extends Component {
   static contextType = TerminalContext
   state = {
@@ -60,9 +61,9 @@ export default class Terminal extends Component {
   }
 
   toggleTerminal = () => {
-    if (this.context.terminalHeight > 0) {
+    if (this.context.terminalHeight > minTerminalHeight) {
       this.context.setDesiredTerminalHeight()
-      this.context.setTerminalHeight(0)
+      this.context.setTerminalHeight(minTerminalHeight)
     } else this.context.setTerminalHeight(this.context.desiredTerminalHeight)
   }
 
@@ -107,9 +108,10 @@ export default class Terminal extends Component {
   }
 
   render () {
-    const { isOpened, terminalLines } = this.state
+    const { terminalLines } = this.state
+    const isOpened = (this.context.terminalHeight <= minTerminalHeight)
     const gridContainerStyle = {
-      flexBasis: this.context.terminalHeight
+      flexBasis: Math.max(this.context.terminalHeight, minTerminalHeight)
     }
 
     return (
@@ -129,7 +131,7 @@ export default class Terminal extends Component {
               <Button
                 onClick={this.toggleTerminal}
               >
-                {isOpened ? <Fragment>
+                {!isOpened ? <Fragment>
                   <ExpandMoreIcon />
                   Close
                 </Fragment> : <Fragment>

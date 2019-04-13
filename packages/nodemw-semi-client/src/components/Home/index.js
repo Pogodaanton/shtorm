@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Grid, Paper, Typography, Divider, Chip, Avatar } from '@material-ui/core'
+import { Paper, Typography, Divider, Chip, Avatar } from '@material-ui/core'
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile'
 import NoPresets from './NoPresets'
 import Api from '../Api/index'

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core'
 import { theme } from '../../themes/dark'
-import TerminalContextProvider, { TerminalContext } from '../../contexts/TerminalContext'
+import TerminalContextProvider from '../../contexts/TerminalContext'
 import DefaultGridContainer from '../DefaultGridContainer'
 import Header from '../Header'
 import Home from '../Home'
@@ -10,27 +10,6 @@ import NotFound from '../NotFound'
 import Terminal from '../Terminal'
 import BotConfigs from '../BotConfigs'
 import './App.scss'
-
-class PanelPaddingBuffer extends Component {
-  static contextType = TerminalContext
-
-  state = {
-    bufferSize: 0
-  }
-
-  render () {
-    const bufferStyle = {
-      padding: this.state.bufferSize
-    }
-
-    return (
-      <div
-        className='panel-buffer'
-        style={bufferStyle}
-      />
-    )
-  }
-}
 
 class App extends Component {
   render () {

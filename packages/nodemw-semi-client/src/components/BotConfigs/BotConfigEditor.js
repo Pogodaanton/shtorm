@@ -41,7 +41,7 @@ export default class BotConfigEditor extends Component {
     name: '',
     protocol: 'https', // default to 'http'
     server: '', // host name of MediaWiki-powered site
-    path: '/', // path to api.php script
+    path: '', // path to api.php script
     debug: false, // is more verbose when set to true
     username: '', // account to be used when logIn is called (optional)
     password: '', // password to be used when logIn is called (optional)
@@ -56,7 +56,6 @@ export default class BotConfigEditor extends Component {
   }
 
   onButtonClick = name => e => {
-    console.log({ name, e })
     if (name === 'save') this.saveConfig()
     if (name === 'delete') this.deleteConfig()
   }

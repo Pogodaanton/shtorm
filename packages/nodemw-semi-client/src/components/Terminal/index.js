@@ -87,7 +87,7 @@ export default class Terminal extends Component {
 
     const differenceY = y - clientY
     const boundaryTop = window.innerHeight - (document.getElementById('page-header').clientHeight + this.headerRef.current.clientHeight + 15)
-    const newTerminalSize = Math.max(Math.min(terminalHeight + differenceY, boundaryTop), 0)
+    const newTerminalSize = Math.max(Math.min(terminalHeight + differenceY, boundaryTop), minTerminalHeight)
     this.context.setTerminalHeight(newTerminalSize)
 
     this.setState({
@@ -98,20 +98,20 @@ export default class Terminal extends Component {
   onHandleMouseUp = (e) => {
     if (this.state.isDraggingHeader) {
       const { terminalHeight, setDesiredTerminalHeight } = this.context
-      if (terminalHeight > 10) setDesiredTerminalHeight(terminalHeight)
-    }
+      if (terminalHeight > minTerminalHeight + 10) setDesiredTerminalHeight(terminalHeight)
 
+      this.setState({
+        isDraggingHeader: false
+      })
+    }
     document.removeEventListener('mousemove', this.onHandleMouseMove)
-    this.setState({
-      isDraggingHeader: false
-    })
   }
 
   render () {
     const { terminalLines } = this.state
     const isOpened = (this.context.terminalHeight <= minTerminalHeight)
     const gridContainerStyle = {
-      flexBasis: Math.max(this.context.terminalHeight, minTerminalHeight)
+      flexBasis: this.context.terminalHeight
     }
 
     return (

@@ -15,9 +15,9 @@ class PresetController {
         data
       })
     } else {
-      return res.status(404).send({
+      return res.status(410).send({
         success: false,
-        message: 'The requested config was not found!'
+        message: 'The requested preset was not found!'
       })
     }
   }

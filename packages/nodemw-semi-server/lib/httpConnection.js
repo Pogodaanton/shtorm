@@ -16,5 +16,6 @@ router.get('/api/v1/getAllPresets', presetController.requestAllPresets)
 
 // Scripts
 router.get('/api/v1/getAllScripts', scriptController.requestAllScripts)
+router.get('/api/v1/getScriptOptions', scriptController.requestScriptOptions)
 
 export default router

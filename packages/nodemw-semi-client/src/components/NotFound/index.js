@@ -8,7 +8,7 @@ export default class index extends Component {
       <DefaultGridItem name='not-found'>
         <Paper>
           <Typography variant='h4'>404: Not found</Typography>
-          <Typography variant='body1'>You tried to go to a page which does not exist. Wait, that{'\''}s illegal!</Typography>
+          <Typography variant='body1'>You tried to go to a page which does not exist. Wait, that&apos;s illegal!</Typography>
         </Paper>
       </DefaultGridItem>
     )

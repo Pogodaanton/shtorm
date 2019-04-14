@@ -1,0 +1,14 @@
+.preset-add-dialog {
+  .preset-add-dialog-stepper {
+    padding: 5px 0px;
+  }
+
+  .preset-add-dialog-results {
+    display: flex;
+    margin-top: 10px;
+
+    .preset-add-dialog-result {
+      margin-right: 20px;
+    }
+  }
+}

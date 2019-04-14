@@ -34,6 +34,7 @@ class AddPreset extends Component {
     width: PropTypes.string.isRequired
   }
 
+  shouldScriptOptionsUpdate = true
   state = {
     open: false,
     loading: true,
@@ -67,13 +68,12 @@ class AddPreset extends Component {
     axios.get(Api.getApiUrl('getScriptOptions'))
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
-          let { currentStep, skippedSteps } = this.state
-          const options = res.data.data
-          if (options.length <= 0) {
-            skippedSteps[currentStep] = true
-            currentStep++
-          }
-          this.setState({ options: res.data.data, currentStep, skippedSteps, loading: false })
+          let { currentStep, skippedSteps, options } = this.state
+          if (this.shouldScriptOptionsUpdate) options = res.data.data
+          if (options.length <= 0) skippedSteps[currentStep + 1] = true
+          this.shouldScriptOptionsUpdate = false
+          this.setState({ options, skippedSteps, loading: false })
+          this.triggerNext()
         }
       })
       .catch(Api.axiosErrorHandler)
@@ -85,13 +85,14 @@ class AddPreset extends Component {
   }
 
   onDropdownChange = name => event => {
+    if (name === 'Script') this.shouldScriptOptionsUpdate = true
     this.setState({ [`selected${name}`]: event.target.value })
   }
 
   onFormValidate = (e) => {
     const { currentStep } = this.state
-    if (currentStep === 0) this.getScriptOptions()
-    if (currentStep < this.getSteps().length) this.triggerNext(e)
+    if (currentStep === 0 && this.shouldScriptOptionsUpdate) this.getScriptOptions()
+    else this.triggerNext(e)
   }
 
   getSteps = () => {
@@ -162,6 +163,7 @@ class AddPreset extends Component {
         return 'What is an ad group anyways?'
       case 2:
         const allItems = { selectedConfig, selectedScript }
+
         return (
           <Fragment>
             <DialogContentText>
@@ -196,17 +198,17 @@ class AddPreset extends Component {
   }
 
   triggerNext = () => {
-    this.setState(state => ({
-      currentStep: state.currentStep + 1
-    }))
+    let { currentStep, skippedSteps } = this.state
+    currentStep++
+    if (skippedSteps[currentStep] === true) currentStep++
+    this.setState({ currentStep })
   };
 
   triggerBack = () => {
-    let { options, currentStep } = this.state
-    if (currentStep === 2 && options.length <= 0) currentStep--
-    this.setState({
-      currentStep: currentStep - 1
-    })
+    let { currentStep, skippedSteps } = this.state
+    currentStep--
+    if (skippedSteps[currentStep] === true) currentStep--
+    this.setState({ currentStep })
   };
 
   triggerReset = () => {

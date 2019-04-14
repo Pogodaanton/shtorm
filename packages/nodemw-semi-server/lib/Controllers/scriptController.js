@@ -28,8 +28,30 @@ class ScriptController {
     })
   }
 
+  /**
+   * Looks for duplicates in an array of objects based on a unique identifier
+   * Code originally from: https://reactgo.com/removeduplicateobjects/ 🙇🏻‍
+   * @param {array} arr - Array which will be checked
+   * @param {string} uniqueId - Name of the key that should be the reference for duplicates
+   */
+  makeUnique = (arr, uniqueId) => {
+    const unique = arr
+      .map(e => e[uniqueId])
+      .map((e, i, final) => e !== 'script' && e !== 'config' && e !== 'name' && final.indexOf(e) === i && i) // store the keys of the unique objects
+      .filter(e => arr[e]) // eliminate the dead keys & store unique objects
+      .map(e => arr[e])
+
+    return unique
+  }
+
   getScriptOptions = (scriptName) => {
-    return []
+    const scriptOptions = [
+      { type: 'text', name: 'Summary', value: 'Infobox --> Infobox_Waffen | Fragen: [[User:Pogodaanton|Pogodaanton]]' },
+      { type: 'number', name: 'From page in category', value: 0 },
+      { type: 'number', name: 'Amount of pages', value: 10 }
+    ]
+
+    return this.makeUnique(scriptOptions, 'name')
   }
 
   getAllScripts = () => {

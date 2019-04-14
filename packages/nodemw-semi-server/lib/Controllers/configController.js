@@ -48,8 +48,8 @@ class ConfigController {
 
     const existingConfig = this.db.find({ name: key })
 
-    if (!existingConfig.value()) this.db.unshift({ ...config }).write()
-    else existingConfig.assign({ ...config }).write()
+    if (!existingConfig.value()) this.db.unshift(config).write()
+    else existingConfig.assign(config).write()
 
     return res.status(201).send({
       success: true,

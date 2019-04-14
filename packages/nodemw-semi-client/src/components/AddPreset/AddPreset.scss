@@ -3,12 +3,22 @@
     padding: 5px 0px;
   }
 
+  .preset-add-dialog-select-title {
+    margin-bottom: 10px
+  }
+
   .preset-add-dialog-results {
     display: flex;
-    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: {
+      top: 10px;
+      bottom: -10px;
+    }
 
     .preset-add-dialog-result {
       margin-right: 20px;
+      margin-bottom: 10px;
     }
   }
 }

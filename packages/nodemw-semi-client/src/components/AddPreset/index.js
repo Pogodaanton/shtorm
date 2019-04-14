@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { ValidatorForm, SelectValidator } from 'react-material-ui-form-validator'
+import { ValidatorForm, TextValidator, SelectValidator } from 'react-material-ui-form-validator'
 import {
   Button,
   CircularProgress,
@@ -41,8 +41,9 @@ class AddPreset extends Component {
     scripts: [],
     configs: [],
     options: [],
-    selectedScript: '',
-    selectedConfig: '',
+    name: '',
+    script: '',
+    config: '',
     currentStep: 0,
     skippedSteps: {}
   };
@@ -79,20 +80,60 @@ class AddPreset extends Component {
       .catch(Api.axiosErrorHandler)
   }
 
+  savePreset = () => {
+    this.setState({ loading: true })
+    axios.post(Api.getApiUrl('savePreset'), { key: this.state.name, preset: this.getAllPreferences() })
+      .then((res) => {
+        if (Api.axiosCheckResponse(res)) {
+          console.log(res)
+          this.onDialogClose()
+        }
+      })
+      .catch(Api.axiosErrorHandler)
+  }
+
   onDialogClose = () => {
     this.setState({ open: false })
     setTimeout(() => this.props.history.push('/'), 205)
   }
 
-  onDropdownChange = name => event => {
-    if (name === 'Script') this.shouldScriptOptionsUpdate = true
-    this.setState({ [`selected${name}`]: event.target.value })
+  onDropdownChange = name => e => {
+    if (name === 'script') this.shouldScriptOptionsUpdate = true
+    this.setState({ [name]: e.target.value })
+  }
+
+  onScriptPreferenceChange = name => e => {
+    let { options } = this.state
+    options = options.map((item) => {
+      if (item.name === name) item.value = e.target.value
+      return item
+    })
+    this.setState({ options })
   }
 
   onFormValidate = (e) => {
     const { currentStep } = this.state
+    if (currentStep === this.getSteps().length - 1) this.savePreset()
     if (currentStep === 0 && this.shouldScriptOptionsUpdate) this.getScriptOptions()
     else this.triggerNext(e)
+  }
+
+  getAllPreferences = () => {
+    const { options, name, config, script } = this.state
+    const allPreferences = { name, config, script }
+    options.forEach(({ name, value }) => { allPreferences[name] = value })
+    return allPreferences
+  }
+
+  getAllowedType = (proposedType) => {
+    switch (proposedType) {
+      case 'number':
+        return 'number'
+      case 'password':
+        return 'password'
+      default:
+        return 'text'
+    }
   }
 
   getSteps = () => {
@@ -105,23 +146,37 @@ class AddPreset extends Component {
   }
 
   getStepContent = (step) => {
-    const { scripts, configs, selectedScript, selectedConfig } = this.state
+    const { scripts, options, configs, name, script, config } = this.state
     const scriptSelectDisabled = (scripts.length <= 0)
     const configSelectDisabled = (configs.length <= 0)
     switch (step) {
       case 0:
         return (
           <Fragment>
-            <DialogContentText>
-              First, let&apos;s decide, which script and config we should use for this preset.
+            <DialogContentText className='preset-add-dialog-select-title'>
+              First, give the preset a name and let&apos;s decide, which script and config we want to use for it.
             </DialogContentText>
+            <TextValidator
+              id='preset-add-dialog-select-name'
+              variant='outlined'
+              margin='dense'
+              fullWidth
+              required
+              value={name}
+              label='Preset name:'
+              validators={['required']}
+              errorMessages={['This field cannot be empty.']}
+              onChange={this.onDropdownChange('name')}
+            />
             <SelectValidator
               id='preset-add-dialog-select-script'
               select
+              variant='outlined'
               label={scriptSelectDisabled ? 'No scripts available, create a script first.' : 'Select a script:'}
               disabled={scriptSelectDisabled}
-              value={selectedScript}
-              onChange={this.onDropdownChange('Script')}
+              value={script}
+              onChange={this.onDropdownChange('script')}
+              required
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
               margin='dense'
@@ -139,10 +194,12 @@ class AddPreset extends Component {
             <SelectValidator
               id='preset-add-dialog-select-config'
               select
+              variant='outlined'
               label={configSelectDisabled ? 'No configs available, create a config first.' : 'Select a config:'}
               disabled={configSelectDisabled}
-              value={selectedConfig}
-              onChange={this.onDropdownChange('Config')}
+              value={config}
+              onChange={this.onDropdownChange('config')}
+              required
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
               margin='dense'
@@ -160,28 +217,50 @@ class AddPreset extends Component {
           </Fragment>
         )
       case 1:
-        return 'What is an ad group anyways?'
+        return (
+          <Fragment>
+            <DialogContentText className='preset-add-dialog-select-title'>
+              Your script has some preferences which need to be set.
+            </DialogContentText>
+            {options.map(({ type, name, value }) => {
+              const inputType = this.getAllowedType(type)
+              return (
+                <TextValidator
+                  key={name}
+                  variant='outlined'
+                  type={inputType}
+                  margin='dense'
+                  fullWidth
+                  required
+                  value={value}
+                  label={name}
+                  validators={['required']}
+                  errorMessages={['This field cannot be empty.']}
+                  onChange={this.onScriptPreferenceChange(name)}
+                />
+              )
+            })}
+          </Fragment>
+        )
       case 2:
-        const allItems = { selectedConfig, selectedScript }
-
+        const allPreferences = this.getAllPreferences()
         return (
           <Fragment>
             <DialogContentText>
               Alright, here&apos;s everything you set for this preset.
             </DialogContentText>
             <div className='preset-add-dialog-results'>
-              {Object.keys(allItems).map((key, index) => {
-                const title = key.substr(8)
-                const value = allItems[key]
+              {Object.keys(allPreferences).map((key, index) => {
+                const value = allPreferences[key]
                 return (
                   <div
                     className='preset-add-dialog-result'
-                    key={title}
+                    key={key}
                   >
                     <Typography
                       variant='button'
                       className='preset-add-dialog-result-title'
-                    >{title}: </Typography>
+                    >{key}: </Typography>
                     <Typography
                       variant='body2'
                       className='preset-add-dialog-result-value'
@@ -260,17 +339,11 @@ class AddPreset extends Component {
               </DialogContent>
               <DialogActions>
                 <Button
-                  onClick={this.onDialogClose}
-                  disabled={loading}
-                >
-                    Cancel
-                </Button>
-                <Button
                   color='primary'
                   disabled={loading}
-                  onClick={this.triggerReset}
+                  onClick={this.onDialogClose}
                 >
-                    Reset
+                  Close
                 </Button>
               </DialogActions>
             </Fragment>
@@ -279,13 +352,14 @@ class AddPreset extends Component {
               <DialogContent>{this.getStepContent(currentStep)}</DialogContent>
               <DialogActions>
                 <Button
-                  disabled={currentStep === 0}
+                  disabled={loading || currentStep === 0}
                   onClick={this.triggerBack}
                 >
                   Back
                 </Button>
                 <Button
                   type='submit'
+                  disabled={loading}
                   variant='contained'
                   color='primary'
                 >

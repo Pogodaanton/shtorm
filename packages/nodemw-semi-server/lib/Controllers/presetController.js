@@ -34,16 +34,16 @@ class PresetController {
   }
 
   requestSavePreset = (req, res) => {
-    const { key, config } = req.body
+    const { key, preset } = req.body
 
-    if (typeof config !== 'object') {
+    if (typeof preset !== 'object') {
       return res.status(400).send({
         success: false,
         message: 'Preset is required or is in wrong format!'
       })
     }
 
-    if (!config.name || !key) {
+    if (!preset.name || !key) {
       return res.status(400).send({
         success: false,
         message: 'Name is required!'
@@ -52,8 +52,8 @@ class PresetController {
 
     const existingPreset = this.db.find({ name: key })
 
-    if (!existingPreset.value()) this.db.unshift({ ...req.body }).write()
-    else existingPreset.assign({ ...config }).write()
+    if (!existingPreset.value()) this.db.unshift(preset).write()
+    else existingPreset.assign(preset).write()
 
     return res.status(201).send({
       success: true,
@@ -90,7 +90,7 @@ class PresetController {
   }
 
   getAllPresets = () => {
-    return this.db.map(({ name, logo, configName }) => { return { name, logo, configName } }).value()
+    return this.db.map(({ name, logo, presetName }) => { return { name, logo, presetName } }).value()
   }
 
   getPreset = (name = '') => {

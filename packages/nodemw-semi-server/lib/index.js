@@ -1,5 +1,6 @@
 import { Server } from 'http'
 import socketIo from 'socket.io'
+import shortid from 'shortid'
 import interceptStdout from 'intercept-stdout'
 import express from 'express'
 import bodyParser from 'body-parser'
@@ -32,9 +33,9 @@ httpServer.listen(port, () => console.log(`Listening on *:${port}`))
  * Intercepting console log in order to send it to client
  */
 interceptStdout((msg) => {
-  io.emit('log_message', { type: 'DEBUG', timestamp: new Date().getTime(), msg: msg })
+  io.emit('log_message', { type: 'DEBUG', key: shortid.generate(), timestamp: new Date().getTime(), msg: msg })
   return msg
 }, (errMsg) => {
-  io.emit('log_message', { type: 'ERROR', timestamp: new Date().getTime(), msg: errMsg })
+  io.emit('log_message', { type: 'ERROR', key: shortid.generate() , timestamp: new Date().getTime(), msg: errMsg })
   return errMsg
 })

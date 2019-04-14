@@ -11,7 +11,6 @@ const cache = new CellMeasurerCache({
 export default class index extends Component {
   static propTypes = {
     rows: PropTypes.array.isRequired,
-    height: PropTypes.number,
     disableTransition: PropTypes.bool
   }
 
@@ -55,13 +54,13 @@ export default class index extends Component {
     style, // Style object to be applied to row (to position it)
     parent
   }) => {
-    const { timestamp, msg, type } = this.props.rows[index]
+    const { timestamp, msg, type, key } = this.props.rows[index]
 
     return (
       <CellMeasurer
         cache={cache}
         columnIndex={0}
-        key={timestamp}
+        key={key}
         parent={parent}
         rowIndex={index}
       >

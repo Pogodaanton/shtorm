@@ -44,18 +44,20 @@ export default class Terminal extends Component {
     return new Date().getTime()
   }
 
-  addLine = ({ msg = 'N/A', type = 'CLIENT', timestamp = this.getCurrentTimestamp() }) => {
+  addLine = ({ msg = 'N/A', type = 'CLIENT', timestamp = this.getCurrentTimestamp(), key = timestamp }) => {
     const { terminalLines } = this.state
-    terminalLines.push({ msg, type, timestamp })
+    terminalLines.push({ msg, type, timestamp, key })
     this.setState({ terminalLines })
   }
 
   emptyList = () => {
+    const timestamp = this.getCurrentTimestamp()
     this.setState({
       terminalLines: [{
         msg: 'Terminal log has been emptied.',
         type: 'CLIENT',
-        timestamp: this.getCurrentTimestamp()
+        key: timestamp,
+        timestamp
       }]
     })
   }

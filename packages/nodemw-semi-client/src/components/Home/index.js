@@ -14,6 +14,7 @@ import AddPreset from './AddPreset'
 import EditPreset from './EditPreset'
 import DeletePreset from './DeletePreset'
 import PresetTable from './PresetTable'
+import Fullscreen from '../Spinners/Fullscreen'
 
 export default class index extends Component {
   static propTypes = {
@@ -22,6 +23,7 @@ export default class index extends Component {
   }
 
   state = {
+    loading: true,
     location: {},
     presets: [],
     scripts: []
@@ -44,19 +46,19 @@ export default class index extends Component {
   }
 
   getAllPresets = () => {
-    this.setState({ presets: [], scripts: [] })
+    this.setState({ loading: true })
     axios.get(Api.getApiUrl('getAllPresets'))
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { presets, scripts } = res.data.data
-          this.setState({ presets, scripts })
+          this.setState({ presets, scripts, loading: false })
         }
       })
       .catch(Api.axiosErrorHandler)
   }
 
   render () {
-    const { presets, scripts, location } = this.state
+    const { loading, presets, scripts, location } = this.state
 
     return (
       <DefaultGridItem name='home'>
@@ -104,6 +106,7 @@ export default class index extends Component {
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 4) === '/add') && <AddPreset history={this.props.history} />}
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 6) === '/edit/') && <EditPreset {...this.props} />}
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 8) === '/delete/') && <DeletePreset {...this.props} />}
+        {loading && <Fullscreen />}
       </DefaultGridItem>
     )
   }

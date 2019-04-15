@@ -16,7 +16,13 @@ export default class PresetTable extends Component {
     rows: []
   }
 
-  componentDidMount = () => {
+  componentDidUpdate = (prevProps) => {
+    if (this.props.rows !== prevProps.rows) this.fixRows()
+  }
+
+  componentDidMount = () => this.fixRows()
+
+  fixRows = () => {
     let { rows } = this.props
     rows = rows.map((row) => {
       row.favicon = (

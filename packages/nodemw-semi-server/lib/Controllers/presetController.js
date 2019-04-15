@@ -35,7 +35,7 @@ class PresetController {
   }
 
   requestSavePreset = (req, res) => {
-    const { key, preset } = req.body
+    let { key, preset } = req.body
 
     if (typeof preset !== 'object') {
       return res.status(400).send({
@@ -44,13 +44,14 @@ class PresetController {
       })
     }
 
-    if (!preset.name || !key) {
+    if (!preset.name) {
       return res.status(400).send({
         success: false,
         message: 'Name is required!'
       })
     }
 
+    if (!key) key = preset.name
     if (!preset.config) {
       return res.status(400).send({
         success: false,

@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Switch, Route } from 'react-router-dom'
-import { AppBar, Typography, Toolbar } from '@material-ui/core'
+import { Switch, Route, Link } from 'react-router-dom'
+import { AppBar, Typography, Toolbar, IconButton, Tooltip } from '@material-ui/core'
 import { Build, Home } from '@material-ui/icons'
-import HeaderLink from './HeaderLink'
 import './Header.scss'
 
 export default class index extends Component {
@@ -52,19 +51,29 @@ export default class index extends Component {
             <Route
               path='/'
               exact
-              component={() => <HeaderLink
-                icon={Build}
-                to='/configs'
-                tooltip='Edit bot configs'
-              />}
+              component={() => (
+                <Tooltip title='Edit bot configs'>
+                  <IconButton
+                    component={Link}
+                    to='/configs'
+                  >
+                    <Build />
+                  </IconButton>
+                </Tooltip>
+              )}
             />
             <Route
               path='/'
-              component={() => <HeaderLink
-                icon={Home}
-                to='/'
-                tooltip='Go back to Dashboard'
-              />}
+              component={() => (
+                <Tooltip title='Go back to the Dashboard'>
+                  <IconButton
+                    component={Link}
+                    to='/'
+                  >
+                    <Home />
+                  </IconButton>
+                </Tooltip>
+              )}
             />
           </Switch>
         </Toolbar>

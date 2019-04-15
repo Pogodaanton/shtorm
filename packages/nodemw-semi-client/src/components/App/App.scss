@@ -39,23 +39,8 @@ html, body, #root, .content {
   }
 }
 
-.paper {
-  /*
-  &.paper-window {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    > header {
-      display: flex;
-      align-items: center;
-      padding: 6px 15px;
-
-      > .spacing { flex-grow: 1; }
-      > svg { margin-right: 10px; }
-    }
-  }
-  */
+a.MuiButtonBase-root-91:hover {
+  color: inherit;
 }
 
 .fill-space { flex-grow: 1 }

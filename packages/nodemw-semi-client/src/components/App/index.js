@@ -29,6 +29,10 @@ class App extends Component {
                 component={Home}
               />
               <Route
+                path='/edit/:name'
+                component={Home}
+              />
+              <Route
                 path='/configs'
                 component={BotConfigs}
                 exact

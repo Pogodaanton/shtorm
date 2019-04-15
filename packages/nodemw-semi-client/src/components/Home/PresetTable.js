@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
+import { Link } from 'react-router-dom'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
@@ -27,16 +28,19 @@ export default class PresetTable extends Component {
         />
       )
 
+      const urlFriendlyName = encodeURIComponent(row.name)
       row.buttons = (
         <Fragment>
           <Tooltip title='Delete preset'>
             <IconButton
-              onClick={this.onRowButtonClick('delete', row.name)}
+              component={Link}
+              to={`/delete/${urlFriendlyName}`}
             ><DeleteIcon /></IconButton>
           </Tooltip>
           <Tooltip title='Edit preset'>
             <IconButton
-              onClick={this.onRowButtonClick('edit', row.name)}
+              component={Link}
+              to={`/edit/${urlFriendlyName}`}
             ><EditIcon /></IconButton>
           </Tooltip>
           <Button

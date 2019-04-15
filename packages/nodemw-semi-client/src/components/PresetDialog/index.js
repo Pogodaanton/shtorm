@@ -45,6 +45,7 @@ class PresetDialog extends Component {
     skippedSteps: {},
     scriptOptions: [],
     options: {
+      key: '',
       name: '',
       script: '',
       config: ''
@@ -53,14 +54,16 @@ class PresetDialog extends Component {
 
   componentDidUpdate = (prevProps) => {
     if (prevProps.presetData !== this.props.presetData) {
+      const combinedOptions = { ...this.state.options, ...this.props.presetData }
       this.getDropdownData()
-      this.setState({ options: { ...this.state.options, ...this.props.presetData } })
+      this.setState({ options: { ...combinedOptions, key: combinedOptions.name } })
     }
   }
 
   componentDidMount = () => {
+    const combinedOptions = { ...this.state.options, ...this.props.presetData }
     this.getDropdownData()
-    this.setState({ open: true, options: { ...this.state.options, ...this.props.presetData } })
+    this.setState({ open: true, options: { ...combinedOptions, key: combinedOptions.name } })
   };
 
   getDropdownData = () => {
@@ -79,9 +82,12 @@ class PresetDialog extends Component {
     axios.get(Api.getApiUrl('getScriptOptions'))
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
-          let { currentStep, skippedSteps } = this.state
-          const scriptOptions = res.data.data
+          const { currentStep, skippedSteps, options } = this.state
+          let scriptOptions = res.data.data
+
           if (scriptOptions.length <= 0) skippedSteps[currentStep + 1] = true
+          if (options.key) scriptOptions = this.setScriptOptions(scriptOptions)
+
           this.shouldScriptOptionsUpdate = false
           this.setState({ scriptOptions, skippedSteps, loading: false })
           this.triggerNext()
@@ -90,9 +96,16 @@ class PresetDialog extends Component {
       .catch(Api.axiosErrorHandler)
   }
 
+  setScriptOptions = (scriptOptions) => {
+    return scriptOptions.map((obj) => {
+      obj.value = (this.state.options[obj.name] || '')
+      return obj
+    })
+  }
+
   savePreset = () => {
     this.setState({ loading: true })
-    axios.post(Api.getApiUrl('savePreset'), { key: this.state.name, preset: this.getAllOptions() })
+    axios.post(Api.getApiUrl('savePreset'), { key: this.state.options.key, preset: this.getAllOptions() })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           console.log(res)
@@ -131,7 +144,9 @@ class PresetDialog extends Component {
   }
 
   getAllOptions = () => {
-    const { scriptOptions, options: allOptions } = this.state
+    const { scriptOptions } = this.state
+    const { name, script, config } = this.state.options
+    const allOptions = { name, script, config }
     scriptOptions.forEach(({ name, value }) => { allOptions[name] = value })
     return allOptions
   }
@@ -166,7 +181,7 @@ class PresetDialog extends Component {
         return (
           <Fragment>
             <DialogContentText className='preset-add-dialog-select-title'>
-              First, give the preset a name and let&apos;s decide, which script and config we want to use for it.
+              First, give the preset a name and decide, which script and config you want to use for it.
             </DialogContentText>
             <TextValidator
               id='preset-add-dialog-select-name'
@@ -252,15 +267,15 @@ class PresetDialog extends Component {
           </Fragment>
         )
       case 2:
-        const allPreferences = this.getAllOptions()
+        const allOptions = this.getAllOptions()
         return (
           <Fragment>
             <DialogContentText>
               Alright, here&apos;s everything you set for this preset.
             </DialogContentText>
             <div className='preset-add-dialog-results'>
-              {Object.keys(allPreferences).map((key, index) => {
-                const value = allPreferences[key]
+              {Object.keys(allOptions).map((key, index) => {
+                const value = allOptions[key]
                 return (
                   <div
                     className='preset-add-dialog-result'
@@ -320,7 +335,7 @@ class PresetDialog extends Component {
       >
         <ValidatorForm onSubmit={this.onFormValidate}>
           <DialogTitle id='preset-add-dialog-title'>
-            Add Preset
+            {this.state.options.key ? 'Edit Preset' : 'Add Preset'}
             <Stepper
               orientation={stepperOrientation[this.props.width]}
               activeStep={currentStep}

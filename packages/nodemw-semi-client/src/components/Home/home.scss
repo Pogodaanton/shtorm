@@ -25,9 +25,21 @@
     flex-grow: 1;
   }
 
-  > a {
+  > .preset-selector-fabs {
     position: absolute;
     right: 20px;
-    bottom: 15px
+    bottom: 15px;
+
+    > * {
+      margin-right: 10px;
+      &:last-child { margin-right: 0; }
+    }
+  }
+}
+
+.mui-vtable {
+  .mui-vtable-column-favicon > div,
+  .mui-vtable-row .mui-vtable-cell-header-favicon {
+    &:last-child { padding: 3px; }
   }
 }

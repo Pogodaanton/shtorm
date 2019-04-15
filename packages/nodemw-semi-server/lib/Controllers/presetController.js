@@ -1,5 +1,6 @@
 import DatabaseController from './databaseController'
 import ScriptController from './scriptController'
+import configController from './configController'
 
 class PresetController {
   constructor () {
@@ -50,10 +51,26 @@ class PresetController {
       })
     }
 
+    if (!preset.config) {
+      return res.status(400).send({
+        success: false,
+        message: 'Config is required!'
+      })
+    }
+
+    const { config: configName } = preset
+    const config = configController.getConfig(configName)
+    if (!config) {
+      return res.status(400).send({
+        success: false,
+        message: 'Given config does not exist!'
+      })
+    }
+    const favicon = this.getFaviconUrl(config)
     const existingPreset = this.db.find({ name: key })
 
-    if (!existingPreset.value()) this.db.unshift(preset).write()
-    else existingPreset.assign(preset).write()
+    if (!existingPreset.value()) this.db.unshift({ ...preset, favicon }).write()
+    else existingPreset.assign({ ...preset, favicon }).write()
 
     return res.status(201).send({
       success: true,
@@ -89,8 +106,12 @@ class PresetController {
     })
   }
 
+  getFaviconUrl = ({ server }) => {
+    return `https://www.google.com/s2/favicons?domain=${server}`
+  }
+
   getAllPresets = () => {
-    return this.db.map(({ name, logo, presetName }) => { return { name, logo, presetName } }).value()
+    return this.db.map(({ favicon, name, script, config }) => { return { favicon, name, script, config } }).value()
   }
 
   getPreset = (name = '') => {

@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Paper, Typography, Divider, Chip, Avatar, Fab } from '@material-ui/core'
+import { Paper, Typography, Divider, Chip, Avatar, Fab, Tooltip } from '@material-ui/core'
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile'
 import AddIcon from '@material-ui/icons/Add'
+import RefreshIcon from '@material-ui/icons/Refresh'
 import PropTypes from 'prop-types'
 import NoPresets from './NoPresets'
 import Api from '../Api/index'
@@ -10,9 +11,11 @@ import axios from 'axios'
 import './home.scss'
 import DefaultGridItem from '../DefaultGridItem/index'
 import AddPreset from '../AddPreset'
+import PresetTable from './PresetTable'
 
 export default class index extends Component {
   static propTypes = {
+    location: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired
   }
 
@@ -28,11 +31,18 @@ export default class index extends Component {
     } else return null
   }
 
+  componentDidUpdate = (prevProps) => {
+    if (typeof prevProps.location.pathname !== 'undefined' && prevProps.location.pathname !== this.state.location.pathname && this.state.location.pathname === '/') {
+      this.getAllPresets()
+    }
+  }
+
   componentDidMount = () => {
     this.getAllPresets()
   }
 
   getAllPresets = () => {
+    this.setState({ presets: [], scripts: [] })
     axios.get(Api.getApiUrl('getAllPresets'))
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
@@ -50,7 +60,7 @@ export default class index extends Component {
       <DefaultGridItem name='home'>
         <Paper className='paper paper-preset-selector'>
           <Typography variant='h5'>Welcome Back!</Typography>
-          <Typography variant='subtitle1'>Choose your next preset you want to execute or create a new one from scratch.</Typography>
+          <Typography variant='subtitle1'>Choose the next preset you want to execute or create a new one from scratch.</Typography>
           <Divider />
           <div className='preset-selector-scripts'>
             <span>Quick start:</span>
@@ -67,15 +77,27 @@ export default class index extends Component {
           </div>
           <Divider />
           <div className='preset-selector-presets'>
-            {presets.length > 0 ? presets.map(({ name }, index) => null) : <NoPresets />}
+            {presets.length > 0 ? <PresetTable rows={presets} /> : <NoPresets />}
           </div>
-          <Fab
-            color='primary'
-            component={Link}
-            to='/add'
-          >
-            <AddIcon />
-          </Fab>
+          <div className='preset-selector-fabs'>
+            <Tooltip title='Refresh list'>
+              <Fab
+                size='small'
+                onClick={this.getAllPresets}
+              >
+                <RefreshIcon />
+              </Fab>
+            </Tooltip>
+            <Tooltip title='Create a new preset'>
+              <Fab
+                color='primary'
+                component={Link}
+                to='/add'
+              >
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+          </div>
         </Paper>
         {(typeof location.pathname !== 'undefined' && location.pathname === '/add') && <AddPreset history={this.props.history} />}
       </DefaultGridItem>

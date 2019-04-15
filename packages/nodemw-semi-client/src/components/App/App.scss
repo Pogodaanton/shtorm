@@ -26,7 +26,7 @@ html, body, #root, .content {
   .grid-container-main {
     height: 0px;
     flex-grow: 1;
-    overflow: hidden;
+    overflow: auto;
 
     > div > .paper {
       padding: 10px 15px;

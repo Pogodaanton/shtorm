@@ -1,0 +1,15 @@
+.mui-vtable {
+  .mui-vtable-row, .mui-vtable-cell-header, .mui-vtable-cell-body {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .mui-vtable-cell-header, .mui-vtable-cell-body {
+    flex: 1;
+  }
+
+  .MuiTableCell-root-276:last-child {
+    padding-right: 14px;
+  }
+}

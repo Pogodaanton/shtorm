@@ -50,19 +50,20 @@ export default class index extends Component {
           <div className='fill-space' />
           <Switch>
             <Route
-              path='/configs'
+              path='/'
+              exact
               component={() => <HeaderLink
-                icon={Home}
-                to='/'
-                tooltip='Go back to Dashboard'
+                icon={Build}
+                to='/configs'
+                tooltip='Edit bot configs'
               />}
             />
             <Route
               path='/'
               component={() => <HeaderLink
-                icon={Build}
-                to='/configs'
-                tooltip='Edit bot configs'
+                icon={Home}
+                to='/'
+                tooltip='Go back to Dashboard'
               />}
             />
           </Switch>

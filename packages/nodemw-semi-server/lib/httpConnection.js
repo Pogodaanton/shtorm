@@ -14,6 +14,7 @@ router.post('/api/v1/deleteConfig', configController.requestDeleteConfig)
 // Presets
 router.get('/api/v1/getAllPresets', presetController.requestAllPresets)
 router.get('/api/v1/getPreset', presetController.requestPreset)
+router.post('/api/v1/deletePreset', presetController.requestDeletePreset)
 router.post('/api/v1/savePreset', presetController.requestSavePreset)
 
 // Scripts

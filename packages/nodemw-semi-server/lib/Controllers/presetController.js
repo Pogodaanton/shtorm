@@ -80,16 +80,16 @@ class PresetController {
   }
 
   requestDeletePreset = (req, res) => {
-    const { key } = req.body
+    const { name } = req.body
 
-    if (!key) {
+    if (!name) {
       return res.status(400).send({
         success: false,
         message: 'Name is required!'
       })
     }
 
-    if (!this.getPreset(key)) {
+    if (!this.getPreset(name)) {
       return res.status(410).send({
         success: false,
         message: 'Name not found in database!'
@@ -97,7 +97,7 @@ class PresetController {
     }
 
     this.db
-      .remove({ name: key })
+      .remove({ name })
       .write()
 
     return res.status(201).send({

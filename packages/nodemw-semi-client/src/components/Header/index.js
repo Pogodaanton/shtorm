@@ -30,6 +30,14 @@ export default class index extends Component {
                 component={() => 'Add Preset'}
               />
               <Route
+                path='/edit'
+                component={() => 'Edit Preset'}
+              />
+              <Route
+                path='/delete'
+                component={() => 'Delete Preset'}
+              />
+              <Route
                 path='/configs'
                 component={() => 'Bot configs'}
               />

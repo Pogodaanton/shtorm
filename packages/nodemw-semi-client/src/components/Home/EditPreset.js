@@ -15,7 +15,6 @@ export default class EditPreset extends Component {
   }
 
   componentDidMount = () => {
-    console.log(this.props)
     this.getPresetData(decodeURIComponent(this.props.match.params.name))
   }
 

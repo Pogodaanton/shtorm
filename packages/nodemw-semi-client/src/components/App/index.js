@@ -10,6 +10,7 @@ import NotFound from '../NotFound'
 import Terminal from '../Terminal'
 import BotConfigs from '../BotConfigs'
 import './App.scss'
+import Fullscreen from '../Spinners/Fullscreen'
 
 class App extends Component {
   render () {
@@ -33,6 +34,10 @@ class App extends Component {
                 component={Home}
               />
               <Route
+                path='/delete/:name'
+                component={Home}
+              />
+              <Route
                 path='/configs'
                 component={BotConfigs}
                 exact
@@ -49,6 +54,7 @@ class App extends Component {
           </DefaultGridContainer>
           <TerminalContextProvider>
             <Terminal />
+            <Fullscreen />
           </TerminalContextProvider>
         </div>
       </MuiThemeProvider>

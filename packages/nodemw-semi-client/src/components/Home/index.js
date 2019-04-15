@@ -12,6 +12,7 @@ import './home.scss'
 import DefaultGridItem from '../DefaultGridItem/index'
 import AddPreset from './AddPreset'
 import EditPreset from './EditPreset'
+import DeletePreset from './DeletePreset'
 import PresetTable from './PresetTable'
 
 export default class index extends Component {
@@ -102,6 +103,7 @@ export default class index extends Component {
         </Paper>
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 4) === '/add') && <AddPreset history={this.props.history} />}
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 6) === '/edit/') && <EditPreset {...this.props} />}
+        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 8) === '/delete/') && <DeletePreset {...this.props} />}
       </DefaultGridItem>
     )
   }

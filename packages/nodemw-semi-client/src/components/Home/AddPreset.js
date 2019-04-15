@@ -1,5 +1,5 @@
 import React from 'react'
-import PresetDialog from '../PresetDialog/index'
+import PresetDialog from '../PresetDialog'
 
 export default function AddPreset (props) {
   return (

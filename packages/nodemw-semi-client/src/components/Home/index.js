@@ -101,7 +101,7 @@ export default class index extends Component {
           </div>
         </Paper>
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 4) === '/add') && <AddPreset history={this.props.history} />}
-        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 5) === '/edit') && <EditPreset {...props} />}
+        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 5) === '/edit') && <EditPreset {...this.stateprops} />}
       </DefaultGridItem>
     )
   }

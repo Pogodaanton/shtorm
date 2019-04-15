@@ -15,6 +15,11 @@
   > h5 { margin-bottom: 0; }
 
   .preset-selector-scripts {
+    min-height: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
     > span, .preset-selector-scripts-chip {
       margin-right: 10px;
       &:last-child { margin-right: 0; }

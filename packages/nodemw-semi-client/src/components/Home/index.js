@@ -10,7 +10,8 @@ import Api from '../Api/index'
 import axios from 'axios'
 import './home.scss'
 import DefaultGridItem from '../DefaultGridItem/index'
-import AddPreset from '../AddPreset'
+import AddPreset from './AddPreset'
+import EditPreset from './EditPreset'
 import PresetTable from './PresetTable'
 
 export default class index extends Component {
@@ -99,7 +100,8 @@ export default class index extends Component {
             </Tooltip>
           </div>
         </Paper>
-        {(typeof location.pathname !== 'undefined' && location.pathname === '/add') && <AddPreset history={this.props.history} />}
+        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 4) === '/add') && <AddPreset history={this.props.history} />}
+        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 5) === '/edit') && <EditPreset {...props} />}
       </DefaultGridItem>
     )
   }

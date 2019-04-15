@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core'
 import axios from 'axios'
 import Api from '../Api'
-import './AddPreset.scss'
+import './PresetDialog.scss'
 
 const stepperOrientation = {
   'xs': 'vertical',
@@ -28,8 +28,9 @@ const stepperOrientation = {
   'xl': 'horizontal'
 }
 
-class AddPreset extends Component {
+class PresetDialog extends Component {
   static propTypes = {
+    presetData: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     width: PropTypes.string.isRequired
   }
@@ -40,17 +41,26 @@ class AddPreset extends Component {
     loading: true,
     scripts: [],
     configs: [],
-    options: [],
-    name: '',
-    script: '',
-    config: '',
     currentStep: 0,
-    skippedSteps: {}
+    skippedSteps: {},
+    scriptOptions: [],
+    options: {
+      name: '',
+      script: '',
+      config: ''
+    }
   };
+
+  componentDidUpdate = (prevProps) => {
+    if (prevProps.presetData !== this.props.presetData) {
+      this.getDropdownData()
+      this.setState({ options: { ...this.state.options, ...this.props.presetData } })
+    }
+  }
 
   componentDidMount = () => {
     this.getDropdownData()
-    this.setState({ open: true })
+    this.setState({ open: true, options: { ...this.state.options, ...this.props.presetData } })
   };
 
   getDropdownData = () => {
@@ -69,11 +79,11 @@ class AddPreset extends Component {
     axios.get(Api.getApiUrl('getScriptOptions'))
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
-          let { currentStep, skippedSteps, options } = this.state
-          if (this.shouldScriptOptionsUpdate) options = res.data.data
-          if (options.length <= 0) skippedSteps[currentStep + 1] = true
+          let { currentStep, skippedSteps } = this.state
+          const scriptOptions = res.data.data
+          if (scriptOptions.length <= 0) skippedSteps[currentStep + 1] = true
           this.shouldScriptOptionsUpdate = false
-          this.setState({ options, skippedSteps, loading: false })
+          this.setState({ scriptOptions, skippedSteps, loading: false })
           this.triggerNext()
         }
       })
@@ -82,33 +92,35 @@ class AddPreset extends Component {
 
   savePreset = () => {
     this.setState({ loading: true })
-    axios.post(Api.getApiUrl('savePreset'), { key: this.state.name, preset: this.getAllPreferences() })
+    axios.post(Api.getApiUrl('savePreset'), { key: this.state.name, preset: this.getAllOptions() })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           console.log(res)
-          this.onDialogClose()
+          this.closeDialog()
         }
       })
       .catch(Api.axiosErrorHandler)
   }
 
-  onDialogClose = () => {
+  closeDialog = () => {
     this.setState({ open: false })
     setTimeout(() => this.props.history.push('/'), 205)
   }
 
-  onDropdownChange = name => e => {
+  onOptionValueChange = name => e => {
+    const { options } = this.state
     if (name === 'script') this.shouldScriptOptionsUpdate = true
-    this.setState({ [name]: e.target.value })
+    options[name] = e.target.value
+    this.setState({ options })
   }
 
   onScriptPreferenceChange = name => e => {
-    let { options } = this.state
-    options = options.map((item) => {
+    let { scriptOptions } = this.state
+    scriptOptions = scriptOptions.map((item) => {
       if (item.name === name) item.value = e.target.value
       return item
     })
-    this.setState({ options })
+    this.setState({ scriptOptions })
   }
 
   onFormValidate = (e) => {
@@ -118,11 +130,10 @@ class AddPreset extends Component {
     else this.triggerNext(e)
   }
 
-  getAllPreferences = () => {
-    const { options, name, config, script } = this.state
-    const allPreferences = { name, config, script }
-    options.forEach(({ name, value }) => { allPreferences[name] = value })
-    return allPreferences
+  getAllOptions = () => {
+    const { scriptOptions, options: allOptions } = this.state
+    scriptOptions.forEach(({ name, value }) => { allOptions[name] = value })
+    return allOptions
   }
 
   getAllowedType = (proposedType) => {
@@ -146,7 +157,8 @@ class AddPreset extends Component {
   }
 
   getStepContent = (step) => {
-    const { scripts, options, configs, name, script, config } = this.state
+    const { scripts, options, configs, scriptOptions } = this.state
+    const { name, script, config } = options
     const scriptSelectDisabled = (scripts.length <= 0)
     const configSelectDisabled = (configs.length <= 0)
     switch (step) {
@@ -161,12 +173,11 @@ class AddPreset extends Component {
               variant='outlined'
               margin='dense'
               fullWidth
-              required
               value={name}
               label='Preset name:'
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
-              onChange={this.onDropdownChange('name')}
+              onChange={this.onOptionValueChange('name')}
             />
             <SelectValidator
               id='preset-add-dialog-select-script'
@@ -175,8 +186,7 @@ class AddPreset extends Component {
               label={scriptSelectDisabled ? 'No scripts available, create a script first.' : 'Select a script:'}
               disabled={scriptSelectDisabled}
               value={script}
-              onChange={this.onDropdownChange('script')}
-              required
+              onChange={this.onOptionValueChange('script')}
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
               margin='dense'
@@ -198,8 +208,7 @@ class AddPreset extends Component {
               label={configSelectDisabled ? 'No configs available, create a config first.' : 'Select a config:'}
               disabled={configSelectDisabled}
               value={config}
-              onChange={this.onDropdownChange('config')}
-              required
+              onChange={this.onOptionValueChange('config')}
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
               margin='dense'
@@ -222,7 +231,7 @@ class AddPreset extends Component {
             <DialogContentText className='preset-add-dialog-select-title'>
               Your script has some preferences which need to be set.
             </DialogContentText>
-            {options.map(({ type, name, value }) => {
+            {scriptOptions.map(({ type, name, value }) => {
               const inputType = this.getAllowedType(type)
               return (
                 <TextValidator
@@ -243,7 +252,7 @@ class AddPreset extends Component {
           </Fragment>
         )
       case 2:
-        const allPreferences = this.getAllPreferences()
+        const allPreferences = this.getAllOptions()
         return (
           <Fragment>
             <DialogContentText>
@@ -303,7 +312,7 @@ class AddPreset extends Component {
     return (
       <Dialog
         open={open}
-        onClose={this.onDialogClose}
+        onClose={this.closeDialog}
         className='preset-add-dialog'
         aria-labelledby='preset-add-dialog-title'
         maxWidth='md'
@@ -341,7 +350,7 @@ class AddPreset extends Component {
                 <Button
                   color='primary'
                   disabled={loading}
-                  onClick={this.onDialogClose}
+                  onClick={this.closeDialog}
                 >
                   Close
                 </Button>
@@ -374,4 +383,4 @@ class AddPreset extends Component {
   }
 }
 
-export default withWidth()(AddPreset)
+export default withWidth()(PresetDialog)

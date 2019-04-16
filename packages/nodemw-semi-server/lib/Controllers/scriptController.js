@@ -1,6 +1,13 @@
+import fs from 'fs'
+import path from 'path'
 import configController from './configController'
 
+const scriptsFolder = path.join(__dirname, '../../scripts')
 class ScriptController {
+  constructor () {
+    if (!fs.existsSync(scriptsFolder)) fs.mkdirSync(scriptsFolder)
+  }
+
   requestScriptOptions = (req, res) => {
     const data = this.getScriptOptions(req.query.name)
     if (data) {
@@ -55,7 +62,7 @@ class ScriptController {
   }
 
   getAllScripts = () => {
-    return ['Mum', 'Gae', 'Boi', 'Wut']
+    return fs.readdirSync(scriptsFolder).map((name) => name.slice(-3) === '.js' && name)
   }
 }
 

@@ -14,7 +14,8 @@
     "intercept-stdout": "^0.1.2",
     "lowdb": "^1.0.0",
     "shortid": "^2.2.14",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "vm2": "^3.7.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",

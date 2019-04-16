@@ -67,8 +67,13 @@ export default class index extends Component {
           <Typography variant='subtitle1'>Choose the next preset you want to execute or create a new one from scratch.</Typography>
           <Divider />
           <div className='preset-selector-scripts'>
-            <span>Quick start:</span>
-            {scripts.map((scriptName, index) => (
+            <Typography variant='body1'>Quick start:</Typography>
+            {scripts.length <= 0 ? (
+              <Typography
+                className='preset-selector-scripts-empty'
+                variant='body2'
+              >You have no scripts in your directory.</Typography>
+            ) : scripts.map((scriptName, index) => (
               <Chip
                 className='preset-selector-scripts-chip'
                 key={scriptName}

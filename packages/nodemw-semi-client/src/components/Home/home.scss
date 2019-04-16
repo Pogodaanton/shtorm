@@ -20,9 +20,10 @@
     flex-wrap: wrap;
     align-items: center;
 
-    > span, .preset-selector-scripts-chip {
+    > p, .preset-selector-scripts-chip {
       margin-right: 10px;
       &:last-child { margin-right: 0; }
+      &.preset-selector-scripts-empty { opacity: .5; }
     }
   }
 

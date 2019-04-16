@@ -5,16 +5,19 @@ import LineWeightIcon from '@material-ui/icons/LineWeight'
 import ClearAllIcon from '@material-ui/icons/ClearAll'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import ExpandLessIcon from '@material-ui/icons/ExpandLess'
+import PropTypes from 'prop-types'
 import DefaultGridItem from '../DefaultGridItem/index'
 import TerminalWindow from '../TerminalWindow'
-import io from 'socket.io-client'
-import config from '../../config.json'
-import './Terminal.scss'
 import DefaultGridContainer from '../DefaultGridContainer/index'
+import { SocketContext } from '../../contexts/SocketContext'
+import './Terminal.scss'
 
 let minTerminalHeight = 53
-export default class Terminal extends Component {
-  static contextType = TerminalContext
+class Terminal extends Component {
+  static propTypes = {
+    context: PropTypes.object.isRequired
+  }
+
   state = {
     isOpened: false,
     terminalLines: [],
@@ -22,14 +25,13 @@ export default class Terminal extends Component {
   }
 
   headerRef = createRef()
-  socket = io(config.socketAdress)
 
   componentDidUpdate = (prevProps, prevState) => {
   }
 
   componentDidMount = () => {
-    this.socket.on('connect', () => this.addLine({ msg: `Connected to socket. (${config.socketAdress})` }))
-    this.socket.on('log_message', this.addLine)
+    this.props.context.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
+    this.props.context.socket.on('log_message', this.addLine)
 
     document.addEventListener('mousedown', this.onHandleMouseDown)
     document.addEventListener('mouseup', this.onHandleMouseUp)
@@ -63,10 +65,10 @@ export default class Terminal extends Component {
   }
 
   toggleTerminal = () => {
-    if (this.context.terminalHeight > minTerminalHeight) {
-      this.context.setDesiredTerminalHeight()
-      this.context.setTerminalHeight(minTerminalHeight)
-    } else this.context.setTerminalHeight(this.context.desiredTerminalHeight)
+    if (this.props.context.terminalHeight > minTerminalHeight) {
+      this.props.context.setDesiredTerminalHeight()
+      this.props.context.setTerminalHeight(minTerminalHeight)
+    } else this.props.context.setTerminalHeight(this.props.context.desiredTerminalHeight)
   }
 
   checkElementIsHandlebar = ({ target }) => {
@@ -77,7 +79,7 @@ export default class Terminal extends Component {
   onHandleMouseDown = (e) => {
     if (this.checkElementIsHandlebar(e)) {
       document.addEventListener('mousemove', this.onHandleMouseMove)
-      this.mouseDownCapture = { y: e.clientY, terminalHeight: this.context.terminalHeight }
+      this.mouseDownCapture = { y: e.clientY, terminalHeight: this.props.context.terminalHeight }
     }
   }
 
@@ -90,7 +92,7 @@ export default class Terminal extends Component {
     const differenceY = y - clientY
     const boundaryTop = window.innerHeight - (document.getElementById('page-header').clientHeight + this.headerRef.current.clientHeight + 15)
     const newTerminalSize = Math.max(Math.min(terminalHeight + differenceY, boundaryTop), minTerminalHeight)
-    this.context.setTerminalHeight(newTerminalSize)
+    this.props.context.setTerminalHeight(newTerminalSize)
 
     this.setState({
       isDraggingHeader: true
@@ -99,7 +101,7 @@ export default class Terminal extends Component {
 
   onHandleMouseUp = (e) => {
     if (this.state.isDraggingHeader) {
-      const { terminalHeight, setDesiredTerminalHeight } = this.context
+      const { terminalHeight, setDesiredTerminalHeight } = this.props.context
       if (terminalHeight > minTerminalHeight + 10) setDesiredTerminalHeight(terminalHeight)
 
       this.setState({
@@ -111,9 +113,9 @@ export default class Terminal extends Component {
 
   render () {
     const { terminalLines } = this.state
-    const isOpened = (this.context.terminalHeight <= minTerminalHeight)
+    const isOpened = (this.props.context.terminalHeight <= minTerminalHeight)
     const gridContainerStyle = {
-      flexBasis: this.context.terminalHeight
+      flexBasis: this.props.context.terminalHeight
     }
 
     return (
@@ -159,4 +161,19 @@ export default class Terminal extends Component {
       </DefaultGridContainer>
     )
   }
+}
+
+export default function ContextCombiner (props) {
+  return (
+    <TerminalContext.Consumer>
+      {(tcontext) => (
+        <SocketContext.Consumer>
+          {(scontext) => <Terminal
+            {...props}
+            context={{ ...tcontext, ...scontext }}
+          />}
+        </SocketContext.Consumer>
+      )}
+    </TerminalContext.Consumer>
+  )
 }

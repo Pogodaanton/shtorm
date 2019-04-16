@@ -52,7 +52,8 @@ export default class PresetTable extends Component {
           <Button
             color='secondary'
             variant='outlined'
-            onClick={this.onRowButtonClick('start', row.name)}
+            component={Link}
+            to={`/start/${urlFriendlyName}`}
             style={{ marginLeft: 5 }}
           ><PlayIcon style={{ marginRight: 10 }} /> Start</Button>
         </Fragment>

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import configController from './Controllers/configController'
 import presetController from './Controllers/presetController'
-import scriptController from './Controllers/scriptController'
+import scriptConfigController from './Controllers/scriptConfigController'
 
 const router = Router()
 
@@ -18,7 +18,7 @@ router.post('/api/v1/deletePreset', presetController.requestDeletePreset)
 router.post('/api/v1/savePreset', presetController.requestSavePreset)
 
 // Scripts
-router.get('/api/v1/getAllScripts', scriptController.requestAllScripts)
-router.get('/api/v1/getScriptOptions', scriptController.requestScriptOptions)
+router.get('/api/v1/getAllScripts', scriptConfigController.requestAllScripts)
+router.get('/api/v1/getScriptOptions', scriptConfigController.requestScriptOptions)
 
 export default router

@@ -1,5 +1,5 @@
 import DatabaseController from './databaseController'
-import ScriptController from './scriptController'
+import scriptConfigController from './scriptConfigController'
 import configController from './configController'
 
 class PresetController {
@@ -8,7 +8,7 @@ class PresetController {
   }
 
   requestPreset = (req, res) => {
-    const data = this.getPreset(req.query.name)
+    const data = this.getPreset(req.query.name).preset
     if (data) {
       return res.status(200).send({
         success: true,
@@ -29,7 +29,7 @@ class PresetController {
       message: 'Presets successfully requested.',
       data: {
         presets: this.getAllPresets(),
-        scripts: ScriptController.getAllScripts()
+        scripts: scriptConfigController.getAllScripts()
       }
     })
   }
@@ -90,7 +90,7 @@ class PresetController {
       })
     }
 
-    if (!this.getPreset(name)) {
+    if (!this.getPreset(name).preset) {
       return res.status(410).send({
         success: false,
         message: 'Name not found in database!'
@@ -116,7 +116,13 @@ class PresetController {
   }
 
   getPreset = (name = '') => {
-    return this.db.find({ name }).value()
+    const preset = this.db.find({ name }).value()
+    let config = null
+    if (name && preset) {
+      config = configController.getConfig(preset.config)
+    }
+
+    return { preset, config }
   }
 }
 

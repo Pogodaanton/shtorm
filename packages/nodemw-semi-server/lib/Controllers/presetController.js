@@ -116,7 +116,7 @@ class PresetController {
   }
 
   getPreset = (name = '') => {
-    const preset = this.db.find({ name }).value()
+    let preset = this.db.find({ name }).value()
     let config = null
     if (name && preset) {
       config = configController.getConfig(preset.config)

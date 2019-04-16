@@ -13,7 +13,6 @@ export default class Start extends Component {
   }
 
   uuid = null
-  scriptName = decodeURIComponent(this.props.match.params.name)
   state = {
     progress: 0
   }
@@ -22,12 +21,18 @@ export default class Start extends Component {
     this.context.socket.emit('stop', this.scriptName)
     this.context.socket.off('prompt', this.openPrompt)
     this.context.socket.off('start.success', this.saveUUID)
+    this.context.socket.off('script.progress', this.progress)
+    this.context.socket.off('script.success', this.finished)
+    this.context.socket.off('prompt', this.openPrompt)
   }
 
   componentDidMount = () => {
+    this.scriptName = decodeURIComponent(this.props.match.params.name)
+    console.log(this.scriptName)
     this.context.socket.emit('start', this.scriptName)
     this.context.socket.on('start.success', this.saveUUID)
     this.context.socket.on('script.progress', this.progress)
+    this.context.socket.on('script.success', this.finished)
     this.context.socket.on('prompt', this.openPrompt)
   }
 
@@ -39,6 +44,10 @@ export default class Start extends Component {
   progress = (progress) => {
     console.log(progress)
     this.setState({ progress })
+  }
+
+  finished = () => {
+    console.log('Script finished!')
   }
 
   openPrompt = (e) => {

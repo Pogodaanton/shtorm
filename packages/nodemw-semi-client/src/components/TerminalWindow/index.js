@@ -1,6 +1,7 @@
 import React, { Component, createRef } from 'react'
 import { AutoSizer, List, CellMeasurerCache, CellMeasurer } from 'react-virtualized'
 import PropTypes from 'prop-types'
+import AnsiParser from './AnsiParser'
 import './TerminalWindow.scss'
 
 const cache = new CellMeasurerCache({
@@ -69,7 +70,7 @@ export default class index extends Component {
           key={timestamp}
           style={style}
         >
-          [{type}] {new Date(timestamp).toLocaleTimeString()} - {msg}
+          [{type}] {new Date(timestamp).toLocaleTimeString()} - <AnsiParser>{msg}</AnsiParser>
         </div>
       </CellMeasurer>
     )

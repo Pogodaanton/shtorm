@@ -97,10 +97,8 @@ class Script {
   }
 
   getScriptExecutionData = () => {
-    return {
-      scriptName: this.scriptName,
-      progress: this.progress
-    }
+    const { progress, scriptName, finished } = this
+    return { progress, scriptName, finished }
   }
 
   stop = () => console.log('Händehoch!')

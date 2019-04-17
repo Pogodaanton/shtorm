@@ -66,14 +66,14 @@ export default class TasksPopover extends PureComponent {
           horizontal: 'right'
         }}
       >
-        {tasks ? tasks.length === 0 ? 'There are no tasks running currently' : tasks.map(({ uuid, scriptName, progress }) => (
+        {tasks ? tasks.length === 0 ? 'There are no tasks running currently' : tasks.map(({ uuid, scriptName, progress, finished }) => (
           <List
             dense
             key={uuid}
           >
             <ListItem>
               <ListItemIcon>
-                {progress < 100 ? (
+                {finished ? (
                   <CircularProgress
                     variant={progress > 0 ? 'determinate' : 'indeterminate'}
                     value={progress}

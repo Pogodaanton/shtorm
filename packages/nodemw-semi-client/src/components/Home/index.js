@@ -13,6 +13,7 @@ import DefaultGridItem from '../DefaultGridItem/index'
 import AddPreset from './AddPreset'
 import EditPreset from './EditPreset'
 import DeletePreset from './DeletePreset'
+import StartPreset from './StartPreset'
 import PresetTable from './PresetTable'
 import Fullscreen from '../Spinners/Fullscreen'
 
@@ -111,6 +112,7 @@ export default class index extends Component {
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 4) === '/add') && <AddPreset history={this.props.history} />}
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 6) === '/edit/') && <EditPreset {...this.props} />}
         {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 8) === '/delete/') && <DeletePreset {...this.props} />}
+        {(typeof location.pathname !== 'undefined' && location.pathname.substr(0, 7) === '/start/') && <StartPreset {...this.props} />}
         {loading && <Fullscreen />}
       </DefaultGridItem>
     )

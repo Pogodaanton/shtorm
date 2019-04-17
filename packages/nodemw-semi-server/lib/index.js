@@ -14,7 +14,7 @@ const port = process.argv[2]
 const allowedOrigin = process.argv[3]
 
 // Sending connections to wsConnection
-io.on('connection', wsConnection)
+io.on('connection', (client) => wsConnection(client, io))
 
 // Hooking body-parser and httpConnection middleware to express
 app.use(bodyParser.json())
@@ -36,6 +36,6 @@ interceptStdout((msg) => {
   io.emit('log_message', { type: 'DEBUG', key: shortid.generate(), timestamp: new Date().getTime(), msg: msg })
   return msg
 }, (errMsg) => {
-  io.emit('log_message', { type: 'ERROR', key: shortid.generate() , timestamp: new Date().getTime(), msg: errMsg })
+  io.emit('log_message', { type: 'ERROR', key: shortid.generate(), timestamp: new Date().getTime(), msg: errMsg })
   return errMsg
 })

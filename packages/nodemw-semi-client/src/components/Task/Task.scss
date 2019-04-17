@@ -1,0 +1,11 @@
+.grid-item-task > div > div {
+  &.spotlight {
+    &.spotlight-task-error, &.spotlight-task-success {
+      opacity: 1;
+      > a {
+        margin-top: 5px;
+        svg { margin-right: 10px; }
+      }
+    }
+  }
+}

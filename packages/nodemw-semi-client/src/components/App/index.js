@@ -7,7 +7,7 @@ import SocketContextProvider from '../../contexts/SocketContext'
 import DefaultGridContainer from '../DefaultGridContainer'
 import Header from '../Header'
 import Home from '../Home'
-import Start from '../Start'
+import Task from '../Task'
 import NotFound from '../NotFound'
 import Terminal from '../Terminal'
 import BotConfigs from '../BotConfigs'
@@ -41,7 +41,11 @@ class App extends Component {
                 />
                 <Route
                   path='/start/:name'
-                  component={Start}
+                  component={Home}
+                />
+                <Route
+                  path='/task/:uuid'
+                  component={Task}
                 />
                 <Route
                   path='/configs'

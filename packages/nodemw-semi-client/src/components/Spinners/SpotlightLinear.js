@@ -6,6 +6,7 @@ import './SpotlightLinear.scss'
 export default class Fullscreen extends PureComponent {
   static propTypes = {
     value: PropTypes.number,
+    msg: PropTypes.string,
     color: PropTypes.string
   }
 
@@ -23,13 +24,13 @@ export default class Fullscreen extends PureComponent {
   }
 
   render () {
-    const { value, color } = this.props
+    const { value, color, msg } = this.props
     return this.state.visibility ? (
       <div className='spotlight spinner spinner-spotlight-linear'>
         <Typography
           variant='h5'
           className='spinner-text'
-        >Loading the unloadable!</Typography>
+        >{msg || 'Loading the unloadable!'}</Typography>
         <LinearProgress
           color={color || 'primary'}
           className='spinner-progress'

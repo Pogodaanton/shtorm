@@ -17,8 +17,8 @@ class ExampleClass {
 
 export default () => new Promise((resolve, reject) => {
   const ex = new ExampleClass(bot, clientOptions)
-  updateClient({ progress: 10, progressMessage: 'Starting up bot' })
 
+  updateClient({ progress: 10, progressMessage: 'Starting up bot' })
   ex.getOptions()
 
   updateClient({

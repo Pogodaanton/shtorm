@@ -12,7 +12,7 @@ var config = {
   output: {
     filename: '[name].[hash].bundle.js',
     chunkFilename: '[name].[chunkhash].chunk.bundle.js',
-    path: path.join(__dirname, 'dist'),
+    path: path.join(__dirname, '../dist'),
     publicPath: '/'
   },
   module: {

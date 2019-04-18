@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import configController from './configController'
+import { VM } from 'vm2'
+import { transformFileSync } from '@babel/core'
 
 const scriptsFolder = path.join(__dirname, '../../scripts')
 class ScriptConfigController {
@@ -9,7 +11,7 @@ class ScriptConfigController {
   }
 
   requestScriptOptions = (req, res) => {
-    const data = this.getScriptOptions(req.query.name)
+    const data = this.getScriptOptions(req.query.script)
     if (data) {
       return res.status(200).send({
         success: true,
@@ -52,12 +54,22 @@ class ScriptConfigController {
   }
 
   getScriptOptions = (scriptName) => {
-    const scriptOptions = [
+    const vm = new VM({
+      sandbox: { exports: {} },
+      require: {
+        external: false,
+        builtin: ['lowdb'],
+        root: './'
+      }
+    })
+    /* const scriptOptions = [
       { type: 'text', name: 'Summary', value: 'Infobox --> Infobox_Waffen | Fragen: [[User:Pogodaanton|Pogodaanton]]' },
       { type: 'number', name: 'From page in category', value: 0 },
       { type: 'number', name: 'Amount of pages', value: 10 }
-    ]
-
+    ] */
+    const { code } = transformFileSync(path.join(scriptsFolder, `./${scriptName}`))
+    const scriptOptions = vm.run(code).scriptOptions
+    if (typeof scriptOptions !== 'object') return []
     return this.makeUnique(scriptOptions, 'name')
   }
 

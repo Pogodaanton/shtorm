@@ -79,7 +79,7 @@ class PresetDialog extends Component {
 
   getScriptOptions = () => {
     this.setState({ loading: true })
-    axios.get(Api.getApiUrl('getScriptOptions'))
+    axios.get(Api.getApiUrl('getScriptOptions'), { params: { script: this.state.options.script } })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { currentStep, skippedSteps, options } = this.state

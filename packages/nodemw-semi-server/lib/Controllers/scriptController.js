@@ -52,15 +52,15 @@ class Script {
     transformFile(path.join(scriptsFolder, this.scriptName), (err, data) => {
       if (err) {
         console.error('Failed to load and transpile script', err)
-        this.client.emit('start.error', err)
+        this.client.emit('script.error', err)
         return
       }
 
       const { code } = data
-      if (typeof this.vm.run(code) !== 'function') {
-        const errMsg = 'Failed to load script: Export.default needs to be a function that returns a Promise!'
+      if (typeof this.vm.run(code).default !== 'function') {
+        const errMsg = 'Failed to load script: exports.default needs to be a function that returns a Promise!'
         console.error(errMsg)
-        this.client.emit('start.error', errMsg)
+        this.client.emit('script.error', errMsg)
         return
       }
 
@@ -71,7 +71,7 @@ class Script {
 
   executeScript = () => {
     try {
-      this.vm.run(this.code)(this.scriptOptions)
+      this.vm.run(this.code).default(this.scriptOptions)
         .then(() => {
           this.finished = true
           this.updateClient({ progress: 100, progressMessage: 'Script executed successfully.', dialog: {} })

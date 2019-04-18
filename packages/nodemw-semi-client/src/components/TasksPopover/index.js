@@ -73,8 +73,9 @@ export default class TasksPopover extends PureComponent {
           >
             <ListItem>
               <ListItemIcon>
-                {finished ? (
+                {!finished ? (
                   <CircularProgress
+                    size={25}
                     variant={progress > 0 ? 'determinate' : 'indeterminate'}
                     value={progress}
                   />

@@ -1,11 +1,15 @@
 .grid-item-task > div > div {
   &.spotlight {
-    &.spotlight-task-error, &.spotlight-task-success {
+    &.spotlight-task-error, &.spotlight-task-success, &.spotlight-task-has-dialog {
       opacity: 1;
-      > a {
+      > a, > button {
         margin-top: 5px;
         svg { margin-right: 10px; }
       }
     }
   }
+}
+
+.task-dialog-actions > button svg {
+  margin-right: 10px;
 }

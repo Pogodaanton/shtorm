@@ -12,13 +12,17 @@ class Script {
   progress = 0
   progressMessage = null
   finished = false
+  dialog = {}
+
+  scriptDialogResolveFunction = null
+  scriptDialogRejectFunction = null
 
   constructor (client, config, scriptName, scriptOptions = {}) {
-    this.client = client
     this.config = config
     this.scriptName = scriptName
     this.scriptOptions = scriptOptions
 
+    this.setClient(client)
     this.initPrequesities()
   }
 
@@ -31,8 +35,13 @@ class Script {
     Promise.promisifyAll(this.bot)
 
     this.vm = new VM({
-      console: 'inherit',
-      sandbox: { exports: {} },
+      sandbox: {
+        exports: {},
+        updateClient: this.updateClient,
+        bot: this.bot,
+        clientOptions: this.scriptOptions,
+        console
+      },
       require: {
         external: true,
         builtin: ['lowdb'],
@@ -62,11 +71,10 @@ class Script {
 
   executeScript = () => {
     try {
-      this.vm.run(this.code)(this.bot, {}, this.scriptOptions)
+      this.vm.run(this.code)(this.scriptOptions)
         .then(() => {
-          console.log('yaaay, finished!')
-          this.setProgress(80)
           this.finished = true
+          this.updateClient({ progress: 100, progressMessage: 'Script executed successfully.', dialog: {} })
         })
         .catch((err) => {
           console.error('Failed to successfully execute the script.', err)
@@ -78,22 +86,57 @@ class Script {
     }
   }
 
-  setProgress = (progress, progressMessage = null) => {
-    if (typeof progress !== 'number') progress = 0
+  updateClient = (updateObj) => {
+    if (typeof updateObj !== 'object') {
+      console.error('Function "updateClient" requires an "Object" as argument.')
+      return new Promise((resolve) => resolve)
+    }
+
+    const { progress, progressMessage, dialog } = updateObj
+    if (typeof progress === 'number') this.progress = progress
     if (typeof progressMessage === 'string') this.progressMessage = progressMessage
-    this.progress = progress
-    this.sendProgress()
+    if (typeof dialog === 'object') {
+      return new Promise((resolve, reject) => {
+        this.dialog = dialog
+        this.scriptDialogResolveFunction = resolve
+        this.scriptDialogRejectFunction = reject
+
+        this.emitProgress()
+      })
+    }
+
+    this.emitProgress()
   }
 
-  sendProgress = () => {
-    const { progress, progressMessage, finished } = this
-    this.client.emit('script.progress', { progress, progressMessage, finished })
+  dialogHandler = (isRejected) => (data) => {
+    const { scriptDialogRejectFunction: reject, scriptDialogResolveFunction: resolve } = this
+    if (typeof resolve === 'function' && typeof reject === 'function') {
+      if (isRejected) reject(data)
+      else resolve(data)
+
+      this.dialog = {}
+      this.scriptDialogRejectFunction = null
+      this.scriptDialogResolveFunction = null
+    }
+  }
+
+  emitProgress = () => {
+    const { progress, progressMessage, finished, dialog } = this
+    this.client.emit('script.progress', { progress, progressMessage, finished, dialog })
   }
 
   setClient = (client) => {
     if (typeof client === 'undefined') return
+    if (typeof this.client !== 'undefined') {
+      this.client.off('script.dialog.resolve', this.dialogHandler(false))
+      this.client.off('script.dialog.reject', this.dialogHandler(true))
+      this.client.emit('client.disconnect')
+    }
+
     this.client = client
-    this.sendProgress()
+    this.client.on('script.dialog.resolve', this.dialogHandler(false))
+    this.client.on('script.dialog.reject', this.dialogHandler(true))
+    this.emitProgress()
   }
 
   getScriptExecutionData = () => {

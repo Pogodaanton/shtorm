@@ -1,3 +1,4 @@
+/* globals updateClient, bot, clientOptions */
 export const scriptOptions = [
   { type: 'text', name: 'Summary', value: 'Infobox --> Infobox_Weapons' },
   { type: 'number', name: 'From page in category', value: 0 },
@@ -9,19 +10,28 @@ class ExampleClass {
     this.bot = bot
     this.options = options
   }
-
-  getBot = () => {
-    console.log(this.bot)
-  }
-
   getOptions = () => {
     console.log(this.options)
   }
 }
 
-export default (bot, options) => new Promise((resolve, reject) => {
-  const ex = new ExampleClass(bot, options)
-  ex.getBot()
+export default () => new Promise((resolve, reject) => {
+  const ex = new ExampleClass(bot, clientOptions)
+  updateClient({ progress: 10, progressMessage: 'Starting up bot' })
+
   ex.getOptions()
-  resolve()
+
+  updateClient({
+    progress: 80,
+    progressMessage: 'Getting approval...',
+    dialog: {
+      type: 'code',
+      code: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+      msg: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+    }
+  }).then((data) => {
+    if (typeof data === 'string' && data) console.log('You accepted the changes.', data)
+    else console.log('You rejected the changes.')
+    resolve()
+  })
 })

@@ -47,10 +47,10 @@ var config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      title: 'Loading... | Nodemw-Semi'
+      title: 'Nodemw-Semi | The Semi-Automatic scriptable WikiBot'
     }),
     new MonacoWebpackPlugin({
-      languages: ['json', 'xml']
+      languages: ['json', 'xml', 'markdown', 'html']
     })
   ]
 }
@@ -58,12 +58,13 @@ var config = {
 var devConfig = {
   devtool: 'source-map',
   devServer: {
+    host: '0.0.0.0',
+    port: 3000,
     stats: 'errors-only',
     contentBase: 'src/',
     progress: true,
     compress: true,
-    historyApiFallback: true,
-    port: 3000
+    historyApiFallback: true
   }
 }
 

@@ -16,7 +16,7 @@ export default class Fullscreen extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.visibilityTimeout = setTimeout(() => this.setState({ visibility: true }), 280)
+    this.visibilityTimeout = setTimeout(() => this.setState({ visibility: true }), 600)
   }
 
   componentWillUnmount = () => {

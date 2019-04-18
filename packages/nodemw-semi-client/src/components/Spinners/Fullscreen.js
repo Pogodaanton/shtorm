@@ -9,7 +9,7 @@ export default class Fullscreen extends PureComponent {
   }
 
   componentDidMount = () => {
-    this.openTimeout = setTimeout(() => this.setState({ open: true }), 280)
+    this.openTimeout = setTimeout(() => this.setState({ open: true }), 600)
   }
 
   componentWillUnmount = () => {

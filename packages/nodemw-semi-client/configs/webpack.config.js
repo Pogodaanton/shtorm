@@ -1,5 +1,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
+const NODEMODULES_DIR = path.resolve(__dirname, '../node_modules')
+const MONACO_DIR = path.resolve(__dirname, '../node_modules/monaco-editor')
 
 var config = {
   stats: 'errors-only',
@@ -16,18 +19,27 @@ var config = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
+        exclude: NODEMODULES_DIR,
         use: {
           loader: 'babel-loader'
         }
       },
       {
         test: /\.scss$/,
+        exclude: NODEMODULES_DIR,
         use: [
           'style-loader',
           'css-loader',
           'postcss-loader',
           'sass-loader'
+        ]
+      },
+      {
+        test: /\.css$/,
+        include: MONACO_DIR,
+        use: [
+          'style-loader',
+          'css-loader'
         ]
       }
     ]
@@ -36,6 +48,9 @@ var config = {
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       title: 'Loading... | Nodemw-Semi'
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['json', 'xml']
     })
   ]
 }

@@ -58,6 +58,8 @@ yarn.lock
 # compiled folders
 dist
 db
+scripts
+!scripts/example.js
 
 # dotenv environment variables file
 .env

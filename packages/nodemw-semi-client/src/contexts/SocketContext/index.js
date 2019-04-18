@@ -10,7 +10,7 @@ export default class SocketContextProvider extends Component {
     children: PropTypes.node.isRequired
   }
 
-  socket = io(config.socketAdress)
+  socket = io(config.prefix + config.socketAdress, { path: config.socketPath })
 
   provideValue = {
     socket: this.socket

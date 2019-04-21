@@ -56,8 +56,8 @@ scripts
 !scripts/example.js
 
 # config files users need to create themselves
-src/config.json 
-lib/config.json 
+src
+lib
 
 # dotenv environment variables file
 .env

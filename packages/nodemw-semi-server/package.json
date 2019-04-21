@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "build": "babel lib -d dist",
-    "start": "nodemon --exec babel-node lib/index.js 8000",
+    "start": "nodemon --exec babel-node lib/index.js",
     "serve": "node dist/index.js"
   },
   "dependencies": {
@@ -36,9 +35,8 @@
   },
   "nodemonConfig": {
     "verbose": false,
-    "ignore": [
-      "db",
-      "scripts"
+    "watch": [
+      "lib/"
     ]
   }
 }

@@ -2,7 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "start": "lerna run --parallel start"
+    "start": "lerna run --parallel start",
+    "build": "lerna run --no-bail build"
   },
   "devDependencies": {
     "lerna": "^3.13.1"

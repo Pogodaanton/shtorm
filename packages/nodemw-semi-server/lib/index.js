@@ -6,12 +6,12 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import wsConnection from './wsConnection'
 import httpConnection from './httpConnection'
+import configChecker from './configChecker'
 
+const { port, clientUrl } = configChecker()
 const app = express()
 const httpServer = Server(app)
 const io = socketIo(httpServer)
-const port = process.argv[2]
-const allowedOrigin = process.argv[3]
 
 // Sending connections to wsConnection
 io.on('connection', (client) => wsConnection(client, io))
@@ -20,7 +20,7 @@ io.on('connection', (client) => wsConnection(client, io))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', allowedOrigin || 'http://localhost:3000')
+  res.header('Access-Control-Allow-Origin', clientUrl)
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
 })

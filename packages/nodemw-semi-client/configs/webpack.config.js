@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const NODEMODULES_DIR = path.resolve(__dirname, '../node_modules')
@@ -75,6 +76,11 @@ module.exports = (env, argv) => {
   if (isDevServer) {
     cfg = Object.assign(config, devConfig) // Appending config specific for dev
     cfg.entry.main.push('./configs/status-bar.js') // Loading webpack-dev-server-status-bar w/ custom config
+  }
+
+  if (!fs.existsSync(path.join(__dirname, '../src/config.json'))) {
+    console.error('You need to create a config.json in "packages/nodemw-semi-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
+    process.exit(9)
   }
 
   return cfg

@@ -52,12 +52,11 @@ yarn.lock
 # compiled folders
 dist
 db
-scripts
-!scripts/example.js
+packages/shtorm-server/scripts/**
+!packages/shtorm-server/scripts/example.js
 
 # config files users need to create themselves
-src
-lib
+**/config.json
 
 # dotenv environment variables file
 .env

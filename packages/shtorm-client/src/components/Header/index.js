@@ -28,7 +28,7 @@ export default class index extends Component {
             variant='h6'
             color='inherit'
             className='main-header'
-          >Nodemw-Semi |&nbsp;
+          >Shtorm ⛈ |&nbsp;
             <Switch>
               <Route
                 exact

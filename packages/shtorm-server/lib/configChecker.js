@@ -8,7 +8,7 @@ function stopWithError (err) {
 
 export default () => {
   const configPath = path.join(__dirname, './config.json')
-  if (!fs.existsSync(configPath)) stopWithError('You need to create a config.json in "packages/nodemw-semi-server/lib" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
+  if (!fs.existsSync(configPath)) stopWithError('You need to create a config.json in "packages/shtorm-server/lib" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
 
   const configFile = fs.readFileSync(configPath)
   const config = JSON.parse(configFile)

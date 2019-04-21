@@ -48,7 +48,7 @@ var config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      title: 'Nodemw-Semi | The semi-automatic scriptable WikiBot'
+      title: 'Shtorm | The semi-automatic scriptable WikiBot'
     }),
     new MonacoWebpackPlugin({
       languages: ['json', 'xml', 'markdown', 'html']
@@ -79,7 +79,7 @@ module.exports = (env, argv) => {
   }
 
   if (!fs.existsSync(path.join(__dirname, '../src/config.json'))) {
-    console.error('You need to create a config.json in "packages/nodemw-semi-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
+    console.error('You need to create a config.json in "packages/shtorm-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
     process.exit(9)
   }
 

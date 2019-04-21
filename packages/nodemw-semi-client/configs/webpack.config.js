@@ -48,7 +48,7 @@ var config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      title: 'Nodemw-Semi | The Semi-Automatic scriptable WikiBot'
+      title: 'Nodemw-Semi | The semi-automatic scriptable WikiBot'
     }),
     new MonacoWebpackPlugin({
       languages: ['json', 'xml', 'markdown', 'html']

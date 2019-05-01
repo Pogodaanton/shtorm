@@ -2,5 +2,6 @@
   "prefix": "http://",
   "socketAdress": "localhost:8000",
   "socketPath": "",
-  "apiAdress": "/api/v1/"
+  "apiAdress": "/api/v1/",
+  "clientPath": "/"
 }

@@ -10,12 +10,6 @@ var config = {
   entry: {
     main: ['./src/main.js']
   },
-  output: {
-    filename: '[name].[hash].bundle.js',
-    chunkFilename: '[name].[chunkhash].chunk.bundle.js',
-    path: path.join(__dirname, '../dist'),
-    publicPath: '/'
-  },
   module: {
     rules: [
       {
@@ -72,15 +66,31 @@ var devConfig = {
 module.exports = (env, argv) => {
   var cfg = config
   const isDevServer = process.argv.some(s => s.match(/webpack-dev-server$/))
+  const clientCfgPath = path.join(__dirname, '../src/config.json')
+
+  if (!fs.existsSync(clientCfgPath)) {
+    console.error('You need to create a config.json in "packages/shtorm-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
+    process.exit(9)
+  }
+
+  try {
+    const clientCfgRaw = fs.readFileSync(clientCfgPath)
+    const clientCfg = JSON.parse(clientCfgRaw)
+
+    cfg.output = {
+      filename: '[name].[hash].bundle.js',
+      chunkFilename: '[name].[chunkhash].chunk.bundle.js',
+      path: path.join(__dirname, '../dist'),
+      publicPath: clientCfg.clientPath
+    }
+  } catch (err) {
+    console.error('An unexpected error happened when reading src/config.json!', err)
+    process.exit()
+  }
 
   if (isDevServer) {
     cfg = Object.assign(config, devConfig) // Appending config specific for dev
     cfg.entry.main.push('./configs/status-bar.js') // Loading webpack-dev-server-status-bar w/ custom config
-  }
-
-  if (!fs.existsSync(path.join(__dirname, '../src/config.json'))) {
-    console.error('You need to create a config.json in "packages/shtorm-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')
-    process.exit(9)
   }
 
   return cfg

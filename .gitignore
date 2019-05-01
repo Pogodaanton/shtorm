@@ -47,7 +47,6 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-yarn.lock
 
 # compiled folders
 dist

@@ -62,7 +62,7 @@ export default class index extends Component {
             id='toggleTasks'
             ref={this.setIconButtonRef}
           >
-            <Tooltip title='Show running tasks'>
+            <Tooltip title='Show running processes'>
               <IconButton onClick={this.toggleTasks} >
                 <Assignment />
               </IconButton>

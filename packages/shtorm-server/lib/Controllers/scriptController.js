@@ -10,7 +10,7 @@ const scriptsFolder = path.join(__dirname, '../../scripts')
 class Script {
   bot = null
   progress = 0
-  progressMessage = null
+  progressText = null
   finished = false
   dialog = {}
 
@@ -74,7 +74,7 @@ class Script {
       this.vm.run(this.code).default(this.scriptOptions)
         .then(() => {
           this.finished = true
-          this.updateClient({ progress: 100, progressMessage: 'Script executed successfully.', dialog: {} })
+          this.updateClient({ progress: 100, progressText: 'Script executed successfully.', dialog: {} })
         })
         .catch((err) => {
           console.error('Failed to successfully execute the script.', err)
@@ -92,9 +92,9 @@ class Script {
       return new Promise((resolve) => resolve)
     }
 
-    const { progress, progressMessage, dialog } = updateObj
+    const { progress, progressText, dialog } = updateObj
     if (typeof progress === 'number') this.progress = progress
-    if (typeof progressMessage === 'string') this.progressMessage = progressMessage
+    if (typeof progressText === 'string') this.progressText = progressText
     if (typeof dialog === 'object') {
       return new Promise((resolve, reject) => {
         this.dialog = dialog
@@ -121,8 +121,8 @@ class Script {
   }
 
   emitProgress = () => {
-    const { progress, progressMessage, finished, dialog } = this
-    this.client.emit('script.progress', { progress, progressMessage, finished, dialog })
+    const { progress, progressText, finished, dialog } = this
+    this.client.emit('script.progress', { progress, progressText, finished, dialog })
   }
 
   setClient = (client) => {

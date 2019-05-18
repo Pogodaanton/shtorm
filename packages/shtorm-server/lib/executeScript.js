@@ -119,8 +119,6 @@ transformFile(path.join(scriptsFolder, args[0]), (err, data) => {
   }
 
   compiledCode = data.code
-  console.log('Code compiled!')
-  console.log(options.length)
   if (Object.keys(options).length > 0) prepareVM()
 })
 
@@ -134,7 +132,6 @@ process.on('message', ({ type, data }) => {
         typeof data.scriptOptions !== 'undefined'
       ) {
         options = data
-        console.log('Message received!')
         if (compiledCode.length > 0) prepareVM()
       }
       break

@@ -9,10 +9,12 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from '@material-ui/core'
 import AssignmentDoneIcon from '@material-ui/icons/AssignmentTurnedIn'
 import InputIcon from '@material-ui/icons/Input'
+import ClearIcon from '@material-ui/icons/Clear'
 import { SocketContext } from '../../contexts/SocketContext'
 import './TasksPopover.scss'
 
@@ -39,6 +41,7 @@ export default class TasksPopover extends PureComponent {
       this.context.socket.on('tasks.update', this.updateTasks)
       this.context.socket.emit('tasks.request')
     } else {
+      this.context.socket.emit('tasks.request.stop')
       this.context.socket.off('tasks.update', this.updateTasks)
     }
   }
@@ -46,6 +49,10 @@ export default class TasksPopover extends PureComponent {
   updateTasks = (tasks) => {
     console.log(tasks)
     this.setState({ tasks })
+  }
+
+  killTask = (uuid) => () => {
+    this.context.socket.emit('task.kill', uuid)
   }
 
   render () {
@@ -66,12 +73,14 @@ export default class TasksPopover extends PureComponent {
           horizontal: 'right'
         }}
       >
-        {tasks ? tasks.length === 0 ? 'There are no tasks running currently' : tasks.map(({ uuid, scriptName, progress, finished }) => (
+        {tasks ? tasks.length === 0 ? (
+          <Typography variant='caption'>There are no processes running currently.</Typography>
+        ) : tasks.map(({ uuid, scriptName, progress, finished }) => (
           <List
             dense
             key={uuid}
           >
-            <ListItem>
+            <ListItem className='popover-tasks-list'>
               <ListItemIcon>
                 {!finished ? (
                   <CircularProgress
@@ -82,21 +91,29 @@ export default class TasksPopover extends PureComponent {
                 ) : <AssignmentDoneIcon /> }
               </ListItemIcon>
               <ListItemText
-                primary={`Task ID: ${uuid}`}
+                primary={`Process ID: ${uuid}`}
                 secondary={`Script: ${scriptName}`}
               />
               <ListItemSecondaryAction>
                 <IconButton
+                  onClick={this.killTask(uuid)}
+                  aria-label='Kill Process'
+                >
+                  <ClearIcon />
+                </IconButton>
+                <IconButton
                   component={Link}
                   to={`/task/${encodeURIComponent(uuid)}`}
-                  aria-label='Visit Task'
+                  aria-label='Open Process'
                 >
                   <InputIcon />
                 </IconButton>
               </ListItemSecondaryAction>
             </ListItem>
           </List>
-        )) : 'Requesting current tasks...'}
+        )) : (
+          <Typography variant='subtitle1'>Requesting running processes...</Typography>
+        )}
       </Popover>
     )
   }

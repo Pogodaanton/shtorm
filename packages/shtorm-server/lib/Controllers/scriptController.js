@@ -33,8 +33,10 @@ class Script {
     }
   }
 
-  dialogHandler = (isRejected) => (newText) => this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
   emitProgress = () => this.clientObj !== null && this.client.emit('script.progress', this.clientObj)
+  dialogHandler = (isRejected) => (newText) => {
+    if (!this.childProcess.killed) this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
+  }
 
   emitConsole = (type) => (data) => this.client.emit('log_message', {
     type,
@@ -65,10 +67,11 @@ class Script {
   }
 
   getScriptExecutionData = () => {
+    const obj = this.clientObj || {}
     return {
-      progress: this.clientObj.progress || 0,
+      progress: obj.progress || 0,
       scriptName: this.scriptName,
-      finished: this.clientObj.finished || false
+      finished: obj.finished || false
     }
   }
 }
@@ -76,7 +79,7 @@ class Script {
 class ScriptController {
   tasks = {}
 
-  startScript = (name, client) => {
+  startProcess = (name, client) => {
     try {
       const { preset, config } = presetController.getPreset(name)
       if (preset && config) {
@@ -94,20 +97,21 @@ class ScriptController {
     }
   }
 
-  stopScript = (uuid, client) => {
+  killProcess = (uuid, client) => {
     const proc = this.tasks[uuid]
     if (proc) proc.stop()
-    else client.emit('script.stop.error', `Process ${uuid} does not exist!`)
+    else client.emit('task.kill.error', `Process ${uuid} does not exist!`)
   }
 
   handleStop = (task, client) => {
     const index = Object.values(this.tasks).findIndex((t) => t === task)
     const uuid = Object.keys(this.tasks)[index]
     delete this.tasks[uuid]
-    client.emit('script.stop', true)
+    client.emit('task.killed', true)
+    this.getProcesses(client)
   }
 
-  getTasks = (client) => {
+  getProcesses = (client) => {
     const tasks = Object.keys(this.tasks).map((uuid) => {
       const scriptExecutionData = this.tasks[uuid].getScriptExecutionData()
       return { uuid, ...scriptExecutionData }
@@ -115,7 +119,7 @@ class ScriptController {
     client.emit('tasks.update', tasks)
   }
 
-  setClientToTask = (uuid, client) => {
+  setClientToProcess = (uuid, client) => {
     const task = this.tasks[uuid]
     if (!task) {
       client.emit('task.request.error', `Process ${uuid} does not exist!`)

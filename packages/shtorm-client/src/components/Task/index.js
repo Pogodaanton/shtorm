@@ -30,6 +30,7 @@ export default class Start extends Component {
   componentWillUnmount = () => {
     this.context.socket.off('task.request.success', this.handleSuccess)
     this.context.socket.off('task.request.error', this.handleError)
+    this.context.socket.off('task.killed', this.handleKilled)
     this.context.socket.off('script.progress', this.updateProgress)
     this.context.socket.off('client.disconnect', this.handleDisconnect)
   }
@@ -38,6 +39,7 @@ export default class Start extends Component {
     this.uuid = decodeURIComponent(this.props.match.params.uuid)
     this.context.socket.on('task.request.success', this.handleSuccess)
     this.context.socket.on('task.request.error', this.handleError)
+    this.context.socket.on('task.killed', this.handleKilled)
     this.context.socket.on('script.progress', this.updateProgress)
     this.context.socket.on('client.disconnect', this.handleDisconnect)
 
@@ -48,6 +50,7 @@ export default class Start extends Component {
   handleError = (error) => this.setState({ error })
   updateProgress = ({ progress, progressText, finished, dialog }) => this.setState({ progress, progressText, finished, dialog })
   handleDisconnect = () => this.setState({ error: 'You have been disconnected from the task socket, as a new client connected to it.' })
+  handleKilled = () => !this.state.finished && this.setState({ error: 'You have been disconnected from the process socket, as it was killed.' })
 
   handleDialogClose = () => this.setState({ dialog: {}, dialogOpen: true })
   toggleDialog = () => this.setState({ dialogOpen: !this.state.dialogOpen })

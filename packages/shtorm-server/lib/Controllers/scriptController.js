@@ -1,128 +1,52 @@
 import presetController from './presetController'
 import shortid from 'shortid'
-import NodeMw from 'nodemw'
-import Promise from 'bluebird'
+import cp from 'child_process'
 import path from 'path'
-import { transformFile } from '@babel/core'
-import { VM } from 'vm2'
 
-const scriptsFolder = path.join(__dirname, '../../scripts')
 class Script {
-  bot = null
-  progress = 0
-  progressMessage = null
-  finished = false
-  dialog = {}
-
-  scriptDialogResolveFunction = null
-  scriptDialogRejectFunction = null
-
   constructor (client, config, scriptName, scriptOptions = {}) {
     this.config = config
     this.scriptName = scriptName
     this.scriptOptions = scriptOptions
+    this.clientObj = null
+
+    this.childProcess = cp.fork(path.join(__dirname, '../executeScript.js'), [scriptName], { stdio: 'pipe' })
+    this.childProcess.on('message', this.messageHandler)
+    this.childProcess.on('exit', this.exitHandler)
+    this.childProcess.stdout.on('data', this.emitConsole('DEBUG'))
+    this.childProcess.stderr.on('data', this.emitConsole('ERROR'))
 
     this.setClient(client)
-    this.initPrequesities()
+    this.childProcess.send({ type: 'options', data: { config, scriptOptions } })
   }
 
-  initPrequesities = () => {
-    this.client.emit('script.progress', 0)
-    this.bot = new NodeMw({
-      ...this.config,
-      debug: true
-    })
-    Promise.promisifyAll(this.bot)
-
-    this.vm = new VM({
-      sandbox: {
-        exports: {},
-        updateClient: this.updateClient,
-        bot: this.bot,
-        clientOptions: this.scriptOptions,
-        console
-      },
-      require: {
-        external: true,
-        builtin: ['lowdb'],
-        root: './'
-      }
-    })
-
-    transformFile(path.join(scriptsFolder, this.scriptName), (err, data) => {
-      if (err) {
-        console.error('Failed to load and transpile script', err)
-        this.client.emit('script.error', err)
-        return
-      }
-
-      const { code } = data
-      if (typeof this.vm.run(code).default !== 'function') {
-        const errMsg = 'Failed to load script: exports.default needs to be a function that returns a Promise!'
-        console.error(errMsg)
-        this.client.emit('script.error', errMsg)
-        return
-      }
-
-      this.code = code
-      this.executeScript()
-    })
-  }
-
-  executeScript = () => {
-    try {
-      this.vm.run(this.code).default(this.scriptOptions)
-        .then(() => {
-          this.finished = true
-          this.updateClient({ progress: 100, progressMessage: 'Script executed successfully.', dialog: {} })
-        })
-        .catch((err) => {
-          console.error('Failed to successfully execute the script.', err)
-          this.client.emit('script.error', err)
-        })
-    } catch (err) {
-      console.error('Failed to execute the script.', err)
-      this.client.emit('script.error', err)
-    }
-  }
-
-  updateClient = (updateObj) => {
-    if (typeof updateObj !== 'object') {
-      console.error('Function "updateClient" requires an "Object" as argument.')
-      return new Promise((resolve) => resolve)
-    }
-
-    const { progress, progressMessage, dialog } = updateObj
-    if (typeof progress === 'number') this.progress = progress
-    if (typeof progressMessage === 'string') this.progressMessage = progressMessage
-    if (typeof dialog === 'object') {
-      return new Promise((resolve, reject) => {
-        this.dialog = dialog
-        this.scriptDialogResolveFunction = resolve
-        this.scriptDialogRejectFunction = reject
-
+  messageHandler = ({ type, data }) => {
+    if (typeof type !== 'string') return
+    switch (type) {
+      case 'progress':
+        this.clientObj = data
         this.emitProgress()
-      })
-    }
+        break
 
-    this.emitProgress()
-  }
-
-  dialogHandler = (isRejected) => (data) => {
-    const { scriptDialogRejectFunction: reject, scriptDialogResolveFunction: resolve } = this
-    if (typeof resolve === 'function' && typeof reject === 'function') {
-      if (isRejected) reject(data)
-      else resolve(data)
-
-      this.dialog = {}
-      this.scriptDialogRejectFunction = null
-      this.scriptDialogResolveFunction = null
+      default:
+        break
     }
   }
 
-  emitProgress = () => {
-    const { progress, progressMessage, finished, dialog } = this
-    this.client.emit('script.progress', { progress, progressMessage, finished, dialog })
+  dialogHandler = (isRejected) => (newText) => this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
+  emitProgress = () => this.clientObj !== null && this.client.emit('script.progress', this.clientObj)
+
+  emitConsole = (type) => (data) => this.client.emit('log_message', {
+    type,
+    key: shortid.generate(),
+    timestamp: new Date().getTime(),
+    msg: `${data}`
+  })
+
+  stop = () => this.childProcess.kill()
+  exitHandler = () => {
+    console.log('Process killed.')
+    scriptController.handleStop(this, this.client)
   }
 
   setClient = (client) => {
@@ -136,15 +60,16 @@ class Script {
     this.client = client
     this.client.on('script.dialog.resolve', this.dialogHandler(false))
     this.client.on('script.dialog.reject', this.dialogHandler(true))
+
     this.emitProgress()
   }
 
   getScriptExecutionData = () => {
-    const { progress, scriptName, finished } = this
-    return { progress, scriptName, finished }
+    if (this.clientObj !== null) {
+      const { progress, scriptName, finished } = this.clientObj
+      return { progress, scriptName, finished }
+    } else return null
   }
-
-  stop = () => console.log('Händehoch!')
 }
 
 class ScriptController {
@@ -170,19 +95,21 @@ class ScriptController {
 
   stopScript = (uuid, client) => {
     const proc = this.tasks[uuid]
-    if (proc) {
-      proc.stop()
-      this.tasks[uuid] = null
-      client.emit('stop.success')
-    } else {
-      client.emit('stop.error', `Process ${uuid} does not exist!`)
-    }
+    if (proc) proc.stop()
+    else client.emit('script.stop.error', `Process ${uuid} does not exist!`)
+  }
+
+  handleStop = (task, client) => {
+    const index = Object.values(this.tasks).findIndex((t) => t === task)
+    const uuid = Object.keys(this.tasks)[index]
+    delete this.tasks[uuid]
+    client.emit('script.stop', true)
   }
 
   getTasks = (client) => {
     const tasks = Object.keys(this.tasks).map((uuid) => {
       const scriptExecutionData = this.tasks[uuid].getScriptExecutionData()
-      return { uuid, ...scriptExecutionData }
+      if (scriptExecutionData !== null) return { uuid, ...scriptExecutionData }
     })
     client.emit('tasks.update', tasks)
   }

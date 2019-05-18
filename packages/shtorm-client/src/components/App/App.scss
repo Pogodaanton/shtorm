@@ -39,7 +39,7 @@ html, body, #root, .content {
   }
 }
 
-a.MuiButtonBase-root-91:hover {
+a[role="button"]:hover {
   color: inherit;
 }
 

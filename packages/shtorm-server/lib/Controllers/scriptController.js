@@ -65,10 +65,11 @@ class Script {
   }
 
   getScriptExecutionData = () => {
-    if (this.clientObj !== null) {
-      const { progress, scriptName, finished } = this.clientObj
-      return { progress, scriptName, finished }
-    } else return null
+    return {
+      progress: this.clientObj.progress || 0,
+      scriptName: this.scriptName,
+      finished: this.clientObj.finished || false
+    }
   }
 }
 
@@ -109,7 +110,7 @@ class ScriptController {
   getTasks = (client) => {
     const tasks = Object.keys(this.tasks).map((uuid) => {
       const scriptExecutionData = this.tasks[uuid].getScriptExecutionData()
-      if (scriptExecutionData !== null) return { uuid, ...scriptExecutionData }
+      return { uuid, ...scriptExecutionData }
     })
     client.emit('tasks.update', tasks)
   }

@@ -4,18 +4,6 @@ import cp from 'child_process'
 import path from 'path'
 
 class Script {
-<<<<<<< HEAD
-=======
-  bot = null
-  progress = 0
-  progressText = null
-  finished = false
-  dialog = {}
-
-  scriptDialogResolveFunction = null
-  scriptDialogRejectFunction = null
-
->>>>>>> refs/remotes/origin/master
   constructor (client, config, scriptName, scriptOptions = {}) {
     this.config = config
     this.scriptName = scriptName
@@ -28,7 +16,6 @@ class Script {
     this.childProcess.stdout.on('data', this.emitConsole('DEBUG'))
     this.childProcess.stderr.on('data', this.emitConsole('ERROR'))
 
-<<<<<<< HEAD
     this.setClient(client)
     this.childProcess.send({ type: 'options', data: { config, scriptOptions } })
   }
@@ -38,83 +25,6 @@ class Script {
     switch (type) {
       case 'progress':
         this.clientObj = data
-=======
-  initPrequesities = () => {
-    this.client.emit('script.progress', 0)
-    this.bot = new NodeMw({
-      ...this.config,
-      debug: true
-    })
-    Promise.promisifyAll(this.bot)
-
-    this.vm = new VM({
-      sandbox: {
-        exports: {},
-        updateClient: this.updateClient,
-        bot: this.bot,
-        clientOptions: this.scriptOptions,
-        console
-      },
-      require: {
-        external: true,
-        builtin: ['lowdb'],
-        root: './'
-      }
-    })
-
-    transformFile(path.join(scriptsFolder, this.scriptName), (err, data) => {
-      if (err) {
-        console.error('Failed to load and transpile script', err)
-        this.client.emit('script.error', err)
-        return
-      }
-
-      const { code } = data
-      if (typeof this.vm.run(code).default !== 'function') {
-        const errMsg = 'Failed to load script: exports.default needs to be a function that returns a Promise!'
-        console.error(errMsg)
-        this.client.emit('script.error', errMsg)
-        return
-      }
-
-      this.code = code
-      this.executeScript()
-    })
-  }
-
-  executeScript = () => {
-    try {
-      this.vm.run(this.code).default(this.scriptOptions)
-        .then(() => {
-          this.finished = true
-          this.updateClient({ progress: 100, progressText: 'Script executed successfully.', dialog: {} })
-        })
-        .catch((err) => {
-          console.error('Failed to successfully execute the script.', err)
-          this.client.emit('script.error', err)
-        })
-    } catch (err) {
-      console.error('Failed to execute the script.', err)
-      this.client.emit('script.error', err)
-    }
-  }
-
-  updateClient = (updateObj) => {
-    if (typeof updateObj !== 'object') {
-      console.error('Function "updateClient" requires an "Object" as argument.')
-      return new Promise((resolve) => resolve)
-    }
-
-    const { progress, progressText, dialog } = updateObj
-    if (typeof progress === 'number') this.progress = progress
-    if (typeof progressText === 'string') this.progressText = progressText
-    if (typeof dialog === 'object') {
-      return new Promise((resolve, reject) => {
-        this.dialog = dialog
-        this.scriptDialogResolveFunction = resolve
-        this.scriptDialogRejectFunction = reject
-
->>>>>>> refs/remotes/origin/master
         this.emitProgress()
         break
 
@@ -128,7 +38,6 @@ class Script {
     if (!this.childProcess.killed) this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
   }
 
-<<<<<<< HEAD
   emitConsole = (type) => (data) => this.client.emit('log_message', {
     type,
     key: shortid.generate(),
@@ -140,11 +49,6 @@ class Script {
   exitHandler = () => {
     console.log('Process killed.')
     scriptController.handleStop(this, this.client)
-=======
-  emitProgress = () => {
-    const { progress, progressText, finished, dialog } = this
-    this.client.emit('script.progress', { progress, progressText, finished, dialog })
->>>>>>> refs/remotes/origin/master
   }
 
   setClient = (client) => {

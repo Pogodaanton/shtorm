@@ -8,7 +8,7 @@
     "build": "NODE_ENV=production webpack --config configs/webpack.config.js"
   },
   "dependencies": {
-    "@material-ui/core": "^3.9.3",
+    "@material-ui/core": "^4.0.0-rc.0",
     "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
     "focus-visible": "^4.1.5",

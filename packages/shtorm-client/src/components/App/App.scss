@@ -25,6 +25,7 @@ html, body, #root, .content {
       height: 0px;
       flex-grow: 1;
       overflow: auto;
+      margin-bottom: 10px;
 
       > div > .paper {
         padding: 10px 15px;
@@ -32,7 +33,7 @@ html, body, #root, .content {
       }
 
       > div, > div .paper {
-        height: calc(100% - 10px);
+        height: 100%;
         overflow: auto;
       }
     }
@@ -58,6 +59,6 @@ a[role="button"]:hover {
 @media (min-width: 600px) {
   .content {
     // max-height: calc(100vh - #{$terminal-header-height + 64px});
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 48px);
   }
 }

@@ -11,6 +11,7 @@ import Task from '../Task'
 import NotFound from '../NotFound'
 import Terminal from '../Terminal'
 import BotConfigs from '../BotConfigs'
+import Users from '../Users'
 import './App.scss'
 
 class App extends Component {
@@ -46,6 +47,11 @@ class App extends Component {
                 <Route
                   path='/task/:uuid'
                   component={Task}
+                />
+                <Route
+                  path='/users'
+                  component={Users}
+                  exact
                 />
                 <Route
                   path='/configs'

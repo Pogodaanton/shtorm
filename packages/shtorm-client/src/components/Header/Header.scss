@@ -1,5 +1,40 @@
 #page-header {
   a, svg {
-    color: initial;
+    color: black;
+  }
+
+  > div > a {
+    svg {
+      margin: {
+        top: 5px;
+        bottom: 5px;
+        right: 5px;
+      }
+    }
+
+    > span > span { display: none; }
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      border-bottom: 3px solid black;
+      opacity: 0;
+      transform: scaleY(0);
+      transform-origin: bottom center;
+      transition: all .2s;
+    }
+
+    &.active::after {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+}
+
+@media (min-width: 600px) {
+  #page-header > div > a > span > span {
+    display: initial;
   }
 }

@@ -6,8 +6,8 @@
   > div > a {
     svg {
       margin: {
-        top: 5px;
-        bottom: 5px;
+        top: 10px;
+        bottom: 10px;
         right: 5px;
       }
     }
@@ -19,7 +19,7 @@
       position: absolute;
       width: 100%;
       bottom: 0;
-      border-bottom: 3px solid black;
+      border-top: 4px solid #21252a;
       opacity: 0;
       transform: scaleY(0);
       transform-origin: bottom center;

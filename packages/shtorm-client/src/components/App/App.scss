@@ -38,6 +38,10 @@ html, body, #root, .content {
       }
     }
   }
+
+  .MuiSnackbar-anchorOriginTopRight {
+    margin-top: 42px;
+  }
 }
 
 a[role="button"]:hover {

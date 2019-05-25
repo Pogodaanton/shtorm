@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Paper, Grid } from '@material-ui/core'
 import { Switch, Route } from 'react-router-dom'
+import { withSnackbar } from 'notistack'
 import UsersSelect from './UsersSelect'
 import UsersList from './UsersList'
 import PropTypes from 'prop-types'
@@ -34,7 +35,12 @@ GridPaper.propTypes = {
   children: PropTypes.any
 }
 
-export default class Users extends Component {
+class Users extends Component {
+  static propTypes = {
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func
+  }
+
   state = {
     loading: true
   }
@@ -49,7 +55,7 @@ export default class Users extends Component {
         if (!Api.axiosCheckResponse(data)) throw new Error('An unexpected error happened!')
         console.log(data)
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   render () {
@@ -85,3 +91,5 @@ export default class Users extends Component {
     )
   }
 }
+
+export default withSnackbar(Users)

@@ -25,7 +25,7 @@ export default class UsersList extends Component {
         {loading && (
           <ListItem key={'loading'} >
             <ListItemIcon><CircularProgress size={22} /></ListItemIcon>
-            <ListItemText primary={'Requesting all users...'} />
+            <ListItemText primary={'Requesting Users...'} />
           </ListItem>
         )}
       </List>

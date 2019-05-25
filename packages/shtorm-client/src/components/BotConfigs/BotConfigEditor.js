@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Grid, Divider, Button } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
+import { withSnackbar } from 'notistack'
 import DeleteIcon from '@material-ui/icons/Delete'
 import CloudUploadIcon from '@material-ui/icons/CloudUpload'
 import CloudQueueIcon from '@material-ui/icons/CloudQueue'
@@ -9,10 +10,12 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
 
-export default class BotConfigEditor extends Component {
+class BotConfigEditor extends Component {
   static propTypes = {
     triggerUpdate: PropTypes.func,
-    onSelectionChanged: PropTypes.func
+    onSelectionChanged: PropTypes.func,
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func
   }
 
   static getDerivedStateFromProps = (props, lastState, b, c) => {
@@ -73,7 +76,7 @@ export default class BotConfigEditor extends Component {
           this.props.triggerUpdate()
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   deleteConfig = () => {
@@ -91,7 +94,7 @@ export default class BotConfigEditor extends Component {
       })
       .catch((err) => {
         if (err.response.status === 410) removeView()
-        else Api.axiosErrorHandler(err)
+        else Api.Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
       })
   }
 
@@ -259,3 +262,5 @@ export default class BotConfigEditor extends Component {
     )
   }
 }
+
+export default withSnackbar(BotConfigEditor)

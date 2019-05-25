@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Grid, Paper } from '@material-ui/core'
+import { withSnackbar } from 'notistack'
+import PropTypes from 'prop-types'
 import BotConfigEditor from './BotConfigEditor'
 import BotConfigSelect from './BotConfigSelect'
 import BotConfigList from './BotConfigList'
@@ -7,7 +9,12 @@ import axios from 'axios'
 import Api from '../Api'
 import './BotConfigs.scss'
 
-export default class BotConfigs extends Component {
+class BotConfigs extends Component {
+  static propTypes = {
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func
+  }
+
   state = {
     configList: [],
     configListLoaded: false,
@@ -24,7 +31,7 @@ export default class BotConfigs extends Component {
       .then((res) => {
         this.setState({ configList: res.data.data, configListLoaded: true })
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   getConfig = (name) => {
@@ -37,7 +44,7 @@ export default class BotConfigs extends Component {
         if (err.response.status === 410) {
           this.setState({ currentConfig: null })
           this.getAllConfigs()
-        } else Api.axiosErrorHandler(err)
+        } else Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
       })
   }
 
@@ -108,3 +115,5 @@ export default class BotConfigs extends Component {
     )
   }
 }
+
+export default withSnackbar(BotConfigs)

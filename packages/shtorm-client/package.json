@@ -12,6 +12,7 @@
     "@material-ui/icons": "^3.0.2",
     "axios": "^0.18.0",
     "focus-visible": "^4.1.5",
+    "notistack": "^0.8.5",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-loadable": "^5.5.0",

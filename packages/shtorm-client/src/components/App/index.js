@@ -1,7 +1,9 @@
-import React, { Component } from 'react'
-import { Switch, Route, withRouter } from 'react-router-dom'
-import { MuiThemeProvider } from '@material-ui/core'
+import React from 'react'
+import { Switch, Route } from 'react-router-dom'
+import { MuiThemeProvider, withStyles } from '@material-ui/core'
 import { theme } from '../../themes/dark'
+import { SnackbarProvider } from 'notistack'
+import PropTypes from 'prop-types'
 import TerminalContextProvider from '../../contexts/TerminalContext'
 import SocketContextProvider from '../../contexts/SocketContext'
 import DefaultGridContainer from '../DefaultGridContainer'
@@ -14,11 +16,28 @@ import BotConfigs from '../BotConfigs'
 import Users from '../Users'
 import './App.scss'
 
-class App extends Component {
-  render () {
-    return (
-      <SocketContextProvider>
-        <MuiThemeProvider theme={theme}>
+const styles = {
+  success: { color: 'white' },
+  error: { color: 'white' },
+  info: { color: 'white' }
+}
+
+function App ({ classes }) {
+  return (
+    <SocketContextProvider>
+      <MuiThemeProvider theme={theme}>
+        <SnackbarProvider
+          maxSnack={4}
+          classes={{
+            variantSuccess: classes.success,
+            variantError: classes.error,
+            variantInfo: classes.info
+          }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+        >
           <Header />
           <div className='content content-flex'>
             <DefaultGridContainer name='main'>
@@ -72,10 +91,14 @@ class App extends Component {
               <Terminal />
             </TerminalContextProvider>
           </div>
-        </MuiThemeProvider>
-      </SocketContextProvider>
-    )
-  }
+        </SnackbarProvider>
+      </MuiThemeProvider>
+    </SocketContextProvider>
+  )
 }
 
-export default withRouter(App)
+App.propTypes = {
+  classes: PropTypes.any.isRequired
+}
+
+export default withStyles(styles)(App)

@@ -63,7 +63,6 @@ export default class BotConfigList extends Component {
           </ListItem>
         ))}
       </List>
-
     )
   }
 }

@@ -1,7 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import { Typography, Paper, Grid } from '@material-ui/core'
+import { Paper, Grid } from '@material-ui/core'
+import { Switch, Route } from 'react-router-dom'
 import UsersSelect from './UsersSelect'
+import UsersList from './UsersList'
 import PropTypes from 'prop-types'
+import axios from 'axios'
+import Api from '../Api'
 
 function GridPaper ({ xs, sm, md, lg, xl, children }) {
   return (
@@ -31,7 +35,25 @@ GridPaper.propTypes = {
 }
 
 export default class Users extends Component {
+  state = {
+    loading: true
+  }
+
+  componentDidMount = () => {
+    this.getAllUsers()
+  }
+
+  getAllUsers = () => {
+    axios.get(Api.getApiUrl('getAllUsers'))
+      .then((data) => {
+        if (!Api.axiosCheckResponse(data)) throw new Error('An unexpected error happened!')
+        console.log(data)
+      })
+      .catch(Api.axiosErrorHandler)
+  }
+
   render () {
+    const { loading } = this.state
     return (
       <Fragment>
         <GridPaper
@@ -40,10 +62,7 @@ export default class Users extends Component {
           md={3}
           xl={2}
         >
-          <div className='spotlight'>
-            <Typography variant='h4'>Left</Typography>
-            <Typography variant='body1'>You tried to go to a page that does not exist. Wait, that&apos;s illegal!</Typography>
-          </div>
+          <UsersList loading={loading} />
         </GridPaper>
         <GridPaper
           xs={12}
@@ -51,7 +70,16 @@ export default class Users extends Component {
           md={8}
           lg={7}
         >
-          <UsersSelect />
+          <Switch>
+            <Route
+              path='/users/:id'
+              component={UsersSelect}
+            />
+            <Route
+              path='/users'
+              component={UsersSelect}
+            />
+          </Switch>
         </GridPaper>
       </Fragment>
     )

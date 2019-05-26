@@ -49,6 +49,7 @@ export default class index extends Component {
         color='primary'
       >
         <Toolbar variant='dense'>
+          <span className='page-header-logo'>⛈</span>
           <ActivatingLinkButton
             to='/'
             activeOnlyWhenExact

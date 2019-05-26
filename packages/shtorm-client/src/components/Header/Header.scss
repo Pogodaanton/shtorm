@@ -1,6 +1,14 @@
 #page-header {
+  position: relative;
+
   a, svg {
     color: black;
+  }
+
+  .page-header-logo {
+    margin-right: 5px;
+    user-select: none;
+    pointer-events: none;
   }
 
   > div > a {
@@ -28,13 +36,33 @@
 
     &.active::after {
       opacity: 1;
-      transform: scaleY(1);
+      transform: scaleY(1) scaleX(0.8);
     }
   }
 }
 
-@media (min-width: 600px) {
-  #page-header > div > a > span > span {
-    display: initial;
+@media (min-width: 780px) {
+  #page-header {
+    .page-header-logo {
+      position: absolute;
+      left: 0;
+      right: 0;
+      widtH: 0;
+      font-size: 1.4em;
+      margin: {
+        left: auto;
+        right: auto;
+      };
+    }
+
+    > div > a {
+      &.active::after {
+        transform: scaleY(1);
+      }
+
+      > span > span {
+        display: initial;
+      }
+    }
   }
 }

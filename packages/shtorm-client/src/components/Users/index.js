@@ -4,14 +4,15 @@ import { Switch, Route } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
 import UsersSelect from './UsersSelect'
 import UsersList from './UsersList'
+import UserEditor from './UserEditor'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
 
-function GridPaper ({ xs, sm, md, lg, xl, children }) {
+function GridPaper ({ className, xs, sm, md, lg, xl, children }) {
   return (
     <Grid
-      className='grid-split'
+      className={className}
       item
       xs={xs}
       sm={sm}
@@ -27,6 +28,7 @@ function GridPaper ({ xs, sm, md, lg, xl, children }) {
 }
 
 GridPaper.propTypes = {
+  className: PropTypes.string,
   xs: PropTypes.number,
   sm: PropTypes.number,
   md: PropTypes.number,
@@ -42,7 +44,8 @@ class Users extends Component {
   }
 
   state = {
-    loading: true
+    loading: true,
+    userList: []
   }
 
   componentDidMount = () => {
@@ -51,26 +54,34 @@ class Users extends Component {
 
   getAllUsers = () => {
     axios.get(Api.getApiUrl('getAllUsers'))
-      .then((data) => {
-        if (!Api.axiosCheckResponse(data)) throw new Error('An unexpected error happened!')
-        console.log(data)
+      .then((res) => {
+        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        this.setState({
+          userList: res.data.data,
+          loading: false
+        })
       })
       .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   render () {
-    const { loading } = this.state
+    const { loading, userList } = this.state
     return (
       <Fragment>
         <GridPaper
+          className='grid-split'
           xs={12}
           sm={5}
           md={3}
           xl={2}
         >
-          <UsersList loading={loading} />
+          <UsersList
+            loading={loading}
+            list={userList}
+          />
         </GridPaper>
         <GridPaper
+          className='grid-split'
           xs={12}
           sm={7}
           md={8}
@@ -79,7 +90,12 @@ class Users extends Component {
           <Switch>
             <Route
               path='/users/:id'
-              component={UsersSelect}
+              component={(props) => (
+                <UserEditor
+                  {...props}
+                  onReloadRequest={this.getAllUsers}
+                />
+              )}
             />
             <Route
               path='/users'

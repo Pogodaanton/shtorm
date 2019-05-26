@@ -1,33 +1,73 @@
 import React, { Component } from 'react'
 import { List, ListItem, ListItemIcon, ListItemText, Divider, CircularProgress } from '@material-ui/core'
-import { Add } from '@material-ui/icons'
+import { Route, Link } from 'react-router-dom'
+import { Add, AccountCircle } from '@material-ui/icons'
 import PropTypes from 'prop-types'
+
+function ActivatingListItem ({ children, to, activeOnlyWhenExact, disabled }) {
+  return (
+    <Route
+      path={to}
+      exact={activeOnlyWhenExact}
+    >
+      {({ match }) => (
+        <ListItem
+          button
+          selected={match && true}
+          component={Link}
+          to={to}
+          disabled={disabled}
+        >
+          {children}
+        </ListItem>
+      )}
+    </Route>
+  )
+}
+
+ActivatingListItem.propTypes = {
+  children: PropTypes.any,
+  to: PropTypes.string,
+  activeOnlyWhenExact: PropTypes.bool,
+  disabled: PropTypes.bool
+}
 
 export default class UsersList extends Component {
   static propTypes = {
-    loading: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    list: PropTypes.array.isRequired
   }
 
   render () {
-    const { loading } = this.props
+    const { loading, list } = this.props
     return (
       <List>
-        <ListItem
-          button
+        <ActivatingListItem
           key={'add'}
-          onClick={this.onAddClick}
+          to='/users/add'
           disabled={loading}
         >
           <ListItemIcon><Add /></ListItemIcon>
           <ListItemText primary={'Add User'} />
-        </ListItem>
+        </ActivatingListItem>
         <Divider />
-        {loading && (
+        {loading ? (
           <ListItem key={'loading'} >
             <ListItemIcon><CircularProgress size={22} /></ListItemIcon>
             <ListItemText primary={'Requesting Users...'} />
           </ListItem>
-        )}
+        ) : list.map(({ name, id, isAdmin, lastLoggedIn }, i) => (
+          <ActivatingListItem
+            key={id}
+            to={`/users/${id}`}
+          >
+            <ListItemIcon><AccountCircle /></ListItemIcon>
+            <ListItemText
+              primary={name}
+              secondary={`${isAdmin ? '👑 • ' : ''} Last Seen: ${lastLoggedIn ? new Date(lastLoggedIn).getDate : 'Never'}`}
+            />
+          </ActivatingListItem>
+        ))}
       </List>
     )
   }

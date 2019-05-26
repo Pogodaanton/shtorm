@@ -1,0 +1,59 @@
+@import '../variables.scss';
+
+.user-editor-form {
+  padding: 15px 0 5px 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .editor-fieldsets {
+    display: flex;
+    overflow-y: auto;
+    height: 100%;
+
+    > fieldset {
+      margin: 0 15px;
+      flex: 1;
+      &:first-child { margin-left: 0; }
+      &:last-child { margin-right: 0; }
+
+      > div > div {
+        margin-top: 15px;
+        &:first-child { margin-top: 12px; }
+      }
+    }
+  }
+
+  .editor-submit {
+    width: 100%;
+    margin: 0;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    background: $paper-color;
+
+    > button {
+      margin-left: 10px;
+      svg { margin-right: 5px; }
+    }
+
+    > hr {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .user-editor-form {
+    .editor-fieldsets {
+      flex-direction: column;
+      align-items: center;
+
+      > fieldset {
+        margin: 0 0 15px 0;
+      }
+    }
+  }
+}

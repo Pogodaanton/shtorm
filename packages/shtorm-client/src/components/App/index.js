@@ -70,7 +70,6 @@ function App ({ classes }) {
                 <Route
                   path='/users'
                   component={Users}
-                  exact
                 />
                 <Route
                   path='/configs'

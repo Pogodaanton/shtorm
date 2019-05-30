@@ -138,7 +138,6 @@ class UserController {
     check('id')
       .exists({ checkFalsy: true, checkNull: true }).withMessage('ID is required!')
       .isString().withMessage('ID must be a string!')
-      .custom((id) => shortid.isValid(id)).withMessage('ID does not seem to be in the right format!')
       .custom((id) => {
         const existingUser = this.db.find({ id }).value()
         if (!existingUser) throw new Error('User was not found in database!')

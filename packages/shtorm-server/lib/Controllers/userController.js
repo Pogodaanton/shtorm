@@ -1,6 +1,8 @@
 import DatabaseController from './databaseController'
 import shortid from 'shortid'
-import bcrypt from 'bcryptjs'
+import { hashSync, compareSync, genSaltSync } from 'bcryptjs'
+import passport from 'passport'
+import { Strategy } from 'passport-local'
 import { check, validationResult } from 'express-validator/check'
 
 class UserController {
@@ -25,18 +27,25 @@ class UserController {
   }
 
   requestAllUsers = (req, res) => {
-    return res.status(200).send({
-      success: true,
-      message: 'Users successfully requested.',
-      data: this.getAllUsers()
-    })
+    if (req.user) {
+      return res.status(200).send({
+        success: true,
+        message: 'Users successfully requested.',
+        data: this.getAllUsers()
+      })
+    } else {
+      return res.status(401).send({
+        success: false,
+        message: 'You need to login first.'
+      })
+    }
   }
 
   requestAllUsernames = (req, res) => {
     return res.status(200).send({
       success: true,
       message: 'Users successfully requested.',
-      data: [] // this.db.map(({ username }) => { return username }).value()
+      data: this.db.map(({ username }) => { return username }).value()
     })
   }
 
@@ -121,7 +130,7 @@ class UserController {
 
     existingUser.assign({
       username,
-      password: (typeof isAdmin === 'string') ? this.hashPassword(password) : existingUserVal.password,
+      password: (password.length > 0) ? this.hashPassword(password) : existingUserVal.password,
       isAdmin: existingUserVal.isOriginal || (typeof isAdmin === 'boolean') ? isAdmin : existingUserVal.isAdmin,
       modifyPresets: existingUserVal.isOriginal || (typeof modifyPresets === 'boolean') ? modifyPresets : existingUserVal.modifyPresets,
       createPresets: existingUserVal.isOriginal || (typeof createPresets === 'boolean') ? createPresets : existingUserVal.createPresets
@@ -167,14 +176,127 @@ class UserController {
     })
   }
 
+  requestLoginChecks = [
+    check('username')
+      .exists({ checkFalsy: true, checkNull: true }).withMessage('Parameter username must not be empty!'),
+    check('password')
+      .exists({ checkFalsy: true, checkNull: true }).withMessage('Parameter password must not be empty!')
+  ]
+
+  requestLoginRedirection = (passport) => (req, res, next) => passport.authenticate('local', {
+    successRedirect: '/api/v1/getAllScripts',
+    failureRedirect: '/api/v1/getAllUsers'
+  })(req, res, next)
+
+  requestLoginAsync = (passport) => (req, res, next) => passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return res.status(500).send({
+        success: true,
+        message: err.toString()
+      })
+    }
+
+    if (!user) {
+      return res.status(402).send({
+        success: true,
+        message: info.message || 'Invalid credentials.'
+      })
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        return res.status(500).send({
+          success: true,
+          message: err.toString()
+        })
+      }
+
+      return res.status(200).send({
+        success: true,
+        message: 'Successfully logged in!'
+      })
+    })
+  })(req, res, next)
+
+  requestLogin = (passport) => (req, res, next) => passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return res.status(500).send({
+        success: true,
+        message: err.toString()
+      })
+    }
+
+    if (!user) {
+      return res.status(402).send({
+        success: true,
+        message: info.message || 'Invalid credentials.'
+      })
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        return res.status(500).send({
+          success: true,
+          message: err.toString()
+        })
+      }
+
+      return res.redirect('/api/v1/getUser?id=' + req.user.id)
+    })
+  })(req, res, next)
+
+  requestLogout = (passport) => (req, res, next) => {
+    req.logout()
+    res.redirect('/api/v1/getAllUsers')
+  }
+
+  configurePassport = (passport) => {
+    // Passport serializes and deserializes user instances to and from the session.
+    // only the user ID is serialized and added to the session
+    passport.serializeUser((user, done) => {
+      done(null, user.id)
+    })
+
+    // for every request, the id is used to find the user, which will be restored
+    // to req.user.
+    passport.deserializeUser((id, done) => {
+      // find user in database
+      var user = this.db.find({ id }).value()
+
+      if (!user) {
+        done({ message: 'Invalid credentials.' }, null)
+      } else {
+        // the object is what will be available for 'request.user'
+        done(null, { id: user.id, username: user.username })
+      }
+    })
+
+    passport.use(new Strategy(
+      (username, password, done) => {
+        var user = this.db.find({ username }).value()
+
+        // if user not found, return error
+        if (!user) {
+          return done(null, false, { message: 'Invalid username & password.' })
+        }
+
+        // check if password matches
+        var passwordsMatch = this.comparePassword(password, user.password)
+        if (!passwordsMatch) {
+          return done(null, false, { message: 'Invalid username & password.' })
+        }
+
+        return done(null, user)
+      }
+    ))
+  }
+
   getAllUsers = () => {
     return this.db.map(({ username, id, isAdmin, lastLoggedIn }) => { return { username, id, isAdmin, lastLoggedIn } }).value()
   }
 
-  hashPassword = (plainPassword) => {
-    let salt = bcrypt.genSaltSync(10)
-    return bcrypt.hashSync(plainPassword, salt)
-  }
+  hashPassword = (plainPassword) => hashSync(plainPassword, genSaltSync(10))
+  comparePassword = (plainPassword, hashPassword) => compareSync(plainPassword, hashPassword)
 
   getUser = (id = '') => {
     const user = this.db.find({ id }).value()

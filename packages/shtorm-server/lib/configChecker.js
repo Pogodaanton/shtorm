@@ -14,7 +14,8 @@ export default () => {
   const config = JSON.parse(configFile)
 
   if (typeof config.port !== 'number') stopWithError('Key "Port" in "lib/config.json" needs to be typeof number!')
-  if (typeof config.clientUrl !== 'string' || !config.clientUrl) stopWithError('Key "clientUrlin "lib/config.json" needs to be typeof string and must not be empty!')
+  if (typeof config.clientUrl !== 'string' || !config.clientUrl) stopWithError('Key "clientUrl" in "lib/config.json" needs to be typeof string and must not be empty!')
+  if (typeof config.sessionSecret !== 'string' || !config.sessionSecret) stopWithError('Key "sessionSecret" in "lib/config.json" needs to be typeof string and must not be empty!')
 
   return config
 }

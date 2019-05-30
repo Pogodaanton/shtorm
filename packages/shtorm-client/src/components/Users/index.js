@@ -40,7 +40,8 @@ GridPaper.propTypes = {
 class Users extends Component {
   static propTypes = {
     enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func
+    closeSnackbar: PropTypes.func,
+    history: PropTypes.object
   }
 
   state = {
@@ -53,7 +54,7 @@ class Users extends Component {
   }
 
   getAllUsers = () => {
-    axios.get(Api.getApiUrl('getAllUsers'))
+    axios.get(Api.getApiUrl('getAllUsers'), { withCredentials: true })
       .then((res) => {
         if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
@@ -61,7 +62,7 @@ class Users extends Component {
           loading: false
         })
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
   }
 
   render () {

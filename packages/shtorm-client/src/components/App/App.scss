@@ -60,6 +60,8 @@ a[role="button"]:hover {
   justify-content: center;
   opacity: .5;
   height: 100%;
+
+  &.spotlight-visible { opacity: 1; }
 }
 
 @media (min-width: 600px) {

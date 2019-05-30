@@ -11,6 +11,8 @@ import Header from '../Header'
 import Home from '../Home'
 import Task from '../Task'
 import NotFound from '../NotFound'
+import Login from '../Login'
+import Logout from '../Logout'
 import Terminal from '../Terminal'
 import BotConfigs from '../BotConfigs'
 import Users from '../Users'
@@ -79,6 +81,14 @@ function App ({ classes }) {
                 <Route
                   path='/configs/:name'
                   component={BotConfigs}
+                />
+                <Route
+                  path='/login'
+                  component={Login}
+                />
+                <Route
+                  path='/logout'
+                  component={Logout}
                 />
                 <Route
                   path='/'

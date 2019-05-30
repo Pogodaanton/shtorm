@@ -8,7 +8,7 @@ class Api {
     return false
   }
 
-  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar) {
+  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history) {
     let errMsg = err.toString()
     if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
       if (typeof err.response.data.message === 'string') errMsg = err.response.data.message
@@ -21,8 +21,7 @@ class Api {
       const isSnackbarDismissable = (typeof closeSnackbar === 'function')
       enqueueSnackbar(errMsg, {
         variant: 'error',
-        autoHideDuration: isSnackbarDismissable ? null : 6000,
-        persist: isSnackbarDismissable,
+        autoHideDuration: isSnackbarDismissable ? 20000 : 6000,
         action: isSnackbarDismissable ? (key) => (
           <Button
             variant='outlined'
@@ -33,9 +32,13 @@ class Api {
         ) : null
       })
     }
+
+    if (typeof history === 'object' && typeof history.replace === 'function') {
+      history.replace('/login')
+    }
   }
 
-  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar)
+  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history)
 
   getApiUrl (controller) {
     return `${config.prefix}${config.socketAdress}${config.apiAdress}${controller}`

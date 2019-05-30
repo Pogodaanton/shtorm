@@ -26,7 +26,7 @@ class UserEditor extends Component {
     isNew: false,
     loading: true,
     id: '',
-    name: '',
+    username: '',
     password: '',
     newPassword: '',
     isAdmin: false,
@@ -37,6 +37,8 @@ class UserEditor extends Component {
   }
 
   componentDidMount = () => {
+    ValidatorForm.addValidationRule('', () => true)
+
     ValidatorForm.addValidationRule('notEmpty', (value) => {
       if (value.trim() === '') return false
       return true
@@ -45,13 +47,10 @@ class UserEditor extends Component {
     ValidatorForm.addValidationRule('wordBlacklist', (value) => {
       if (value.trim() === 'add') return false
       for (let i in this.nameList) {
-        const name = this.nameList[i]
+        const username = this.nameList[i]
         if (
-          /* typeof this.origState.name !== 'undefined' &&
-          name !== this.origState.name &&
-          name === value.trim() */
-          (name === value.trim() && typeof this.origState.name === 'undefined') ||
-          (name === value.trim() && name !== this.origState.name)
+          (username === value.trim() && typeof this.origState.username === 'undefined') ||
+          (username === value.trim() && username !== this.origState.username)
         ) return false
       }
       return true
@@ -113,7 +112,7 @@ class UserEditor extends Component {
   postUserData = () => {
     const {
       id,
-      name,
+      username,
       password,
       isAdmin,
       newPassword,
@@ -127,7 +126,7 @@ class UserEditor extends Component {
     }, () => {
       axios.post(Api.getApiUrl('saveUser'), {
         id,
-        name,
+        username,
         password: password || newPassword,
         isAdmin,
         modifyPresets,
@@ -196,7 +195,7 @@ class UserEditor extends Component {
     const {
       saveState,
       isNew,
-      name,
+      username,
       newPassword,
       password,
       loading,
@@ -232,41 +231,28 @@ class UserEditor extends Component {
               <TextValidator
                 variant='outlined'
                 label='Name'
-                value={name}
+                value={username}
                 required
                 fullWidth
                 validators={['notEmpty', 'wordBlacklist', 'minStringLength:3']}
                 errorMessages={['This field cannot be empty!', 'This name is already taken!', 'The name needs to be at least 3 chars long!']}
                 validatorListener={this.onValidate}
                 disabled={loading}
-                onChange={this.onInputChange('name')}
+                onChange={this.onInputChange('username')}
               />
-              {!isNew ? (
-                <TextValidator
-                  variant='outlined'
-                  label='New Password'
-                  type='password'
-                  value={newPassword}
-                  validatorListener={this.onValidate}
-                  disabled={loading}
-                  fullWidth
-                  onChange={this.onInputChange('newPassword')}
-                />
-              ) : (
-                <TextValidator
-                  variant='outlined'
-                  label='Password'
-                  type='password'
-                  value={password}
-                  required
-                  fullWidth
-                  validators={['notEmpty']}
-                  errorMessages={['This field cannot be empty!']}
-                  validatorListener={this.onValidate}
-                  disabled={loading}
-                  onChange={this.onInputChange('password')}
-                />
-              )}
+              <TextValidator
+                variant='outlined'
+                label={isNew ? 'Password' : 'Change Password'}
+                type='password'
+                value={isNew ? newPassword : password}
+                validators={isNew ? ['notEmpty', 'minStringLength:3'] : null}
+                errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : null}
+                validatorListener={this.onValidate}
+                disabled={loading}
+                required={isNew}
+                fullWidth
+                onChange={this.onInputChange(isNew ? 'newPassword' : 'password')}
+              />
             </FormGroup>
           </FormControl>
           <FormControl component='fieldset'>

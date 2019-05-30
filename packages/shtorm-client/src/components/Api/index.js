@@ -10,8 +10,9 @@ class Api {
 
   axiosErrorHandler (err, enqueueSnackbar, closeSnackbar) {
     let errMsg = err.toString()
-    if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined' && typeof err.response.data.message !== 'undefined') {
-      errMsg = err.response.data.message
+    if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
+      if (typeof err.response.data.message === 'string') errMsg = err.response.data.message
+      if (typeof err.response.data.errors === 'object') errMsg = err.response.data.errors.map(({ msg }) => msg).join('\n')
     }
 
     console.log(errMsg)

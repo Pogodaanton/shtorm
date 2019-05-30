@@ -16,7 +16,7 @@ class DatabaseController {
       users: [
         {
           id: shortid.generate(),
-          name: 'Admin',
+          username: 'Admin',
           password: 'password',
           isAdmin: true,
           isOriginal: true,

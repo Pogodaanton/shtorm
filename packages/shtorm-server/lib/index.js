@@ -4,6 +4,7 @@ import shortid from 'shortid'
 import interceptStdout from 'intercept-stdout'
 import express from 'express'
 import bodyParser from 'body-parser'
+import expressValidator from 'express-validator'
 import wsConnection from './wsConnection'
 import httpConnection from './httpConnection'
 import configChecker from './configChecker'
@@ -19,6 +20,7 @@ io.on('connection', (client) => wsConnection(client, io))
 // Hooking body-parser and httpConnection middleware to express
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(expressValidator())
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', clientUrl)
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')

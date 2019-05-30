@@ -26,7 +26,7 @@ router.get('/api/v1/getScriptOptions', scriptConfigController.requestScriptOptio
 router.get('/api/v1/getAllUsers', userController.requestAllUsers)
 router.get('/api/v1/getAllUsernames', userController.requestAllUsernames)
 router.get('/api/v1/getUser', userController.requestUser)
-router.post('/api/v1/saveUser', userController.requestSaveUser)
-router.post('/api/v1/deleteUser', userController.requestDeleteUser)
+router.post('/api/v1/saveUser', userController.requestSaveUserChecks, userController.requestSaveUser)
+router.post('/api/v1/deleteUser', userController.requestDeleteUserChecks, userController.requestDeleteUser)
 
 export default router

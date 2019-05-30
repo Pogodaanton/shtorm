@@ -100,7 +100,7 @@ class UserEditor extends Component {
       })
       .catch((err) => {
         Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
-        this.props.history.push('/users')
+        this.props.history.replace('/users')
       })
   }
 
@@ -137,7 +137,7 @@ class UserEditor extends Component {
 
           if (typeof res.data.newId === 'string') {
             this.props.onReloadRequest()
-            this.props.history.push(`/users/${res.data.newId}`)
+            this.props.history.replace(`/users/${res.data.newId}`)
           } else {
             this.setState({ saveState: 'Saved', loading: false }, () => {
               this.props.onReloadRequest()
@@ -162,7 +162,7 @@ class UserEditor extends Component {
       axios.post(Api.getApiUrl('deleteUser'), { id })
         .then((res) => {
           this.props.onReloadRequest()
-          this.props.history.push('/users')
+          this.props.history.replace('/users')
         })
         .catch((err) => {
           this.setState({ saveState: 'Save', loading: false })
@@ -230,7 +230,7 @@ class UserEditor extends Component {
             <FormGroup>
               <TextValidator
                 variant='outlined'
-                label='Name'
+                label='Username'
                 value={username}
                 required
                 fullWidth
@@ -321,7 +321,6 @@ class UserEditor extends Component {
           </Button>
           {(!isOriginal && !isNew) && (
             <Button
-              tyoe='submit'
               disabled={loading}
               onClick={this.onButtonClick('delete')}
             >

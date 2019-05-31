@@ -92,7 +92,7 @@ class BotConfigEditor extends Component {
   }
 
   getConfigData = (id) => {
-    axios.get(Api.getApiUrl('getConfigs'), { params: { id }, withCredentials: true })
+    axios.get(Api.getApiUrl('getConfig'), { params: { id }, withCredentials: true })
       .then((res) => {
         if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({

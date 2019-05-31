@@ -4,18 +4,8 @@ import { MuiThemeProvider, withStyles } from '@material-ui/core'
 import { theme } from '../../themes/dark'
 import { SnackbarProvider } from 'notistack'
 import PropTypes from 'prop-types'
-import TerminalContextProvider from '../../contexts/TerminalContext'
 import SocketContextProvider from '../../contexts/SocketContext'
-import DefaultGridContainer from '../DefaultGridContainer'
-import Header from '../Header'
-import Home from '../Home'
-import Task from '../Task'
-import NotFound from '../NotFound'
-import Login from '../Login'
-import Logout from '../Logout'
-import Terminal from '../Terminal'
-import BotConfigs from '../BotConfigs'
-import Users from '../Users'
+import Loader, { ContextLoader } from '../Loader'
 import './App.scss'
 
 const styles = {
@@ -23,6 +13,18 @@ const styles = {
   error: { color: 'white' },
   info: { color: 'white' }
 }
+
+const Home = Loader('Home')
+const Task = Loader('Task')
+const NotFound = Loader('NotFound')
+const Login = Loader('Login')
+const Logout = Loader('Logout')
+const Terminal = Loader('Terminal')
+const BotConfigs = Loader('BotConfigs')
+const Users = Loader('Users')
+const Header = Loader('Header')
+const DefaultGridContainer = Loader('DefaultGridContainer')
+const TerminalContextProvider = ContextLoader('TerminalContext', () => null)
 
 function App ({ classes }) {
   return (
@@ -40,11 +42,16 @@ function App ({ classes }) {
             horizontal: 'right'
           }}
         >
-          <Route path='/login'>
-            {({ match }) => match ? null : (
-              <Header />
-            )}
-          </Route>
+          <Switch>
+            <Route
+              path='/login'
+              component={() => null}
+            />
+            <Route
+              path='/'
+              component={Header}
+            />
+          </Switch>
           <div className='content content-flex'>
             <DefaultGridContainer name='main'>
               <Switch>

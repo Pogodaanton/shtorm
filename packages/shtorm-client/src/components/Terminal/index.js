@@ -31,7 +31,7 @@ class Terminal extends Component {
 
   componentDidMount = () => {
     this.props.context.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
-    this.props.context.socket.on('disconnect', (a) => this.addLine({ msg: `Connected to socket.` }))
+    this.props.context.socket.on('disconnect', (a) => this.addLine({ msg: `Disconnected from socket.` }))
     this.props.context.socket.on('log_message', this.addLine)
 
     document.addEventListener('mousedown', this.onHandleMouseDown)

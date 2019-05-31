@@ -11,6 +11,15 @@
     pointer-events: none;
   }
 
+  .MuiButton-sizeSmall {
+    padding: 2px 8px;
+  }
+
+  > div > .MuiCircularProgress-root {
+    margin-left: 8px;
+    margin-right: 10px;
+  }
+
   > div > a {
     svg {
       margin: {

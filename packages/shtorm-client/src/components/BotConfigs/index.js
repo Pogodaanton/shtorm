@@ -2,12 +2,22 @@ import React, { Component, Fragment } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
 import { GridPaper } from '../DefaultGridItem'
-import BotConfigSelect from './BotConfigSelect'
 import BotConfigList from './BotConfigList'
-import BotConfigEditor from './BotConfigEditor'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
+import Loadable from 'react-loadable'
+import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+
+const BotConfigSelect = Loadable({
+  loader: () => import('./BotConfigSelect'),
+  loading: () => null
+})
+
+const BotConfigEditor = Loadable({
+  loader: () => import('./BotConfigEditor'),
+  loading: FullscreenSpinner
+})
 
 class BotConfigs extends Component {
   static propTypes = {
@@ -23,6 +33,7 @@ class BotConfigs extends Component {
 
   componentDidMount = () => {
     this.getAllConfigs()
+    BotConfigEditor.preload()
   }
 
   getAllConfigs = () => {

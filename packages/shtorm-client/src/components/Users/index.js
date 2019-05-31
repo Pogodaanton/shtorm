@@ -2,12 +2,22 @@ import React, { Component, Fragment } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
 import { GridPaper } from '../DefaultGridItem'
-import UsersSelect from './UsersSelect'
 import UsersList from './UsersList'
-import UserEditor from './UserEditor'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
+import Loadable from 'react-loadable'
+import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+
+const UsersSelect = Loadable({
+  loader: () => import('./UsersSelect'),
+  loading: () => null
+})
+
+const UserEditor = Loadable({
+  loader: () => import('./UserEditor'),
+  loading: FullscreenSpinner
+})
 
 class Users extends Component {
   static propTypes = {
@@ -23,6 +33,7 @@ class Users extends Component {
 
   componentDidMount = () => {
     this.getAllUsers()
+    UserEditor.preload()
   }
 
   getAllUsers = () => {

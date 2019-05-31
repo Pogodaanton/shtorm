@@ -71,6 +71,7 @@ export const validateConfig = (type) => {
 
 class ConfigController {
   requestConfig = (req, res) => {
+    console.log(req.query.id)
     const data = this.getConfig(req.query.id)
     if (data) {
       return res.status(200).send({
@@ -175,68 +176,12 @@ class ConfigController {
     })
   }
 
-  /* requestSaveConfig = (req, res) => {
-    const { key, config } = req.body
-
-    if (typeof config !== 'object') {
-      return res.status(400).send({
-        success: false,
-        message: 'Config is required or is in wrong format!'
-      })
-    }
-
-    if (!config.name || !key) {
-      return res.status(400).send({
-        success: false,
-        message: 'Name is required!'
-      })
-    }
-
-    const existingConfig = this.db.find({ name: key })
-
-    if (!existingConfig.value()) this.db.unshift(config).write()
-    else existingConfig.assign(config).write()
-
-    return res.status(201).send({
-      success: true,
-      message: 'Config successfully saved!',
-      data: req.body
-    })
-  }
-
-  requestDeleteConfig = (req, res) => {
-    const { key } = req.body
-
-    if (!key) {
-      return res.status(400).send({
-        success: false,
-        message: 'Name is required!'
-      })
-    }
-
-    if (!this.getConfig(key)) {
-      return res.status(410).send({
-        success: false,
-        message: 'Name not found in database!'
-      })
-    }
-
-    this.db
-      .remove({ name: key })
-      .write()
-
-    return res.status(201).send({
-      success: true,
-      message: 'Config successfully removed!'
-    })
-  } */
-
   getAllConfigs = () => {
     return db.map(({ id, name }) => { return { id, name } }).value()
   }
 
-  getConfig = (name = '') => {
-    return db.find({ name }).value()
+  getConfig = (id) => {
+    return db.find({ id }).value()
   }
 }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom'
 import { AppBar, Button, Toolbar, IconButton, Tooltip } from '@material-ui/core'
-import { Build, Home, Assignment, SupervisorAccount } from '@material-ui/icons'
+import { Build, Home, Assignment, SupervisorAccount, ExitToApp } from '@material-ui/icons'
 import PropTypes from 'prop-types'
 import TasksPopover from '../TasksPopover'
 import './Header.scss'
@@ -73,6 +73,14 @@ export default class index extends Component {
             <Tooltip title='Show running processes'>
               <IconButton onClick={this.toggleTasks} >
                 <Assignment />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Log out'>
+              <IconButton
+                component={Link}
+                to={'/logout'}
+              >
+                <ExitToApp />
               </IconButton>
             </Tooltip>
           </div>

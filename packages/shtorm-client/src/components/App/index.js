@@ -40,7 +40,11 @@ function App ({ classes }) {
             horizontal: 'right'
           }}
         >
-          <Header />
+          <Route path='/login'>
+            {({ match }) => match ? null : (
+              <Header />
+            )}
+          </Route>
           <div className='content content-flex'>
             <DefaultGridContainer name='main'>
               <Switch>

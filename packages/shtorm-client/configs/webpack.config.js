@@ -36,6 +36,17 @@ var config = {
           'style-loader',
           'css-loader'
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: 'assets'
+            }
+          }
+        ]
       }
     ]
   },

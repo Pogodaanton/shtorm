@@ -16,6 +16,7 @@ import {
   StepLabel,
   withWidth
 } from '@material-ui/core'
+import { withSnackbar } from 'notistack'
 import axios from 'axios'
 import Api from '../Api'
 import './PresetDialog.scss'
@@ -30,6 +31,8 @@ const stepperOrientation = {
 
 class PresetDialog extends Component {
   static propTypes = {
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func,
     presetData: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     width: PropTypes.string.isRequired
@@ -67,19 +70,19 @@ class PresetDialog extends Component {
   };
 
   getDropdownData = () => {
-    axios.get(Api.getApiUrl('getAllScripts'))
+    axios.get(Api.getApiUrl('getAllScripts'), { withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { scripts, configs } = res.data.data
           this.setState({ scripts, configs, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   getScriptOptions = () => {
     this.setState({ loading: true })
-    axios.get(Api.getApiUrl('getScriptOptions'), { params: { script: this.state.options.script } })
+    axios.get(Api.getApiUrl('getScriptOptions'), { params: { script: this.state.options.script }, withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { currentStep, skippedSteps, options } = this.state
@@ -93,7 +96,7 @@ class PresetDialog extends Component {
           this.triggerNext()
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   setScriptOptions = (scriptOptions) => {
@@ -105,14 +108,14 @@ class PresetDialog extends Component {
 
   savePreset = () => {
     this.setState({ loading: true })
-    axios.post(Api.getApiUrl('savePreset'), { key: this.state.options.key, preset: this.getAllOptions() })
+    axios.post(Api.getApiUrl('savePreset'), { key: this.state.options.key, preset: this.getAllOptions() }, { withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           console.log(res)
           this.closeDialog()
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   closeDialog = () => {
@@ -398,4 +401,4 @@ class PresetDialog extends Component {
   }
 }
 
-export default withWidth()(PresetDialog)
+export default withSnackbar(withWidth()(PresetDialog))

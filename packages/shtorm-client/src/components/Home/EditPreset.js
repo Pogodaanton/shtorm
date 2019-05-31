@@ -2,11 +2,15 @@ import React, { Component } from 'react'
 import PresetDialog from '../PresetDialog/index'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { withSnackbar } from 'notistack'
 import Api from '../Api'
 
-export default class EditPreset extends Component {
+class EditPreset extends Component {
   static propTypes = {
-    match: PropTypes.object.isRequired
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func,
+    match: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired
   }
 
   state = {
@@ -19,13 +23,13 @@ export default class EditPreset extends Component {
   }
 
   getPresetData = (name) => {
-    axios.get(Api.getApiUrl('getPreset'), { params: { name } })
+    axios.get(Api.getApiUrl('getPreset'), { params: { name }, withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           this.setState({ presetData: res.data.data, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history, '/'))
   }
 
   render () {
@@ -39,3 +43,5 @@ export default class EditPreset extends Component {
     )
   }
 }
+
+export default withSnackbar(EditPreset)

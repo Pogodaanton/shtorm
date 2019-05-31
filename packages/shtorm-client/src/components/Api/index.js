@@ -8,7 +8,7 @@ class Api {
     return false
   }
 
-  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history) {
+  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history, fallbackPath) {
     let errMsg = err.toString()
     let isAuthError = false
     if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
@@ -37,10 +37,13 @@ class Api {
       })
     }
 
-    if (typeof history === 'object' && typeof history.replace === 'function' && isAuthError) history.replace('/login')
+    if (typeof history === 'object' && typeof history.replace === 'function') {
+      if (isAuthError) history.replace('/login')
+      else if (typeof fallbackPath === 'string') history.replace(fallbackPath)
+    }
   }
 
-  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history)
+  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history, fallbackPath) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history, fallbackPath)
 
   getApiUrl (controller) {
     return `${config.prefix}${config.socketAdress}${config.apiAdress}${controller}`

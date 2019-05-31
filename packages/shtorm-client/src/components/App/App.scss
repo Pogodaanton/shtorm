@@ -44,6 +44,10 @@ html, body, #root, .content {
 
     span { white-space: pre; }
   }
+
+  .MuiDialogContent-root {
+    padding: 0px 24px 15px 24px;
+  }
 }
 
 a[role="button"]:hover {

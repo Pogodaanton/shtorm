@@ -134,10 +134,11 @@ class UserEditor extends Component {
         modifyPresets,
         createPresets,
         createConfigs
-      })
+      }, { withCredentials: true })
         .then((res) => {
           if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
 
+          this.props.enqueueSnackbar('User successfully saved')
           if (typeof res.data.newId === 'string') {
             this.props.onReloadRequest()
             this.props.history.replace(`/users/${res.data.newId}`)
@@ -155,14 +156,14 @@ class UserEditor extends Component {
     })
   }
 
-  postUserDeletion = () => {
+  postDeleteUser = () => {
     const { id } = this.state
 
     this.setState({
       saveState: 'Deleting',
       loading: true
     }, () => {
-      axios.post(Api.getApiUrl('deleteUser'), { id })
+      axios.post(Api.getApiUrl('deleteUser'), { id }, { withCredentials: true })
         .then((res) => {
           this.props.onReloadRequest()
           this.props.history.replace('/users')
@@ -172,11 +173,6 @@ class UserEditor extends Component {
           Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
         })
     })
-  }
-
-  onButtonClick = (action) => (e) => {
-    if (action === 'save') this.postUserData()
-    if (action === 'delete') this.postUserDeletion()
   }
 
   onInputChange = (input) => (e) => {
@@ -226,7 +222,7 @@ class UserEditor extends Component {
       <ValidatorForm
         className='user-editor-form'
         autoComplete='off'
-        onSubmit={this.onButtonClick('save')}
+        onSubmit={this.postUserData}
       >
         <div className='editor-fieldsets'>
           <FormControl component='fieldset'>
@@ -240,7 +236,6 @@ class UserEditor extends Component {
                 fullWidth
                 validators={['notEmpty', 'wordBlacklist', 'minStringLength:3']}
                 errorMessages={['This field cannot be empty!', 'This name is already taken!', 'The name needs to be at least 3 chars long!']}
-                validatorListener={this.onValidate}
                 disabled={loading}
                 onChange={this.onInputChange('username')}
               />
@@ -251,7 +246,6 @@ class UserEditor extends Component {
                 value={isNew ? newPassword : password}
                 validators={isNew ? ['notEmpty', 'minStringLength:3'] : null}
                 errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : null}
-                validatorListener={this.onValidate}
                 disabled={loading}
                 required={isNew}
                 fullWidth
@@ -335,7 +329,7 @@ class UserEditor extends Component {
           {(!isOriginal && !isNew) && (
             <Button
               disabled={loading}
-              onClick={this.onButtonClick('delete')}
+              onClick={this.postDeleteUser}
             >
               <Delete />
               Remove User

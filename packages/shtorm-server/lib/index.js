@@ -28,9 +28,9 @@ app.use(expressValidator())
 app.use(session({
   store: new NedbStore(session)({ filename: path.join(__dirname, '../db/sessionStore.db') }),
   secret: sessionSecret,
-  cookie: {},
-  resave: true,
-  saveUninitialized: true
+  cookie: { secure: false },
+  resave: false,
+  saveUninitialized: false
 }))
 app.use(passport.initialize())
 app.use(passport.session())

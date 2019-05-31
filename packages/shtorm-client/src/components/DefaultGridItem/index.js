@@ -1,6 +1,34 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Grid } from '@material-ui/core'
+import { Paper, Grid } from '@material-ui/core'
+
+const GridPaper = ({ className, xs, sm, md, lg, xl, children }) => {
+  return (
+    <Grid
+      className={className}
+      item
+      xs={xs}
+      sm={sm}
+      md={md}
+      lg={lg}
+      xl={xl}
+    >
+      <Paper className='paper'>
+        {children}
+      </Paper>
+    </Grid>
+  )
+}
+
+GridPaper.propTypes = {
+  className: PropTypes.string,
+  xs: PropTypes.number,
+  sm: PropTypes.number,
+  md: PropTypes.number,
+  lg: PropTypes.number,
+  xl: PropTypes.number,
+  children: PropTypes.any
+}
 
 const DefaultGridItem = (props) => {
   return (
@@ -23,4 +51,4 @@ DefaultGridItem.propTypes = {
   children: PropTypes.any
 }
 
-export default DefaultGridItem
+export { DefaultGridItem as default, GridPaper }

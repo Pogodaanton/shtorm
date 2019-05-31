@@ -1,66 +1,43 @@
 import React, { Component } from 'react'
 import { List, ListItem, ListItemIcon, ListItemText, Divider, CircularProgress } from '@material-ui/core'
 import { Add, Dns } from '@material-ui/icons'
+import ActivatingListItem from '../ActivatingListItem'
 import PropTypes from 'prop-types'
 
 export default class BotConfigList extends Component {
   static propTypes = {
-    onListItemSelect: PropTypes.func.isRequired
-  }
-
-  state = {
-    configList: [],
-    selectedConfig: null,
-    configListLoaded: false
-  }
-
-  onAddClick = (e) => {
-    let { configList } = this.state
-
-    // Untitled Config should start counting up if there is already one called Untitled Config
-    let i = 1
-    while (configList.find(({ name: configName }) => configName === 'Untitled Config' + (i > 1 ? ' ' + i : ''))) i++
-
-    const name = 'Untitled Config' + (i > 1 ? ' ' + i : '')
-    this.props.onListItemSelect(name, true)()
-  }
-
-  static getDerivedStateFromProps = (props, oldState) => {
-    return { configList: props.configList, selectedConfig: props.selectedConfig, configListLoaded: props.configListLoaded }
+    loading: PropTypes.bool.isRequired,
+    list: PropTypes.array.isRequired
   }
 
   render () {
-    const { configList, configListLoaded, selectedConfig } = this.state
-    const { onListItemSelect } = this.props
+    const { loading, list } = this.props
     return (
       <List>
-        <ListItem
-          button
+        <ActivatingListItem
           key={'add'}
-          onClick={this.onAddClick}
-          disabled={!configListLoaded}
+          to='/configs/add'
+          disabled={loading}
         >
           <ListItemIcon><Add /></ListItemIcon>
           <ListItemText primary={'Add Config'} />
-        </ListItem>
+        </ActivatingListItem>
         <Divider />
-        {!configListLoaded && (
+        {loading ? (
           <ListItem key={'loading'} >
             <ListItemIcon><CircularProgress size={22} /></ListItemIcon>
-            <ListItemText primary={'Loading Configs'} />
+            <ListItemText primary={'Requesting Configs...'} />
           </ListItem>
-        )}
-        {configList.map(({ name }, index) => (
-          <ListItem
-            button
-            name={name}
+        ) : list.map(({ name, id }, i) => (
+          <ActivatingListItem
             key={name}
-            selected={name === selectedConfig}
-            onClick={onListItemSelect(name)}
+            to={`/configs/${id}`}
           >
             <ListItemIcon><Dns /></ListItemIcon>
-            <ListItemText primary={name} />
-          </ListItem>
+            <ListItemText
+              primary={name}
+            />
+          </ActivatingListItem>
         ))}
       </List>
     )

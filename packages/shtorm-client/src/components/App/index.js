@@ -76,11 +76,6 @@ function App ({ classes }) {
                 <Route
                   path='/configs'
                   component={BotConfigs}
-                  exact
-                />
-                <Route
-                  path='/configs/:name'
-                  component={BotConfigs}
                 />
                 <Route
                   path='/login'
@@ -97,7 +92,28 @@ function App ({ classes }) {
               </Switch>
             </DefaultGridContainer>
             <TerminalContextProvider>
-              <Terminal />
+              <Switch>
+                <Route
+                  path='/configs'
+                  component={() => null}
+                />
+                <Route
+                  path='/users'
+                  component={() => null}
+                />
+                <Route
+                  path='/login'
+                  component={() => null}
+                />
+                <Route
+                  path='/logout'
+                  component={() => null}
+                />
+                <Route
+                  path='/'
+                  component={Terminal}
+                />
+              </Switch>
             </TerminalContextProvider>
           </div>
         </SnackbarProvider>

@@ -4,6 +4,8 @@ import { hashSync, compareSync, genSaltSync } from 'bcryptjs'
 import { Strategy } from 'passport-local'
 import { check, body, validationResult } from 'express-validator/check'
 
+const db = DatabaseController.getDatabase('users')
+
 class Permission {
   _baseCheck = (callback) => body('permission').custom((val, { req }) => callback(req))
   _logInMessage = 'You need to log in first.'
@@ -47,7 +49,7 @@ class Permission {
 }
 
 export const permission = new Permission()
-export const validate = (type) => {
+export const validateUser = (type) => {
   switch (type) {
     case 'admin':
       return [ permission.checkOneOf(['isAdmin', 'isOriginal']) ]
@@ -63,25 +65,25 @@ export const validate = (type) => {
       return [ permission.checkOneOf(['createConfigs', 'isAdmin', 'isOriginal']) ]
     case 'getUser':
       return [
-        ...validate('admin'),
+        ...validateUser('admin'),
         check('id')
           .exists({ checkFalsy: true, checkNull: true }).withMessage('Missing paramter "id".')
           .isString().withMessage('Parameter "id" needs to be of type string!')
       ]
     case 'saveUser':
       return [
-        ...validate('admin'),
+        ...validateUser('admin'),
         check('username')
           .exists({ checkFalsy: true, checkNull: true })
-          .withMessage('Name is required!')
+          .withMessage('Username is required!')
           .isString()
-          .withMessage('Name must be a string!')
+          .withMessage('Username must be a string!')
           .isLength({ min: 3 })
-          .withMessage('Name needs to be at least 3 chars long!')
+          .withMessage('Username needs to be at least 3 chars long!')
           .custom((username, { req }) => {
             // Custom check for the availability of the username
             const { id } = req.body
-            const existingUsername = this.db.find({ username }).value()
+            const existingUsername = db.find({ username }).value()
             if (existingUsername && existingUsername.id !== id) return false
             return true
           })
@@ -105,7 +107,7 @@ export const validate = (type) => {
           .withMessage('ID does not seem to be in the right format!')
           .custom((id) => {
             if (id !== 'add') {
-              const existingUser = this.db.find({ id }).value()
+              const existingUser = db.find({ id }).value()
               if (!existingUser) return false
             }
             return true
@@ -114,14 +116,14 @@ export const validate = (type) => {
       ]
     case 'deleteUser':
       return [
-        ...validate('admin'),
+        ...validateUser('admin'),
         check('id')
           .exists({ checkFalsy: true, checkNull: true })
           .withMessage('ID is required!')
           .isString()
           .withMessage('ID must be a string!')
           .custom((id) => {
-            const existingUser = this.db.find({ id }).value()
+            const existingUser = db.find({ id }).value()
             if (!existingUser) throw new Error('User was not found in database!')
             if (existingUser.isOriginal === true) throw new Error('User may not be deleted!')
             return true
@@ -210,7 +212,7 @@ class UserController {
 
       return res.status(201).send({
         success: true,
-        message: 'User successfully saved!',
+        message: 'User successfully added!',
         data: req.body,
         newId
       })
@@ -237,10 +239,7 @@ class UserController {
 
   requestDeleteUser = (req, res) => {
     const { id } = req.body
-
-    this.db
-      .remove({ id })
-      .write()
+    this.db.remove({ id }).write()
 
     return res.status(201).send({
       success: true,
@@ -304,7 +303,7 @@ class UserController {
       // find user in database
       var user = this.db.find({ id }).value()
 
-      if (!user) {
+      if (typeof user === 'undefined' || !user) {
         done({ message: 'Invalid credentials.' }, null)
       } else {
         const { id, username, executePresets, modifyPresets, createPresets, createConfigs, isAdmin } = user

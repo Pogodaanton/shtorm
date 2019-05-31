@@ -1,41 +1,13 @@
 import React, { Component, Fragment } from 'react'
-import { Paper, Grid } from '@material-ui/core'
 import { Switch, Route } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
+import { GridPaper } from '../DefaultGridItem'
 import UsersSelect from './UsersSelect'
 import UsersList from './UsersList'
 import UserEditor from './UserEditor'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
-
-function GridPaper ({ className, xs, sm, md, lg, xl, children }) {
-  return (
-    <Grid
-      className={className}
-      item
-      xs={xs}
-      sm={sm}
-      md={md}
-      lg={lg}
-      xl={xl}
-    >
-      <Paper className='paper'>
-        {children}
-      </Paper>
-    </Grid>
-  )
-}
-
-GridPaper.propTypes = {
-  className: PropTypes.string,
-  xs: PropTypes.number,
-  sm: PropTypes.number,
-  md: PropTypes.number,
-  lg: PropTypes.number,
-  xl: PropTypes.number,
-  children: PropTypes.any
-}
 
 class Users extends Component {
   static propTypes = {

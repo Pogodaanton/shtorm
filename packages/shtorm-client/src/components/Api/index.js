@@ -10,9 +10,13 @@ class Api {
 
   axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history) {
     let errMsg = err.toString()
+    let isAuthError = false
     if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
       if (typeof err.response.data.message === 'string') errMsg = err.response.data.message
-      if (typeof err.response.data.errors === 'object') errMsg = err.response.data.errors.map(({ msg }) => msg).join('\n')
+      if (typeof err.response.data.errors === 'object') {
+        err.response.data.errors.forEach(({ param }) => { if (param === 'permission') isAuthError = true })
+        errMsg = err.response.data.errors.map(({ msg }) => msg).join('\n')
+      }
     }
 
     console.log(errMsg)
@@ -33,9 +37,7 @@ class Api {
       })
     }
 
-    if (typeof history === 'object' && typeof history.replace === 'function') {
-      history.replace('/login')
-    }
+    if (typeof history === 'object' && typeof history.replace === 'function' && isAuthError) history.replace('/login')
   }
 
   axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history)

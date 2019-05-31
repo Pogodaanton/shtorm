@@ -1,36 +1,8 @@
 import React, { Component } from 'react'
 import { List, ListItem, ListItemIcon, ListItemText, Divider, CircularProgress } from '@material-ui/core'
-import { Route, Link } from 'react-router-dom'
+import ActivatingListItem from '../ActivatingListItem'
 import { Add, AccountCircle } from '@material-ui/icons'
 import PropTypes from 'prop-types'
-
-function ActivatingListItem ({ children, to, activeOnlyWhenExact, disabled }) {
-  return (
-    <Route
-      path={to}
-      exact={activeOnlyWhenExact}
-    >
-      {({ match }) => (
-        <ListItem
-          button
-          selected={match && true}
-          component={Link}
-          to={to}
-          disabled={disabled}
-        >
-          {children}
-        </ListItem>
-      )}
-    </Route>
-  )
-}
-
-ActivatingListItem.propTypes = {
-  children: PropTypes.any,
-  to: PropTypes.string,
-  activeOnlyWhenExact: PropTypes.bool,
-  disabled: PropTypes.bool
-}
 
 export default class UsersList extends Component {
   static propTypes = {

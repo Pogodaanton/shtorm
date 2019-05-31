@@ -3,6 +3,7 @@ import path from 'path'
 import low from 'lowdb'
 import FileSync from 'lowdb/adapters/FileSync'
 import shortid from 'shortid'
+import { hashSync, genSaltSync } from 'bcryptjs'
 
 const dbFolder = path.join(__dirname, '../../db')
 class DatabaseController {
@@ -17,7 +18,7 @@ class DatabaseController {
         {
           id: shortid.generate(),
           username: 'Admin',
-          password: 'password',
+          password: hashSync('password', genSaltSync(10)),
           isAdmin: true,
           isOriginal: true,
           lastSeen: null

@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import NoPresets from './NoPresets'
 import Api from '../Api/index'
 import axios from 'axios'
+import { withSnackbar } from 'notistack'
 import './home.scss'
 import DefaultGridItem from '../DefaultGridItem/index'
 import AddPreset from './AddPreset'
@@ -17,8 +18,10 @@ import StartPreset from './StartPreset'
 import PresetTable from './PresetTable'
 import Fullscreen from '../Spinners/Fullscreen'
 
-export default class index extends Component {
+class Home extends Component {
   static propTypes = {
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func,
     location: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired
   }
@@ -48,14 +51,14 @@ export default class index extends Component {
 
   getAllPresets = () => {
     this.setState({ loading: true })
-    axios.get(Api.getApiUrl('getAllPresets'))
+    axios.get(Api.getApiUrl('getAllPresets'), { withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { presets, scripts } = res.data.data
           this.setState({ presets, scripts, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
   }
 
   render () {
@@ -118,3 +121,5 @@ export default class index extends Component {
     )
   }
 }
+
+export default withSnackbar(Home)

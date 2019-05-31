@@ -20,7 +20,7 @@ class DatabaseController {
           password: 'password',
           isAdmin: true,
           isOriginal: true,
-          lastLoggedIn: null
+          lastSeen: null
         }
       ]
     }).write()

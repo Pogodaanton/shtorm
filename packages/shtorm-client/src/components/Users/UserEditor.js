@@ -33,7 +33,8 @@ class UserEditor extends Component {
     isOriginal: false,
     executePresets: true,
     modifyPresets: false,
-    createPresets: false
+    createPresets: false,
+    createConfigs: false
   }
 
   componentDidMount = () => {
@@ -81,7 +82,7 @@ class UserEditor extends Component {
   }
 
   getTakenUsernames = () => {
-    axios.get(Api.getApiUrl('getAllUsernames'))
+    axios.get(Api.getApiUrl('getAllUsernames'), { withCredentials: true })
       .then((res) => {
         if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.nameList = res.data.data
@@ -90,7 +91,7 @@ class UserEditor extends Component {
   }
 
   getUserData = (id) => {
-    axios.get(Api.getApiUrl('getUser'), { params: { id } })
+    axios.get(Api.getApiUrl('getUser'), { params: { id }, withCredentials: true })
       .then((res) => {
         if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
@@ -117,7 +118,8 @@ class UserEditor extends Component {
       isAdmin,
       newPassword,
       modifyPresets,
-      createPresets
+      createPresets,
+      createConfigs
     } = this.state
 
     this.setState({
@@ -130,7 +132,8 @@ class UserEditor extends Component {
         password: password || newPassword,
         isAdmin,
         modifyPresets,
-        createPresets
+        createPresets,
+        createConfigs
       })
         .then((res) => {
           if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
@@ -202,6 +205,7 @@ class UserEditor extends Component {
       executePresets,
       modifyPresets,
       createPresets,
+      createConfigs,
       isAdmin,
       isOriginal
     } = this.state
@@ -286,7 +290,16 @@ class UserEditor extends Component {
                   onChange={this.onInputChange('createPresets')}
                 />}
                 disabled={loading || isAdmin}
-                label='Creating Presets'
+                label='Adding/Removing Presets'
+              />
+              <FormControlLabel
+                control={<Checkbox
+                  checked={createConfigs}
+                  indeterminate={isAdmin}
+                  onChange={this.onInputChange('createConfigs')}
+                />}
+                disabled={loading || isAdmin}
+                label='Adding/Removing Configs'
               />
               <Tooltip
                 placement='left'

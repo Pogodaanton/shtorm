@@ -56,7 +56,7 @@ export default class UsersList extends Component {
             <ListItemIcon><CircularProgress size={22} /></ListItemIcon>
             <ListItemText primary={'Requesting Users...'} />
           </ListItem>
-        ) : list.map(({ username, id, isAdmin, lastLoggedIn }, i) => (
+        ) : list.map(({ username, id, isAdmin, lastSeen }, i) => (
           <ActivatingListItem
             key={id}
             to={`/users/${id}`}
@@ -64,7 +64,7 @@ export default class UsersList extends Component {
             <ListItemIcon><AccountCircle /></ListItemIcon>
             <ListItemText
               primary={username}
-              secondary={`${isAdmin ? '👑 • ' : ''} Last Seen: ${lastLoggedIn ? new Date(lastLoggedIn).getDate : 'Never'}`}
+              secondary={`${isAdmin ? '👑 • ' : ''} Last Seen: ${lastSeen ? new Date(lastSeen).getDate : 'Never'}`}
             />
           </ActivatingListItem>
         ))}

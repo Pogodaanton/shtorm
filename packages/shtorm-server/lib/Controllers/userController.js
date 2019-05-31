@@ -1,9 +1,146 @@
 import DatabaseController from './databaseController'
 import shortid from 'shortid'
 import { hashSync, compareSync, genSaltSync } from 'bcryptjs'
-import passport from 'passport'
 import { Strategy } from 'passport-local'
-import { check, validationResult } from 'express-validator/check'
+import { check, body, validationResult } from 'express-validator/check'
+
+class Permission {
+  _baseCheck = (callback) => body('permission').custom((val, { req }) => callback(req))
+  _logInMessage = 'You need to log in first.'
+  _notPermittedMessage = 'You are not permitted to do this.'
+
+  check = (right) => {
+    return this._baseCheck(req => {
+      if (!req.user) throw new Error(this._logInMessage)
+      if (typeof right === 'string' && req.user.rights[right] === false) throw new Error(this._notPermittedMessage)
+      return true
+    })
+  }
+
+  checkOneOf = (rights) => {
+    return this._baseCheck(req => {
+      let permittedRights = 0
+      if (!req.user) throw new Error(this._logInMessage)
+      if (Array.isArray(rights)) {
+        rights.forEach((right) => {
+          if (req.user.rights[right] === true) permittedRights++
+        })
+        if (permittedRights === 0) throw new Error(this._notPermittedMessage)
+      }
+      return true
+    })
+  }
+
+  checkAllOf = (rights) => {
+    return this.baseCheck(req => {
+      let permittedRights = 0
+      if (!req.user) throw new Error(this.logInMessage)
+      if (Array.isArray(rights)) {
+        rights.forEach((right) => {
+          if (req.user.rights[right] === true) permittedRights++
+        })
+        if (permittedRights < rights.length) throw new Error(this.notPermittedMessage)
+      }
+      return true
+    })
+  }
+}
+
+export const permission = new Permission()
+export const validate = (type) => {
+  switch (type) {
+    case 'admin':
+      return [ permission.checkOneOf(['isAdmin', 'isOriginal']) ]
+    case 'executePresets':
+      return [ permission.checkOneOf(['executePresets', 'modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
+    case 'modifyPresets':
+      return [ permission.checkOneOf(['modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
+    case 'createPresets':
+      return [ permission.checkOneOf(['createPresets', 'isAdmin', 'isOriginal']) ]
+    case 'viewConfigs':
+      return [ permission.checkOneOf(['createConfigs', 'modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
+    case 'createConfigs':
+      return [ permission.checkOneOf(['createConfigs', 'isAdmin', 'isOriginal']) ]
+    case 'getUser':
+      return [
+        ...validate('admin'),
+        check('id')
+          .exists({ checkFalsy: true, checkNull: true }).withMessage('Missing paramter "id".')
+          .isString().withMessage('Parameter "id" needs to be of type string!')
+      ]
+    case 'saveUser':
+      return [
+        ...validate('admin'),
+        check('username')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('Name is required!')
+          .isString()
+          .withMessage('Name must be a string!')
+          .isLength({ min: 3 })
+          .withMessage('Name needs to be at least 3 chars long!')
+          .custom((username, { req }) => {
+            // Custom check for the availability of the username
+            const { id } = req.body
+            const existingUsername = this.db.find({ username }).value()
+            if (existingUsername && existingUsername.id !== id) return false
+            return true
+          })
+          .withMessage((value) => `Username ${value} is already taken!`),
+        check('password')
+          .isString()
+          .withMessage('Password must be a string!')
+          .custom((password, { req }) => {
+            // Custom length check, as password can be optional if the user already exists
+            if (req.body.id === 'add' && password.length < 3) return false
+            else if (password.length > 0 && password.length < 3) return false
+            return true
+          })
+          .withMessage('Password needs to be at least 3 chars long!'),
+        check('id')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('ID is required!')
+          .isString()
+          .withMessage('ID must be a string!')
+          .custom((id) => shortid.isValid(id) || id === 'add')
+          .withMessage('ID does not seem to be in the right format!')
+          .custom((id) => {
+            if (id !== 'add') {
+              const existingUser = this.db.find({ id }).value()
+              if (!existingUser) return false
+            }
+            return true
+          })
+          .withMessage('User was not found in database!')
+      ]
+    case 'deleteUser':
+      return [
+        ...validate('admin'),
+        check('id')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('ID is required!')
+          .isString()
+          .withMessage('ID must be a string!')
+          .custom((id) => {
+            const existingUser = this.db.find({ id }).value()
+            if (!existingUser) throw new Error('User was not found in database!')
+            if (existingUser.isOriginal === true) throw new Error('User may not be deleted!')
+            return true
+          })
+      ]
+    default:
+      return []
+  }
+}
+
+export const validationHandler = (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    res.status(422).send({
+      success: false,
+      errors: errors.array()
+    })
+  } else next()
+}
 
 class UserController {
   constructor () {
@@ -27,18 +164,11 @@ class UserController {
   }
 
   requestAllUsers = (req, res) => {
-    if (req.user) {
-      return res.status(200).send({
-        success: true,
-        message: 'Users successfully requested.',
-        data: this.getAllUsers()
-      })
-    } else {
-      return res.status(401).send({
-        success: false,
-        message: 'You need to login first.'
-      })
-    }
+    return res.status(200).send({
+      success: true,
+      message: 'Users successfully requested.',
+      data: this.getAllUsers()
+    })
   }
 
   requestAllUsernames = (req, res) => {
@@ -49,56 +179,16 @@ class UserController {
     })
   }
 
-  requestSaveUserChecks = [
-    check('username')
-      .exists({ checkFalsy: true, checkNull: true }).withMessage('Name is required!')
-      .isString().withMessage('Name must be a string!')
-      .isLength({ min: 3 }).withMessage('Name needs to be at least 3 chars long!')
-      .custom((username, { req }) => {
-        // Custom check for the availability of the username
-        const { id } = req.body
-        const existingUsername = this.db.find({ username }).value()
-        if (existingUsername && existingUsername.id !== id) return false
-        return true
-      }).withMessage((value) => `Username ${value} is already taken!`),
-    check('password')
-      .isString().withMessage('Password must be a string!')
-      .custom((password, { req }) => {
-        // Custom length check, as password can be optional if the user already exists
-        if (req.body.id === 'add' && password.length < 3) return false
-        else if (password.length > 0 && password.length < 3) return false
-        return true
-      }).withMessage('Password needs to be at least 3 chars long!'),
-    check('id')
-      .exists({ checkFalsy: true, checkNull: true }).withMessage('ID is required!')
-      .isString().withMessage('ID must be a string!')
-      .custom((id) => shortid.isValid(id) || id === 'add').withMessage('ID does not seem to be in the right format!')
-      .custom((id) => {
-        if (id !== 'add') {
-          const existingUser = this.db.find({ id }).value()
-          if (!existingUser) return false
-        }
-        return true
-      }).withMessage('User was not found in database!')
-  ]
-
   requestSaveUser = (req, res) => {
-    const errors = validationResult(req)
     const {
       id,
       username,
       password,
       isAdmin,
       modifyPresets,
-      createPresets
+      createPresets,
+      createConfigs
     } = req.body
-
-    if (!errors.isEmpty()) {
-      return res.status(422).send({
-        success: false,
-        errors: errors.array()
-      })
-    }
 
     /**
      * Adding a user if ID === add
@@ -114,7 +204,8 @@ class UserController {
         isOriginal: false,
         isAdmin: (typeof isAdmin === 'boolean') ? isAdmin : false,
         modifyPresets: (typeof modifyPresets === 'boolean') ? modifyPresets : false,
-        createPresets: (typeof createPresets === 'boolean') ? createPresets : false
+        createPresets: (typeof createPresets === 'boolean') ? createPresets : false,
+        createConfigs: (typeof createConfigs === 'boolean') ? createConfigs : false
       }).write()
 
       return res.status(201).send({
@@ -133,7 +224,8 @@ class UserController {
       password: (password.length > 0) ? this.hashPassword(password) : existingUserVal.password,
       isAdmin: existingUserVal.isOriginal || (typeof isAdmin === 'boolean') ? isAdmin : existingUserVal.isAdmin,
       modifyPresets: existingUserVal.isOriginal || (typeof modifyPresets === 'boolean') ? modifyPresets : existingUserVal.modifyPresets,
-      createPresets: existingUserVal.isOriginal || (typeof createPresets === 'boolean') ? createPresets : existingUserVal.createPresets
+      createPresets: existingUserVal.isOriginal || (typeof createPresets === 'boolean') ? createPresets : existingUserVal.createPresets,
+      createConfigs: existingUserVal.isOriginal || (typeof createConfigs === 'boolean') ? createConfigs : existingUserVal.modifcreateConfigsyConfigs
     }).write()
 
     return res.status(201).send({
@@ -143,28 +235,8 @@ class UserController {
     })
   }
 
-  requestDeleteUserChecks = [
-    check('id')
-      .exists({ checkFalsy: true, checkNull: true }).withMessage('ID is required!')
-      .isString().withMessage('ID must be a string!')
-      .custom((id) => {
-        const existingUser = this.db.find({ id }).value()
-        if (!existingUser) throw new Error('User was not found in database!')
-        if (existingUser.isOriginal === true) throw new Error('User may not be deleted!')
-        return true
-      })
-  ]
-
   requestDeleteUser = (req, res) => {
-    const errors = validationResult(req)
     const { id } = req.body
-
-    if (!errors.isEmpty()) {
-      return res.status(422).send({
-        success: false,
-        errors: errors.array()
-      })
-    }
 
     this.db
       .remove({ id })
@@ -176,59 +248,17 @@ class UserController {
     })
   }
 
-  requestLoginChecks = [
-    check('username')
-      .exists({ checkFalsy: true, checkNull: true }).withMessage('Parameter username must not be empty!'),
-    check('password')
-      .exists({ checkFalsy: true, checkNull: true }).withMessage('Parameter password must not be empty!')
-  ]
-
-  requestLoginRedirection = (passport) => (req, res, next) => passport.authenticate('local', {
-    successRedirect: '/api/v1/getAllScripts',
-    failureRedirect: '/api/v1/getAllUsers'
-  })(req, res, next)
-
-  requestLoginAsync = (passport) => (req, res, next) => passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return res.status(500).send({
-        success: true,
-        message: err.toString()
-      })
-    }
-
-    if (!user) {
-      return res.status(402).send({
-        success: true,
-        message: info.message || 'Invalid credentials.'
-      })
-    }
-
-    req.logIn(user, (err) => {
-      if (err) {
-        return res.status(500).send({
-          success: true,
-          message: err.toString()
-        })
-      }
-
-      return res.status(200).send({
-        success: true,
-        message: 'Successfully logged in!'
-      })
-    })
-  })(req, res, next)
-
   requestLogin = (passport) => (req, res, next) => passport.authenticate('local', (err, user, info) => {
     if (err) {
       return res.status(500).send({
-        success: true,
+        success: false,
         message: err.toString()
       })
     }
 
     if (!user) {
       return res.status(402).send({
-        success: true,
+        success: false,
         message: info.message || 'Invalid credentials.'
       })
     }
@@ -241,13 +271,24 @@ class UserController {
         })
       }
 
-      return res.redirect('/api/v1/getUser?id=' + req.user.id)
+      return res.redirect('./getLoginInformation')
     })
   })(req, res, next)
 
   requestLogout = (passport) => (req, res, next) => {
     req.logout()
-    res.redirect('/api/v1/getAllUsers')
+    return res.status(200).send({
+      success: true,
+      message: 'Successfully logged out!'
+    })
+  }
+
+  requestCurrentUser = (req, res, next) => {
+    return res.status(200).send({
+      success: true,
+      message: 'Successfully requested!',
+      data: req.user
+    })
   }
 
   configurePassport = (passport) => {
@@ -266,8 +307,19 @@ class UserController {
       if (!user) {
         done({ message: 'Invalid credentials.' }, null)
       } else {
+        const { id, username, executePresets, modifyPresets, createPresets, createConfigs, isAdmin } = user
         // the object is what will be available for 'request.user'
-        done(null, { id: user.id, username: user.username })
+        done(null, {
+          id,
+          username,
+          rights: {
+            executePresets: executePresets || false,
+            modifyPresets: modifyPresets || false,
+            createPresets: createPresets || false,
+            createConfigs: createConfigs || false,
+            isAdmin: isAdmin || false
+          }
+        })
       }
     })
 
@@ -291,12 +343,12 @@ class UserController {
     ))
   }
 
+  hashPassword = (plainPassword) => hashSync(plainPassword, genSaltSync(10))
+  comparePassword = (plainPassword, hashPassword) => compareSync(plainPassword, hashPassword)
+
   getAllUsers = () => {
     return this.db.map(({ username, id, isAdmin, lastLoggedIn }) => { return { username, id, isAdmin, lastLoggedIn } }).value()
   }
-
-  hashPassword = (plainPassword) => hashSync(plainPassword, genSaltSync(10))
-  comparePassword = (plainPassword, hashPassword) => compareSync(plainPassword, hashPassword)
 
   getUser = (id = '') => {
     const user = this.db.find({ id }).value()

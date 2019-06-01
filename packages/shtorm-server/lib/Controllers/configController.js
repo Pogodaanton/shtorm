@@ -71,7 +71,6 @@ export const validateConfig = (type) => {
 
 class ConfigController {
   requestConfig = (req, res) => {
-    console.log(req.query.id)
     const data = this.getConfig(req.query.id)
     if (data) {
       return res.status(200).send({

@@ -1,15 +1,18 @@
 import React, { Component } from 'react'
 import { Paper } from '@material-ui/core'
 import { withSnackbar } from 'notistack'
+import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
 import SpotlightLinear from '../Spinners/SpotlightLinear'
 import DefaultGridItem from '../DefaultGridItem'
 
-class Login extends Component {
+class Logout extends Component {
+  static context = UserContext
   static propTypes = {
     history: PropTypes.object.isRequired,
+    updateCurrentUser: PropTypes.func.isRequired,
     enqueueSnackbar: PropTypes.func,
     closeSnackbar: PropTypes.func
   }
@@ -19,7 +22,7 @@ class Login extends Component {
     axios.get(Api.getApiUrl('logOut'), { withCredentials: true })
       .then((res) => {
         this.props.enqueueSnackbar('Successfully logged out!')
-        this.props.history.replace('/login')
+        this.props.updateCurrentUser()
       })
       .catch((err) => {
         this.props.history.push('/')
@@ -41,4 +44,15 @@ class Login extends Component {
   }
 }
 
-export default withSnackbar(Login)
+const ContextAdder = (props) => (
+  <UserContext.Consumer>
+    {({ updateCurrentUser }) => (
+      <Logout
+        {...props}
+        updateCurrentUser={updateCurrentUser}
+      />
+    )}
+  </UserContext.Consumer>
+)
+
+export default withSnackbar(ContextAdder)

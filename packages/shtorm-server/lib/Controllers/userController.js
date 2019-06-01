@@ -286,7 +286,7 @@ class UserController {
     return res.status(200).send({
       success: true,
       message: 'Successfully requested!',
-      data: req.user
+      data: req.user ? req.user : {}
     })
   }
 

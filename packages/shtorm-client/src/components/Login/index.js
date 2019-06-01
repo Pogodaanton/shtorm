@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Typography, CircularProgress, Button } from '@material-ui/core'
 import { withSnackbar } from 'notistack'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
+import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
@@ -10,7 +11,7 @@ import './Login.scss'
 
 class Login extends Component {
   static propTypes = {
-    history: PropTypes.object.isRequired,
+    updateCurrentUser: PropTypes.func.isRequired,
     enqueueSnackbar: PropTypes.func,
     closeSnackbar: PropTypes.func
   }
@@ -27,10 +28,9 @@ class Login extends Component {
 
     axios.post(Api.getApiUrl('logIn'), { username, password }, { withCredentials: true })
       .then((res) => {
-        console.log(res)
         this.setState({ loading: false })
         this.props.enqueueSnackbar('Successfully logged in!')
-        this.props.history.push('/')
+        this.props.updateCurrentUser()
       })
       .catch((err) => {
         console.log(err.res)
@@ -90,4 +90,15 @@ class Login extends Component {
   }
 }
 
-export default withSnackbar(Login)
+const ContextAdder = (props) => (
+  <UserContext.Consumer>
+    {({ updateCurrentUser }) => (
+      <Login
+        {...props}
+        updateCurrentUser={updateCurrentUser}
+      />
+    )}
+  </UserContext.Consumer>
+)
+
+export default withSnackbar(ContextAdder)

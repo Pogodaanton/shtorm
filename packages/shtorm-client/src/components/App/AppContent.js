@@ -1,7 +1,7 @@
 
 import React, { Fragment } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import Loader, { ContextLoader } from '../Loader'
+import Loader from '../Loader'
 import { UserContext } from '../../contexts/UserContext'
 
 const Home = Loader('Home')
@@ -14,7 +14,6 @@ const BotConfigs = Loader('BotConfigs')
 const Users = Loader('Users')
 const Header = Loader('Header')
 const DefaultGridContainer = Loader('DefaultGridContainer')
-const TerminalContextProvider = ContextLoader('TerminalContext', () => null)
 
 const AppContent = () => (
   <UserContext.Consumer>
@@ -76,30 +75,21 @@ const AppContent = () => (
                       />
                     </Switch>
                   </DefaultGridContainer>
-                  <TerminalContextProvider>
-                    <Switch>
-                      <Route
-                        path='/configs'
-                        component={() => null}
-                      />
-                      <Route
-                        path='/users'
-                        component={() => null}
-                      />
-                      <Route
-                        path='/login'
-                        component={() => null}
-                      />
-                      <Route
-                        path='/logout'
-                        component={() => null}
-                      />
-                      <Route
-                        path='/'
-                        component={Terminal}
-                      />
-                    </Switch>
-                  </TerminalContextProvider>
+                  <Switch>
+                    <Route
+                      path='/task'
+                      component={Terminal}
+                    />
+                    <Route
+                      path='/'
+                      exact
+                      component={Terminal}
+                    />
+                    <Route
+                      path='/'
+                      component={() => null}
+                    />
+                  </Switch>
                 </div>
               </Fragment>
             ) : <Redirect to='/login' />}

@@ -53,15 +53,17 @@ export default class ToolbarContent extends Component {
           <span>Users</span>
         </ActivatingLinkButton>
         <div className='fill-space' />
-        <div
-          id='toggleTasks'
-          ref={this.props.onIconButtonRef}
-        >
-          <Tooltip title='Show running processes'>
-            <IconButton onClick={this.props.onTaskToggle} >
-              <Assignment />
-            </IconButton>
-          </Tooltip>
+        <div className='right-space'>
+          <div
+            id='toggleTasks'
+            ref={this.props.onIconButtonRef}
+          >
+            <Tooltip title='Show running processes'>
+              <IconButton onClick={this.props.onTaskToggle} >
+                <Assignment />
+              </IconButton>
+            </Tooltip>
+          </div>
           <Tooltip title='Log out'>
             <IconButton
               component={Link}

@@ -5,7 +5,6 @@ import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
-import DefaultGridItem from '../DefaultGridItem'
 import bg from './background.jpg'
 import './Login.scss'
 
@@ -49,46 +48,44 @@ class Login extends Component {
   render () {
     const { username, password, loading } = this.state
     return (
-      <DefaultGridItem name='login'>
-        <div className='spotlight spotlight-visible'>
-          <Typography variant='h4'>Shtorm | Login</Typography>
-          <ValidatorForm onSubmit={this.postLogin}>
-            <TextValidator
-              variant='outlined'
-              label='Username'
-              value={username}
-              required
-              fullWidth
-              disabled={loading}
-              onChange={this.onInputChange('username')}
-            />
-            <TextValidator
-              variant='outlined'
-              label='Password'
-              type='password'
-              value={password}
-              required
-              fullWidth
-              disabled={loading}
-              onChange={this.onInputChange('password')}
-            />
-            <Button
-              type='submit'
-              color='primary'
-              variant='contained'
-              disabled={loading}
-              fullWidth
-            >
-              {loading && <CircularProgress size={24} /> }
+      <div className='spotlight spotlight-visible spotlight-login'>
+        <Typography variant='h4'>Shtorm | Login</Typography>
+        <ValidatorForm onSubmit={this.postLogin}>
+          <TextValidator
+            variant='outlined'
+            label='Username'
+            value={username}
+            required
+            fullWidth
+            disabled={loading}
+            onChange={this.onInputChange('username')}
+          />
+          <TextValidator
+            variant='outlined'
+            label='Password'
+            type='password'
+            value={password}
+            required
+            fullWidth
+            disabled={loading}
+            onChange={this.onInputChange('password')}
+          />
+          <Button
+            type='submit'
+            color='primary'
+            variant='contained'
+            disabled={loading}
+            fullWidth
+          >
+            {loading && <CircularProgress size={24} /> }
                 Log In
-            </Button>
-          </ValidatorForm>
-        </div>
+          </Button>
+        </ValidatorForm>
         <div
           className='login-background'
           style={{ backgroundImage: `url("${bg}")` }}
         />
-      </DefaultGridItem>
+      </div>
     )
   }
 }

@@ -45,88 +45,83 @@ function App ({ classes }) {
           <Switch>
             <Route
               path='/login'
-              component={() => null}
+              component={Login}
             />
-            <Route
-              path='/'
-              component={Header}
-            />
+            <Route path='/'>
+              <Header />
+              <div className='content content-flex'>
+                <DefaultGridContainer name='main'>
+                  <Switch>
+                    <Route
+                      exact
+                      path='/'
+                      component={Home}
+                    />
+                    <Route
+                      path='/add'
+                      component={Home}
+                    />
+                    <Route
+                      path='/edit/:name'
+                      component={Home}
+                    />
+                    <Route
+                      path='/delete/:name'
+                      component={Home}
+                    />
+                    <Route
+                      path='/start/:name'
+                      component={Home}
+                    />
+                    <Route
+                      path='/task/:uuid'
+                      component={Task}
+                    />
+                    <Route
+                      path='/users'
+                      component={Users}
+                    />
+                    <Route
+                      path='/configs'
+                      component={BotConfigs}
+                    />
+                    <Route
+                      path='/logout'
+                      component={Logout}
+                    />
+                    <Route
+                      path='/'
+                      component={NotFound}
+                    />
+                  </Switch>
+                </DefaultGridContainer>
+                <TerminalContextProvider>
+                  <Switch>
+                    <Route
+                      path='/configs'
+                      component={() => null}
+                    />
+                    <Route
+                      path='/users'
+                      component={() => null}
+                    />
+                    <Route
+                      path='/login'
+                      component={() => null}
+                    />
+                    <Route
+                      path='/logout'
+                      component={() => null}
+                    />
+                    <Route
+                      path='/'
+                      component={Terminal}
+                    />
+                  </Switch>
+                </TerminalContextProvider>
+              </div>
+            </Route>
           </Switch>
-          <div className='content content-flex'>
-            <DefaultGridContainer name='main'>
-              <Switch>
-                <Route
-                  exact
-                  path='/'
-                  component={Home}
-                />
-                <Route
-                  path='/add'
-                  component={Home}
-                />
-                <Route
-                  path='/edit/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/delete/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/start/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/task/:uuid'
-                  component={Task}
-                />
-                <Route
-                  path='/users'
-                  component={Users}
-                />
-                <Route
-                  path='/configs'
-                  component={BotConfigs}
-                />
-                <Route
-                  path='/login'
-                  component={Login}
-                />
-                <Route
-                  path='/logout'
-                  component={Logout}
-                />
-                <Route
-                  path='/'
-                  component={NotFound}
-                />
-              </Switch>
-            </DefaultGridContainer>
-            <TerminalContextProvider>
-              <Switch>
-                <Route
-                  path='/configs'
-                  component={() => null}
-                />
-                <Route
-                  path='/users'
-                  component={() => null}
-                />
-                <Route
-                  path='/login'
-                  component={() => null}
-                />
-                <Route
-                  path='/logout'
-                  component={() => null}
-                />
-                <Route
-                  path='/'
-                  component={Terminal}
-                />
-              </Switch>
-            </TerminalContextProvider>
-          </div>
         </SnackbarProvider>
       </MuiThemeProvider>
     </SocketContextProvider>

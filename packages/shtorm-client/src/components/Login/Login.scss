@@ -1,14 +1,16 @@
-.grid-item-login {
-  .spotlight {
-    > *, > form > * {
-      margin-bottom: 15px;
-    }
+.spotlight.spotlight-login {
+  > h4, > form > * {
+    margin-bottom: 15px;
+  }
 
-    > form > * {
-      backdrop-filter: blur(20px) brightness(130%);
-    }
+  h4, form {
+    text-align: center;
+    padding: 0 15px;
+  }
 
-    > form > button {
+  > form {
+    > * { backdrop-filter: blur(20px) brightness(130%); }
+    > button {
       position: relative;
       span > .MuiCircularProgress-indeterminate {
         position: absolute;
@@ -24,6 +26,7 @@
   .login-background {
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
     filter: blur(5px);
     position: absolute;
     width: 100%;

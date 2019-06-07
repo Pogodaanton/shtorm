@@ -126,7 +126,7 @@ class ConfigController {
         protocol: typeof protocol === 'string' ? protocol : 'https',
         server: typeof server === 'string' ? server : '',
         path: typeof path === 'string' ? path : '',
-        debug: typeof concurrency === 'boolean' ? debug : false,
+        debug: typeof debug === 'boolean' ? debug : false,
         username: typeof username === 'string' ? username : '',
         password: typeof password === 'string' ? password : '',
         domain: typeof domain === 'string' ? domain : '',

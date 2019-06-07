@@ -366,7 +366,7 @@ class BotConfigEditor extends Component {
               onClick={this.postDeleteConfig}
             >
               <Delete />
-              Remove User
+              Remove Config
             </Button>
           )}
         </div>

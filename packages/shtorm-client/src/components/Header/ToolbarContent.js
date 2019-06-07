@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Route, Link } from 'react-router-dom'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
-import { Build, Home, Assignment, SupervisorAccount, ExitToApp } from '@material-ui/icons'
+import { Build, Home, Assignment, SupervisorAccount, AccountCircle } from '@material-ui/icons'
 import PropTypes from 'prop-types'
 
 function ActivatingLinkButton ({ children, to, activeOnlyWhenExact }) {
@@ -30,8 +30,10 @@ ActivatingLinkButton.propTypes = {
 
 export default class ToolbarContent extends Component {
   static propTypes = {
-    onIconButtonRef: PropTypes.func.isRequired,
-    onTaskToggle: PropTypes.func.isRequired
+    onTasksButtonRef: PropTypes.func.isRequired,
+    onTaskToggle: PropTypes.func.isRequired,
+    onProfileButtonRef: PropTypes.func.isRequired,
+    onProfileToggle: PropTypes.func.isRequired
   }
 
   render () {
@@ -56,7 +58,7 @@ export default class ToolbarContent extends Component {
         <div className='right-space'>
           <div
             id='toggleTasks'
-            ref={this.props.onIconButtonRef}
+            ref={this.props.onTasksButtonRef}
           >
             <Tooltip title='Show running processes'>
               <IconButton onClick={this.props.onTaskToggle} >
@@ -64,14 +66,16 @@ export default class ToolbarContent extends Component {
               </IconButton>
             </Tooltip>
           </div>
-          <Tooltip title='Log out'>
-            <IconButton
-              component={Link}
-              to={'/logout'}
-            >
-              <ExitToApp />
-            </IconButton>
-          </Tooltip>
+          <div
+            id='toggleProfile'
+            ref={this.props.onProfileButtonRef}
+          >
+            <Tooltip title='User profile'>
+              <IconButton onClick={this.props.onProfileToggle} >
+                <AccountCircle />
+              </IconButton>
+            </Tooltip>
+          </div>
         </div>
       </Fragment>
     )

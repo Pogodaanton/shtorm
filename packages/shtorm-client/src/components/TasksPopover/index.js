@@ -75,43 +75,45 @@ export default class TasksPopover extends PureComponent {
       >
         {tasks ? tasks.length === 0 ? (
           <Typography variant='caption'>There are no processes running currently.</Typography>
-        ) : tasks.map(({ uuid, scriptName, progress, finished }) => (
-          <List
-            dense
-            key={uuid}
-          >
-            <ListItem className='popover-tasks-list'>
-              <ListItemIcon>
-                {!finished ? (
-                  <CircularProgress
-                    size={25}
-                    variant={progress > 0 ? 'determinate' : 'indeterminate'}
-                    value={progress}
-                  />
-                ) : <AssignmentDoneIcon /> }
-              </ListItemIcon>
-              <ListItemText
-                primary={`Process ID: ${uuid}`}
-                secondary={`Script: ${scriptName}`}
-              />
-              <ListItemSecondaryAction>
-                <IconButton
-                  onClick={this.killTask(uuid)}
-                  aria-label='Kill Process'
-                >
-                  <ClearIcon />
-                </IconButton>
-                <IconButton
-                  component={Link}
-                  to={`/task/${encodeURIComponent(uuid)}`}
-                  aria-label='Open Process'
-                >
-                  <InputIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
+        ) : (
+          <List dense>
+            {tasks.map(({ uuid, scriptName, progress, finished }) => (
+              <ListItem
+                className='popover-tasks-list'
+                key={uuid}
+              >
+                <ListItemIcon>
+                  {!finished ? (
+                    <CircularProgress
+                      size={25}
+                      variant={progress > 0 ? 'determinate' : 'indeterminate'}
+                      value={progress}
+                    />
+                  ) : <AssignmentDoneIcon /> }
+                </ListItemIcon>
+                <ListItemText
+                  primary={`Process ID: ${uuid}`}
+                  secondary={`Script: ${scriptName}`}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    onClick={this.killTask(uuid)}
+                    aria-label='Kill Process'
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                  <IconButton
+                    component={Link}
+                    to={`/task/${encodeURIComponent(uuid)}`}
+                    aria-label='Open Process'
+                  >
+                    <InputIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
           </List>
-        )) : (
+        ) : (
           <Typography variant='subtitle1'>Requesting running processes...</Typography>
         )}
       </Popover>

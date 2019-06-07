@@ -16,7 +16,7 @@ class UserContextProvider extends Component {
   componentDidMount = () => this.updateCurrentUser()
   updateCurrentUser = () => {
     this.setState({ loading: true })
-    Axios.get(Api.getApiUrl('getLoginInformation'), { withCredentials: true })
+    Axios.get(Api.getApiUrl('whoami'), { withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res) && typeof res.data.data === 'object') {
           this.setState({

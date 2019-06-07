@@ -36,6 +36,6 @@ router.post(getPath('deleteUser'), validateUser('deleteUser'), validationHandler
 userController.configurePassport(passport)
 router.post(getPath('logIn'), userController.requestLogin(passport))
 router.get(getPath('logOut'), validateUser('executePresets'), validationHandler, userController.requestLogout(passport))
-router.get(getPath('getLoginInformation'), userController.requestCurrentUser)
+router.get(getPath('whoami'), userController.requestCurrentUser)
 
 export default router

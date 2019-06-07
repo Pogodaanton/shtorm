@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Prompt } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
 import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
-import { CloudUpload, CloudQueue, CloudDone, Delete } from '@material-ui/icons'
+import { CloudUpload, CloudQueue, CloudDone, Delete, FileCopy } from '@material-ui/icons'
 import isEqual from 'lodash.isequal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
@@ -111,10 +111,9 @@ class BotConfigEditor extends Component {
     delete this.origState.saveState
   }
 
-  postConfigData = () => {
+  // Custom id and name can be set if f.ex. config wants to duplicate
+  postConfigData = (id = this.state.id, name = this.state.name) => () => {
     const {
-      id,
-      name,
       protocol,
       server,
       path,
@@ -182,6 +181,9 @@ class BotConfigEditor extends Component {
     })
   }
 
+  // Config can be cloned by telling the server that it does not have an ID yet. The name needs to be changed as well.
+  postCloneConfig = () => this.postConfigData('add', this.state.name + ' (copy)')()
+
   onInputChange = (input) => (e) => {
     let val = e.target.value
     if (e.target.type === 'checkbox') val = e.target.checked
@@ -230,7 +232,7 @@ class BotConfigEditor extends Component {
       <ValidatorForm
         className='editor-form'
         autoComplete='off'
-        onSubmit={this.postConfigData}
+        onSubmit={this.postConfigData()}
       >
         <div className='editor-header'>
           <TextValidator
@@ -361,13 +363,22 @@ class BotConfigEditor extends Component {
             {saveState}
           </Button>
           {!isNew && (
-            <Button
-              disabled={loading}
-              onClick={this.postDeleteConfig}
-            >
-              <Delete />
-              Remove Config
-            </Button>
+            <Fragment>
+              <Button
+                disabled={loading}
+                onClick={this.postDeleteConfig}
+              >
+                <Delete />
+                <span>Delete</span>
+              </Button>
+              <Button
+                disabled={loading}
+                onClick={this.postCloneConfig}
+              >
+                <FileCopy />
+                <span>Clone</span>
+              </Button>
+            </Fragment>
           )}
         </div>
         <Prompt

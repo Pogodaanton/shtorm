@@ -70,5 +70,7 @@
         margin: 0 0 15px 0;
       }
     }
+
+    .editor-submit > button .MuiButton-label > span { display: none; }
   }
 }

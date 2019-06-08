@@ -5,8 +5,7 @@ import { SnackbarProvider } from 'notistack'
 import PropTypes from 'prop-types'
 import SocketContextProvider from '../../contexts/SocketContext'
 import UserContextProvider from '../../contexts/UserContext'
-import Loadable from 'react-loadable'
-import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+import Loader from '../Loader'
 import './App.scss'
 
 const styles = {
@@ -15,10 +14,7 @@ const styles = {
   info: { color: 'white' }
 }
 
-const AppContent = Loadable({
-  loader: () => import('./AppContent'),
-  loading: FullscreenSpinner
-})
+const AppContent = Loader(import('./AppContent'))
 
 function App ({ classes }) {
   return (

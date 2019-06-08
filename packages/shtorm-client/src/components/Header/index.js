@@ -3,9 +3,9 @@ import { AppBar, Toolbar, CircularProgress } from '@material-ui/core'
 import Loader from '../Loader'
 import './Header.scss'
 
-const TasksPopover = Loader('TasksPopover', () => null)
-const ProfilePopover = Loader('ProfilePopover', () => null)
-const ToolbarContent = Loader('Header/ToolbarContent', ({ pastDelay }) => !pastDelay ? null : (
+const TasksPopover = Loader(import('../TasksPopover'), () => null)
+const ProfilePopover = Loader(import('../ProfilePopover'), () => null)
+const ToolbarContent = Loader(import('../Header/ToolbarContent'), ({ pastDelay }) => !pastDelay ? null : (
   <Fragment>
     <CircularProgress
       color='primary'

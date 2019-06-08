@@ -4,16 +4,16 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import Loader from '../Loader'
 import { UserContext } from '../../contexts/UserContext'
 
-const Home = Loader('Home')
-const Task = Loader('Task')
-const NotFound = Loader('NotFound')
-const Login = Loader('Login')
-const Logout = Loader('Logout')
-const Terminal = Loader('Terminal')
-const BotConfigs = Loader('BotConfigs')
-const Users = Loader('Users')
-const Header = Loader('Header')
-const DefaultGridContainer = Loader('DefaultGridContainer')
+const Home = Loader(import('../Home'))
+const Task = Loader(import('../Task'))
+const NotFound = Loader(import('../NotFound'))
+const Login = Loader(import('../Login'))
+const Logout = Loader(import('../Logout'))
+const Terminal = Loader(import('../Terminal'))
+const BotConfigs = Loader(import('../BotConfigs'))
+const Users = Loader(import('../Users'))
+const Header = Loader(import('../Header'))
+const DefaultGridContainer = Loader(import('../DefaultGridContainer'))
 
 const AppContent = () => (
   <UserContext.Consumer>

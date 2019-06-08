@@ -1,18 +1,11 @@
 import Loadable from 'react-loadable'
 import FullscreenSpinner from '../Spinners/FullscreenLoadable'
 
-const DefaultLoader = (path, customProgress = false) => {
+const DefaultLoader = (importCode, customProgress = false) => {
   return Loadable({
-    loader: () => import('../' + path),
+    loader: () => importCode,
     loading: customProgress || FullscreenSpinner
   })
 }
 
-const ContextLoader = (path, customProgress = false) => {
-  return Loadable({
-    loader: () => import('../../contexts/' + path),
-    loading: customProgress || FullscreenSpinner
-  })
-}
-
-export { DefaultLoader as default, ContextLoader }
+export { DefaultLoader as default }

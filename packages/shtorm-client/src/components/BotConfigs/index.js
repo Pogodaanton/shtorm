@@ -6,18 +6,10 @@ import BotConfigList from './BotConfigList'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
-import Loadable from 'react-loadable'
-import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+import Loader from '../Loader'
 
-const BotConfigSelect = Loadable({
-  loader: () => import('./BotConfigSelect'),
-  loading: () => null
-})
-
-const BotConfigEditor = Loadable({
-  loader: () => import('./BotConfigEditor'),
-  loading: FullscreenSpinner
-})
+const BotConfigEditor = Loader(import('./BotConfigEditor'))
+const BotConfigSelect = Loader(import('./BotConfigSelect'), () => null)
 
 class BotConfigs extends Component {
   static propTypes = {

@@ -6,19 +6,11 @@ import UsersList from './UsersList'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
-import Loadable from 'react-loadable'
-import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+import Loader from '../Loader'
 import { UserContext } from '../../contexts/UserContext'
 
-const UsersSelect = Loadable({
-  loader: () => import('./UsersSelect'),
-  loading: () => null
-})
-
-const UserEditor = Loadable({
-  loader: () => import('./UserEditor'),
-  loading: FullscreenSpinner
-})
+const UserEditor = Loader(import('./UserEditor'))
+const UsersSelect = Loader(import('./UsersSelect'), () => null)
 
 class Users extends Component {
   static contextType = UserContext

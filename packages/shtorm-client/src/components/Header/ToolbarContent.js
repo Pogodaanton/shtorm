@@ -49,7 +49,7 @@ export default class ToolbarContent extends Component {
           <Home />
           <span>Dashboard</span>
         </ActivatingLinkButton>
-        {createConfigs && (
+        {(isAdmin || createConfigs) && (
           <ActivatingLinkButton to='/configs' >
             <Build />
             <span>Bot configs</span>

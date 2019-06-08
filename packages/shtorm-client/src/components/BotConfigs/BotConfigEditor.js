@@ -8,7 +8,7 @@ import isEqual from 'lodash.isequal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
-import './BotConfigEditor.scss'
+import '../EditorHelpers/EditorHelper.scss'
 
 class BotConfigEditor extends Component {
   static propTypes = {

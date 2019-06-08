@@ -1,6 +1,6 @@
 @import '../variables.scss';
 
-.user-editor-form {
+.editor-form {
   padding: 15px 0 5px 0;
   display: flex;
   flex-direction: column;
@@ -15,7 +15,6 @@
     }
 
     .MuiFilledInput-root {
-      //background-color: transparent;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
     }
@@ -65,7 +64,7 @@
 }
 
 @media (max-width: 480px) {
-  .user-editor-form {
+  .editor-form {
     .editor-fieldsets {
       flex-direction: column;
       align-items: center;
@@ -74,5 +73,7 @@
         margin: 0 0 15px 0;
       }
     }
+
+    .editor-submit > button .MuiButton-label > span { display: none; }
   }
 }

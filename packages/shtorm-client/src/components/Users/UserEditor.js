@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
 import { UserContext } from '../../contexts/UserContext'
-import './UserEditor.scss'
+import '../EditorHelpers/EditorHelper.scss'
 
 class UserEditor extends Component {
   static contextType = UserContext
@@ -224,7 +224,7 @@ class UserEditor extends Component {
 
     return (
       <ValidatorForm
-        className='user-editor-form'
+        className='editor-form'
         autoComplete='off'
         onSubmit={this.postUserData}
       >

@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { Route, Link } from 'react-router-dom'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Build, Home, Assignment, SupervisorAccount, AccountCircle } from '@material-ui/icons'
+import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 
 function ActivatingLinkButton ({ children, to, activeOnlyWhenExact }) {
@@ -29,6 +30,7 @@ ActivatingLinkButton.propTypes = {
 }
 
 export default class ToolbarContent extends Component {
+  static contextType = UserContext
   static propTypes = {
     onTasksButtonRef: PropTypes.func.isRequired,
     onTaskToggle: PropTypes.func.isRequired,
@@ -37,6 +39,7 @@ export default class ToolbarContent extends Component {
   }
 
   render () {
+    const { isAdmin, createConfigs } = this.context.currentUser
     return (
       <Fragment>
         <ActivatingLinkButton
@@ -46,14 +49,18 @@ export default class ToolbarContent extends Component {
           <Home />
           <span>Dashboard</span>
         </ActivatingLinkButton>
-        <ActivatingLinkButton to='/configs' >
-          <Build />
-          <span>Bot configs</span>
-        </ActivatingLinkButton>
-        <ActivatingLinkButton to='/users' >
-          <SupervisorAccount />
-          <span>Users</span>
-        </ActivatingLinkButton>
+        {createConfigs && (
+          <ActivatingLinkButton to='/configs' >
+            <Build />
+            <span>Bot configs</span>
+          </ActivatingLinkButton>
+        )}
+        {isAdmin && (
+          <ActivatingLinkButton to='/users' >
+            <SupervisorAccount />
+            <span>Users</span>
+          </ActivatingLinkButton>
+        )}
         <div className='fill-space' />
         <div className='right-space'>
           <div

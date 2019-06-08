@@ -270,7 +270,7 @@ class UserController {
         })
       }
 
-      return res.redirect('./getLoginInformation')
+      return res.redirect('./whoami')
     })
   })(req, res, next)
 

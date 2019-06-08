@@ -39,7 +39,7 @@ export default class ToolbarContent extends Component {
   }
 
   render () {
-    const { isAdmin, createConfigs } = this.context.currentUser
+    const { isAdmin, createConfigs } = (this.context.currentUser.rights || this.context.currentUser)
     return (
       <Fragment>
         <ActivatingLinkButton

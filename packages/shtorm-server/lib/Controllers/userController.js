@@ -11,41 +11,39 @@ class Permission {
   _logInMessage = 'You need to log in first.'
   _notPermittedMessage = 'You are not permitted to do this.'
 
-  check = (right) => {
-    return this._baseCheck(req => {
-      if (!req.user) throw new Error(this._logInMessage)
-      if (typeof right === 'string' && req.user.rights[right] === false) throw new Error(this._notPermittedMessage)
-      return true
-    })
+  _checkCallback = (permission) => (req) => {
+    if (!req.user) throw new Error(this._logInMessage)
+    if (typeof permission === 'string' && req.user.permissions[permission] === false) throw new Error(this._notPermittedMessage)
+    return true
   }
 
-  checkOneOf = (rights) => {
-    return this._baseCheck(req => {
-      let permittedRights = 0
-      if (!req.user) throw new Error(this._logInMessage)
-      if (Array.isArray(rights)) {
-        rights.forEach((right) => {
-          if (req.user.rights[right] === true) permittedRights++
-        })
-        if (permittedRights === 0) throw new Error(this._notPermittedMessage)
-      }
-      return true
-    })
+  _checkOneOfCallback = (permissions) => (req) => {
+    let permittedRights = 0
+    if (!req.user) throw new Error(this._logInMessage)
+    if (Array.isArray(permissions)) {
+      permissions.forEach((permission) => {
+        if (req.user.permissions[permission] === true) permittedRights++
+      })
+      if (permittedRights === 0) throw new Error(this._notPermittedMessage)
+    }
+    return true
   }
 
-  checkAllOf = (rights) => {
-    return this.baseCheck(req => {
-      let permittedRights = 0
-      if (!req.user) throw new Error(this.logInMessage)
-      if (Array.isArray(rights)) {
-        rights.forEach((right) => {
-          if (req.user.rights[right] === true) permittedRights++
-        })
-        if (permittedRights < rights.length) throw new Error(this.notPermittedMessage)
-      }
-      return true
-    })
+  _checkAllOfCallback = (permissions) => (req) => {
+    let permittedRights = 0
+    if (!req.user) throw new Error(this.logInMessage)
+    if (Array.isArray(permissions)) {
+      permissions.forEach((permission) => {
+        if (req.user.permissions[permission] === true) permittedRights++
+      })
+      if (permittedRights < permissions.length) throw new Error(this.notPermittedMessage)
+    }
+    return true
   }
+
+  check = (permission) => this._baseCheck(this._checkCallback(permission))
+  checkOneOf = (permissions) => this._baseCheck(this._checkOneOfCallback(permissions))
+  checkAllOf = (permissions) => this.baseCheck(this._checkAllOfCallback(permissions))
 }
 
 export const permission = new Permission()
@@ -63,16 +61,25 @@ export const validateUser = (type) => {
       return [ permission.checkOneOf(['createConfigs', 'modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
     case 'createConfigs':
       return [ permission.checkOneOf(['createConfigs', 'isAdmin', 'isOriginal']) ]
+    case 'editOneself':
+      return [
+        body('permission')
+          // Custom permission function to check whether the user is acquiring his own informations
+          .custom((val, { req }) => {
+            if (req.user.id === req.query.id || req.body.id === req.user.id) return true
+            return permission._checkOneOfCallback(['isAdmin', 'isOriginal'])(req)
+          })
+      ]
     case 'getUser':
       return [
-        ...validateUser('admin'),
+        ...validateUser('editOneself'),
         check('id')
           .exists({ checkFalsy: true, checkNull: true }).withMessage('Missing paramter "id".')
           .isString().withMessage('Parameter "id" needs to be of type string!')
       ]
     case 'saveUser':
       return [
-        ...validateUser('admin'),
+        ...validateUser('editOneself'),
         check('username')
           .exists({ checkFalsy: true, checkNull: true })
           .withMessage('Username is required!')
@@ -220,14 +227,18 @@ class UserController {
 
     const existingUser = this.db.find({ id })
     const existingUserVal = existingUser.value()
-
-    existingUser.assign({
-      username,
-      password: (password.length > 0) ? this.hashPassword(password) : existingUserVal.password,
+    const canUserEditRights = req.user.permissions.isAdmin
+    const newRights = canUserEditRights ? {
       isAdmin: existingUserVal.isOriginal || (typeof isAdmin === 'boolean') ? isAdmin : existingUserVal.isAdmin,
       modifyPresets: existingUserVal.isOriginal || (typeof modifyPresets === 'boolean') ? modifyPresets : existingUserVal.modifyPresets,
       createPresets: existingUserVal.isOriginal || (typeof createPresets === 'boolean') ? createPresets : existingUserVal.createPresets,
       createConfigs: existingUserVal.isOriginal || (typeof createConfigs === 'boolean') ? createConfigs : existingUserVal.modifcreateConfigsyConfigs
+    } : {}
+
+    existingUser.assign({
+      username,
+      password: (password.length > 0) ? this.hashPassword(password) : existingUserVal.password,
+      ...newRights
     }).write()
 
     return res.status(201).send({
@@ -306,17 +317,17 @@ class UserController {
       if (typeof user === 'undefined' || !user) {
         done({ message: 'Invalid credentials.' }, null)
       } else {
-        const { id, username, executePresets, modifyPresets, createPresets, createConfigs, isAdmin } = user
+        const { id, username, executePresets, modifyPresets, createPresets, createConfigs, isAdmin, isOriginal } = user
         // the object is what will be available for 'request.user'
         done(null, {
           id,
           username,
-          rights: {
+          permissions: {
             executePresets: executePresets || false,
             modifyPresets: modifyPresets || false,
             createPresets: createPresets || false,
             createConfigs: createConfigs || false,
-            isAdmin: isAdmin || false
+            isAdmin: isOriginal || isAdmin || false
           }
         })
       }

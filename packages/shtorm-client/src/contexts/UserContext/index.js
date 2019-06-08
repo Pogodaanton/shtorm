@@ -28,9 +28,17 @@ class UserContextProvider extends Component {
       .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
+  getUserPermission = (permission) => {
+    const { currentUser } = this.state
+    if (typeof currentUser.permissions === 'undefined') return false
+    if (currentUser.permissions.isAdmin) return true
+    return currentUser.permissions[permission] || false
+  }
+
   state = {
     currentUser: {},
     updateCurrentUser: this.updateCurrentUser,
+    getUserPermission: this.getUserPermission,
     loading: false
   }
 

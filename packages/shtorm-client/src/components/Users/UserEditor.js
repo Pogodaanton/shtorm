@@ -1,16 +1,18 @@
 import React, { Component } from 'react'
 import { Prompt } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
-import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider, Tooltip } from '@material-ui/core'
+import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider, Tooltip, Typography } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import { CloudUpload, CloudQueue, CloudDone, Delete } from '@material-ui/icons'
 import isEqual from 'lodash.isequal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import Api from '../Api'
+import { UserContext } from '../../contexts/UserContext'
 import './UserEditor.scss'
 
 class UserEditor extends Component {
+  static contextType = UserContext
   static propTypes = {
     onReloadRequest: PropTypes.func.isRequired,
     match: PropTypes.object.isRequired,
@@ -66,7 +68,7 @@ class UserEditor extends Component {
       typeof this.props.match.params.id !== 'undefined'
     ) {
       const { id } = this.props.match.params
-      this.getTakenUsernames()
+      if (this.context.getUserPermission('isAdmin')) this.getTakenUsernames()
       if (id === 'add') this.setupNewUser()
       else this.getUserData(id)
     }
@@ -143,8 +145,8 @@ class UserEditor extends Component {
             this.props.onReloadRequest()
             this.props.history.replace(`/users/${res.data.newId}`)
           } else {
-            this.setState({ saveState: 'Saved', loading: false }, () => {
-              this.props.onReloadRequest()
+            this.setState({ saveState: 'Saved', loading: false, password: '' }, () => {
+              if (this.context.getUserPermission('isAdmin')) this.props.onReloadRequest()
               this.setOrigState()
             })
           }
@@ -218,12 +220,20 @@ class UserEditor extends Component {
       }
     }
 
+    const isEditingUserAdmin = this.context.getUserPermission('isAdmin')
+
     return (
       <ValidatorForm
         className='user-editor-form'
         autoComplete='off'
         onSubmit={this.postUserData}
       >
+        {!isEditingUserAdmin && (
+          <div className='editor-header'>
+            <Typography variant='h5'>Change your preferences:</Typography>
+            <Divider />
+          </div>
+        )}
         <div className='editor-fieldsets'>
           <FormControl component='fieldset'>
             <FormLabel component='legend'>User Preferences:</FormLabel>
@@ -244,8 +254,8 @@ class UserEditor extends Component {
                 label={isNew ? 'Password' : 'Change Password'}
                 type='password'
                 value={isNew ? newPassword : password}
-                validators={isNew ? ['notEmpty', 'minStringLength:3'] : null}
-                errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : null}
+                validators={isNew ? ['notEmpty', 'minStringLength:3'] : []}
+                errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : []}
                 disabled={loading}
                 required={isNew}
                 fullWidth
@@ -257,7 +267,7 @@ class UserEditor extends Component {
             <FormLabel
               component='legend'
               focused={false}
-            >User Rights:</FormLabel>
+            >User Permissions:</FormLabel>
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox
@@ -274,7 +284,7 @@ class UserEditor extends Component {
                   indeterminate={isAdmin}
                   onChange={this.onInputChange('modifyPresets')}
                 />}
-                disabled={loading || isAdmin}
+                disabled={loading || isAdmin || !isEditingUserAdmin}
                 label='Modifying Presets'
               />
               <FormControlLabel
@@ -283,7 +293,7 @@ class UserEditor extends Component {
                   indeterminate={isAdmin}
                   onChange={this.onInputChange('createPresets')}
                 />}
-                disabled={loading || isAdmin}
+                disabled={loading || isAdmin || !isEditingUserAdmin}
                 label='Adding/Removing Presets'
               />
               <FormControlLabel
@@ -292,21 +302,21 @@ class UserEditor extends Component {
                   indeterminate={isAdmin}
                   onChange={this.onInputChange('createConfigs')}
                 />}
-                disabled={loading || isAdmin}
+                disabled={loading || isAdmin || !isEditingUserAdmin}
                 label='Adding/Removing Configs'
               />
               <Tooltip
                 placement='left'
                 title={
                   isOriginal
-                    ? 'This user is Owner and thus cannot have his rights removed.'
+                    ? 'This user is Owner and thus cannot have his permissions removed.'
                     : 'This right makes the user an admin, thus they also obtain every other right.'
                 }
               >
                 <FormControlLabel
                   control={<Checkbox
                     checked={isAdmin}
-                    disabled={loading || isOriginal}
+                    disabled={loading || isOriginal || !isEditingUserAdmin}
                     onChange={this.onInputChange('isAdmin')}
                   />}
                   label='Managing Users 👑'
@@ -326,7 +336,7 @@ class UserEditor extends Component {
             <Cloud />
             {saveState}
           </Button>
-          {(!isOriginal && !isNew) && (
+          {(!isOriginal && !isNew && isEditingUserAdmin) && (
             <Button
               disabled={loading}
               onClick={this.postDeleteUser}

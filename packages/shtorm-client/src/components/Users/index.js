@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { withSnackbar } from 'notistack'
 import { GridPaper } from '../DefaultGridItem'
 import UsersList from './UsersList'
@@ -8,6 +8,7 @@ import axios from 'axios'
 import Api from '../Api'
 import Loadable from 'react-loadable'
 import FullscreenSpinner from '../Spinners/FullscreenLoadable'
+import { UserContext } from '../../contexts/UserContext'
 
 const UsersSelect = Loadable({
   loader: () => import('./UsersSelect'),
@@ -20,6 +21,7 @@ const UserEditor = Loadable({
 })
 
 class Users extends Component {
+  static contextType = UserContext
   static propTypes = {
     enqueueSnackbar: PropTypes.func,
     closeSnackbar: PropTypes.func,
@@ -32,7 +34,7 @@ class Users extends Component {
   }
 
   componentDidMount = () => {
-    this.getAllUsers()
+    if (this.context.getUserPermission('isAdmin')) this.getAllUsers()
     UserEditor.preload()
   }
 
@@ -50,26 +52,39 @@ class Users extends Component {
 
   render () {
     const { loading, userList } = this.state
+    const { isAdmin } = (this.context.currentUser.permissions || this.context.currentUser)
+    const editorPaperProps = isAdmin ? {
+      xs: 12,
+      sm: 7,
+      md: 8,
+      lg: 7
+    } : {
+      xs: 12,
+      sm: 11,
+      md: 10,
+      lg: 9,
+      xl: 8
+    }
+
     return (
       <Fragment>
+        {isAdmin && (
+          <GridPaper
+            className='grid-split'
+            xs={12}
+            sm={5}
+            md={3}
+            xl={2}
+          >
+            <UsersList
+              loading={loading}
+              list={userList}
+            />
+          </GridPaper>
+        )}
         <GridPaper
           className='grid-split'
-          xs={12}
-          sm={5}
-          md={3}
-          xl={2}
-        >
-          <UsersList
-            loading={loading}
-            list={userList}
-          />
-        </GridPaper>
-        <GridPaper
-          className='grid-split'
-          xs={12}
-          sm={7}
-          md={8}
-          lg={7}
+          {...editorPaperProps}
         >
           <Switch>
             <Route
@@ -83,7 +98,7 @@ class Users extends Component {
             />
             <Route
               path='/users'
-              component={UsersSelect}
+              component={isAdmin ? UsersSelect : () => <Redirect to='/' />}
             />
           </Switch>
         </GridPaper>

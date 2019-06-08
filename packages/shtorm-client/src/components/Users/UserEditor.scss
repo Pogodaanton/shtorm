@@ -6,6 +6,25 @@
   flex-direction: column;
   height: 100%;
 
+  .editor-header {
+    width: 100%;
+    margin: 0;
+
+    ~ .editor-fieldsets {
+      padding-top: 20px;
+    }
+
+    .MuiFilledInput-root {
+      //background-color: transparent;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    hr {
+      margin-top: 10px;
+    }
+  }
+
   .editor-fieldsets {
     display: flex;
     overflow-y: auto;

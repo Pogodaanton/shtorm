@@ -392,7 +392,7 @@ class ProjectDialog extends Component {
                     Delete Project
                   </Button>
                 )}
-                <div className='fill-space' />
+                <div className='flex-fill' />
                 <Button
                   disabled={loading || currentStep === 0}
                   onClick={this.triggerBack}

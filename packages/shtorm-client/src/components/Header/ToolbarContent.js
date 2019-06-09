@@ -61,7 +61,7 @@ export default class ToolbarContent extends Component {
             <span>Users</span>
           </ActivatingLinkButton>
         )}
-        <div className='fill-space' />
+        <div className='flex-fill' />
         <div className='right-space'>
           <div
             id='toggleTasks'

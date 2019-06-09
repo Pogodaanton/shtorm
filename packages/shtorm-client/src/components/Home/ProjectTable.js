@@ -50,7 +50,7 @@ export default class ProjectTable extends Component {
                 <IconButton
                   component={Link}
                   disabled={hasNoConfig}
-                  to={`/start/${id}?skip=1`}
+                  to={`/start/${id}/skip`}
                 ><FastForwardIcon /></IconButton>
               </Tooltip>
               <Button

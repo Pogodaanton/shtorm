@@ -13,6 +13,7 @@ const Terminal = Loader(import('../Terminal'))
 const BotConfigs = Loader(import('../BotConfigs'))
 const Users = Loader(import('../Users'))
 const Header = Loader(import('../Header'))
+const Start = Loader(import('../Start'))
 const DefaultGridContainer = Loader(import('../DefaultGridContainer'))
 
 const AppContent = () => (
@@ -42,16 +43,12 @@ const AppContent = () => (
                         component={Home}
                       />
                       <Route
-                        path='/edit/:name'
-                        component={Home}
+                        path='/start/:id/:option'
+                        component={Start}
                       />
                       <Route
-                        path='/delete/:name'
-                        component={Home}
-                      />
-                      <Route
-                        path='/start/:name'
-                        component={Home}
+                        path='/start/:id'
+                        component={Start}
                       />
                       <Route
                         path='/task/:uuid'
@@ -87,6 +84,10 @@ const AppContent = () => (
                     />
                     <Route
                       path='/projects/:id'
+                      component={Terminal}
+                    />
+                    <Route
+                      path='/start/:id'
                       component={Terminal}
                     />
                     <Route

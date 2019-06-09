@@ -79,17 +79,17 @@ class Script {
 class ScriptController {
   tasks = {}
 
-  startProcess = (name, client) => {
+  startProcess = (id, client) => {
     try {
-      const { project, config } = projectController.getProject(name)
+      const { project, config } = projectController.getProject(id)
       if (project && config) {
-        const scriptOptions = this.projectToScriptOptions(project)
-        const uuid = shortid.generate()
+        const { scriptOptions } = project
+        const pid = shortid.generate()
 
-        this.tasks[uuid] = new Script(client, config, project.script, scriptOptions)
-        client.emit('task.start.success', uuid)
+        this.tasks[pid] = new Script(client, config, project.script, scriptOptions)
+        client.emit('task.start.success', pid)
       } else {
-        throw new Error('No project found with name ' + name)
+        throw new Error('No project found with id ' + id)
       }
     } catch (err) {
       console.error(err)
@@ -97,32 +97,32 @@ class ScriptController {
     }
   }
 
-  killProcess = (uuid, client) => {
-    const proc = this.tasks[uuid]
+  killProcess = (pid, client) => {
+    const proc = this.tasks[pid]
     if (proc) proc.stop()
-    else client.emit('task.kill.error', `Process ${uuid} does not exist!`)
+    else client.emit('task.kill.error', `Process ${pid} does not exist!`)
   }
 
   handleStop = (task, client) => {
     const index = Object.values(this.tasks).findIndex((t) => t === task)
-    const uuid = Object.keys(this.tasks)[index]
-    delete this.tasks[uuid]
+    const pid = Object.keys(this.tasks)[index]
+    delete this.tasks[pid]
     client.emit('task.killed', true)
     this.getProcesses(client)
   }
 
   getProcesses = (client) => {
-    const tasks = Object.keys(this.tasks).map((uuid) => {
-      const scriptExecutionData = this.tasks[uuid].getScriptExecutionData()
-      return { uuid, ...scriptExecutionData }
+    const tasks = Object.keys(this.tasks).map((pid) => {
+      const scriptExecutionData = this.tasks[pid].getScriptExecutionData()
+      return { pid, ...scriptExecutionData }
     })
     client.emit('tasks.update', tasks)
   }
 
-  setClientToProcess = (uuid, client) => {
-    const task = this.tasks[uuid]
+  setClientToProcess = (pid, client) => {
+    const task = this.tasks[pid]
     if (!task) {
-      client.emit('task.request.error', `Process ${uuid} does not exist!`)
+      client.emit('task.request.error', `Process ${pid} does not exist!`)
       return
     }
     task.setClient(client)

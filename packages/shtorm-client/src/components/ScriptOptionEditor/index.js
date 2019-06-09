@@ -12,7 +12,8 @@ class ScriptOptionEditor extends Component {
     onEmptyScriptOptions: PropTypes.func,
     onValuesUpdate: PropTypes.func.isRequired,
     enqueueSnackbar: PropTypes.func.isRequired,
-    closeSnackbar: PropTypes.func.isRequired
+    closeSnackbar: PropTypes.func.isRequired,
+    disabled: PropTypes.bool
   }
 
   state = {}
@@ -82,6 +83,7 @@ class ScriptOptionEditor extends Component {
                   validators={['required']}
                   errorMessages={['This field cannot be empty.']}
                   onChange={this.onInputChange(name)}
+                  disabled={!!this.props.disabled}
                 />
               )
             })

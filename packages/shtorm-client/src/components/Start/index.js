@@ -31,13 +31,13 @@ class Start extends Component {
 
   componentDidMount = () => {
     this.componentDidUpdate({})
-    this.context.socket.on('task.start.error', this.taskErrorHandler)
-    this.context.socket.on('task.start.success', this.taskSuccessHandler)
+    this.context.socket.on('process.start.error', this.processErrorHandler)
+    this.context.socket.on('process.start.success', this.processSuccessHandler)
   }
 
   componentWillUnmount = () => {
-    this.context.socket.off('task.start.error', this.taskErrorHandler)
-    this.context.socket.off('task.start.success', this.taskSuccessHandler)
+    this.context.socket.off('process.start.error', this.processErrorHandler)
+    this.context.socket.off('process.start.success', this.processSuccessHandler)
   }
 
   componentDidUpdate = (prevProps) => {
@@ -57,8 +57,7 @@ class Start extends Component {
         if (Api.axiosCheckResponse(res)) {
           const { script, scriptOptions } = res.data.data
           this.scriptOptionsDefaults = scriptOptions
-          if (this.props.match.params.option === 'skip') this.onSubmitWithDefaults()
-          else this.setState({ scriptName: script, scriptOptions, loading: false })
+          this.setState({ scriptName: script, scriptOptions, loading: false })
         }
       })
       .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
@@ -68,11 +67,15 @@ class Start extends Component {
     this.setState({ scriptOptions: { ...this.state.scriptOptions, newState } })
   }
 
-  onSubmitWithDefaults = () => this.context.socket.emit('task.start', this.props.match.params.id)
-  onSubmit = () => this.context.socket.emit('task.start', this.props.match.params.id)
+  onSubmit = (defaults = false) => () => {
+    this.context.socket.emit('process.start', {
+      id: this.props.match.params.id,
+      scriptOptions: defaults ? this.scriptOptionsDefaults : this.state.scriptOptions
+    })
+  }
 
-  taskErrorHandler = Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)
-  taskSuccessHandler = (id) => this.props.history.push(`/task/${encodeURIComponent(id)}`)
+  processErrorHandler = Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)
+  processSuccessHandler = (id) => this.props.history.push(`/p/${encodeURIComponent(id)}`)
 
   render () {
     const { scriptName, loading, scriptOptions } = this.state
@@ -81,7 +84,7 @@ class Start extends Component {
         <Paper className='paper'>
           <ValidatorForm
             className='editor-form'
-            onSubmit={this.onSubmit}
+            onSubmit={this.onSubmit()}
             autoComplete='off'
           >
             <div className='editor-header'>
@@ -115,7 +118,7 @@ class Start extends Component {
                 Start
               </Button>
               <Button
-                onClick={this.onStartWithDefaults}
+                onClick={this.onSubmit(true)}
                 disabled={loading}
               >
                 <FastForward />

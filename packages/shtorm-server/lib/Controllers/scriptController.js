@@ -77,65 +77,55 @@ class Script {
 }
 
 class ScriptController {
-  tasks = {}
+  processes = {}
 
-  startProcess = (id, client) => {
+  startProcess = ({ id, scriptOptions }, client) => {
     try {
       const { project, config } = projectController.getProject(id)
       if (project && config) {
-        const { scriptOptions } = project
         const pid = shortid.generate()
 
-        this.tasks[pid] = new Script(client, config, project.script, scriptOptions)
-        client.emit('task.start.success', pid)
+        this.processes[pid] = new Script(client, config, project.script, scriptOptions)
+        client.emit('process.start.success', pid)
       } else {
         throw new Error('No project found with id ' + id)
       }
     } catch (err) {
       console.error(err)
-      client.emit('task.start.error', err)
+      client.emit('process.start.error', err)
     }
   }
 
   killProcess = (pid, client) => {
-    const proc = this.tasks[pid]
+    const proc = this.processes[pid]
     if (proc) proc.stop()
-    else client.emit('task.kill.error', `Process ${pid} does not exist!`)
+    else client.emit('process.kill.error', `Process ${pid} does not exist!`)
   }
 
-  handleStop = (task, client) => {
-    const index = Object.values(this.tasks).findIndex((t) => t === task)
-    const pid = Object.keys(this.tasks)[index]
-    delete this.tasks[pid]
-    client.emit('task.killed', true)
+  handleStop = (proc, client) => {
+    const index = Object.values(this.processes).findIndex((t) => t === proc)
+    const pid = Object.keys(this.processes)[index]
+    delete this.processes[pid]
+    client.emit('process.killed', true)
     this.getProcesses(client)
   }
 
   getProcesses = (client) => {
-    const tasks = Object.keys(this.tasks).map((pid) => {
-      const scriptExecutionData = this.tasks[pid].getScriptExecutionData()
+    const processes = Object.keys(this.processes).map((pid) => {
+      const scriptExecutionData = this.processes[pid].getScriptExecutionData()
       return { pid, ...scriptExecutionData }
     })
-    client.emit('tasks.update', tasks)
+    client.emit('processes.update', processes)
   }
 
   setClientToProcess = (pid, client) => {
-    const task = this.tasks[pid]
-    if (!task) {
-      client.emit('task.request.error', `Process ${pid} does not exist!`)
+    const proc = this.processes[pid]
+    if (!proc) {
+      client.emit('process.request.error', `Process ${pid} does not exist!`)
       return
     }
-    task.setClient(client)
-    client.emit('task.request.success')
-  }
-
-  projectToScriptOptions = (project) => {
-    const newProject = { ...project } // Needs to be done, so that we don't mutate lowdb...
-    delete newProject.name
-    delete newProject.script
-    delete newProject.config
-    delete newProject.favicon
-    return newProject
+    proc.setClient(client)
+    client.emit('process.request.success')
   }
 }
 

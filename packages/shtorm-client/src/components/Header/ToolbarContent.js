@@ -32,8 +32,8 @@ ActivatingLinkButton.propTypes = {
 export default class ToolbarContent extends Component {
   static contextType = UserContext
   static propTypes = {
-    onTasksButtonRef: PropTypes.func.isRequired,
-    onTaskToggle: PropTypes.func.isRequired,
+    onProcessExplorerButtonRef: PropTypes.func.isRequired,
+    onProcessExplorerToggle: PropTypes.func.isRequired,
     onProfileButtonRef: PropTypes.func.isRequired,
     onProfileToggle: PropTypes.func.isRequired
   }
@@ -65,10 +65,10 @@ export default class ToolbarContent extends Component {
         <div className='right-space'>
           <div
             id='toggleTasks'
-            ref={this.props.onTasksButtonRef}
+            ref={this.props.onProcessExplorerButtonRef}
           >
             <Tooltip title='Show running processes'>
-              <IconButton onClick={this.props.onTaskToggle} >
+              <IconButton onClick={this.props.onProcessExplorerToggle} >
                 <Assignment />
               </IconButton>
             </Tooltip>

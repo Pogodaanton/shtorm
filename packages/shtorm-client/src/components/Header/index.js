@@ -3,7 +3,7 @@ import { AppBar, Toolbar, CircularProgress } from '@material-ui/core'
 import Loader from '../Loader'
 import './Header.scss'
 
-const TasksPopover = Loader(import('../TasksPopover'), () => null)
+const ProcessExplorer = Loader(import('../ProcessExplorer'), () => null)
 const ProfilePopover = Loader(import('../ProfilePopover'), () => null)
 const ToolbarContent = Loader(import('../Header/ToolbarContent'), ({ pastDelay }) => !pastDelay ? null : (
   <Fragment>
@@ -18,13 +18,12 @@ const ToolbarContent = Loader(import('../Header/ToolbarContent'), ({ pastDelay }
 
 export default class index extends Component {
   state = {
-    tasksOpen: false,
+    processExOpen: false,
     profileOpen: false
   }
 
   componentDidMount = () => {
-    TasksPopover.preload()
-    TasksPopover.preload()
+    ProcessExplorer.preload()
   }
 
   togglePopover = (popoverType) => (e) => {
@@ -32,12 +31,12 @@ export default class index extends Component {
     this.setState({ [stateName]: !this.state[stateName] })
   }
 
-  tasksButtonRef = null
+  processExButtonRef = null
   profileButtonRef = null
   setRef = (refType) => (r) => { this[refType + 'ButtonRef'] = r }
 
   render () {
-    const { tasksOpen, profileOpen } = this.state
+    const { processExOpen, profileOpen } = this.state
     return (
       <AppBar
         id='page-header'
@@ -47,16 +46,16 @@ export default class index extends Component {
         <Toolbar variant='dense'>
           <span className='page-header-logo'>⛈</span>
           <ToolbarContent
-            onTasksButtonRef={this.setRef('tasks')}
-            onTaskToggle={this.togglePopover('tasks')}
+            onProcessExplorerButtonRef={this.setRef('processEx')}
+            onProcessExplorerToggle={this.togglePopover('processEx')}
             onProfileButtonRef={this.setRef('profile')}
             onProfileToggle={this.togglePopover('profile')}
           />
         </Toolbar>
-        {this.tasksButtonRef && <TasksPopover
-          open={tasksOpen}
-          anchor={this.tasksButtonRef}
-          requestClose={this.togglePopover('tasks')}
+        {this.processExButtonRef && <ProcessExplorer
+          open={processExOpen}
+          anchor={this.processExButtonRef}
+          requestClose={this.togglePopover('processEx')}
         />}
         {this.profileButtonRef && <ProfilePopover
           open={profileOpen}

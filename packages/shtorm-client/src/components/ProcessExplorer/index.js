@@ -16,9 +16,9 @@ import AssignmentDoneIcon from '@material-ui/icons/AssignmentTurnedIn'
 import InputIcon from '@material-ui/icons/Input'
 import ClearIcon from '@material-ui/icons/Clear'
 import { SocketContext } from '../../contexts/SocketContext'
-import './TasksPopover.scss'
+import './ProcessExplorer.scss'
 
-export default class TasksPopover extends PureComponent {
+export default class ProcessExplorer extends PureComponent {
   static contextType = SocketContext
   static propTypes = {
     open: PropTypes.bool.isRequired,
@@ -27,43 +27,41 @@ export default class TasksPopover extends PureComponent {
   }
 
   state = {
-    tasks: null
+    processes: null
   }
 
-  componentDidMount = () => this.requestTasks()
-
+  componentDidMount = () => this.requestProcesses()
   componentDidUpdate = (prevProps) => {
-    if (prevProps.open !== this.props.open) this.requestTasks()
+    if (prevProps.open !== this.props.open) this.requestProcesses()
   }
 
-  requestTasks = () => {
+  requestProcesses = () => {
     if (this.props.open) {
-      this.context.socket.on('tasks.update', this.updateTasks)
-      this.context.socket.emit('tasks.request')
+      this.context.socket.on('processes.update', this.updateProcesses)
+      this.context.socket.emit('processes.request')
     } else {
-      this.context.socket.emit('tasks.request.stop')
-      this.context.socket.off('tasks.update', this.updateTasks)
+      this.context.socket.emit('processes.request.stop')
+      this.context.socket.off('processes.update', this.updateProcesses)
     }
   }
 
-  updateTasks = (tasks) => {
-    console.log(tasks)
-    this.setState({ tasks })
+  updateProcesses = (processes) => {
+    this.setState({ processes })
   }
 
-  killTask = (uuid) => () => {
-    this.context.socket.emit('task.kill', uuid)
+  killTask = (pid) => () => {
+    this.context.socket.emit('process.kill', pid)
   }
 
   render () {
     const { open, anchor, requestClose } = this.props
-    const { tasks } = this.state
+    const { processes } = this.state
     return (
       <Popover
         open={open}
         anchorEl={anchor}
         onClose={requestClose}
-        className='popover-tasks'
+        className='popover-process-explorer'
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right'
@@ -73,14 +71,14 @@ export default class TasksPopover extends PureComponent {
           horizontal: 'right'
         }}
       >
-        {tasks ? tasks.length === 0 ? (
+        {processes ? processes.length === 0 ? (
           <Typography variant='caption'>There are no processes running currently.</Typography>
         ) : (
           <List dense>
-            {tasks.map(({ uuid, scriptName, progress, finished }) => (
+            {processes.map(({ pid, scriptName, progress, finished }) => (
               <ListItem
-                className='popover-tasks-list'
-                key={uuid}
+                className='popover-process-explorer-list'
+                key={pid}
               >
                 <ListItemIcon>
                   {!finished ? (
@@ -92,19 +90,19 @@ export default class TasksPopover extends PureComponent {
                   ) : <AssignmentDoneIcon /> }
                 </ListItemIcon>
                 <ListItemText
-                  primary={`Process ID: ${uuid}`}
+                  primary={`Process ID: ${pid}`}
                   secondary={`Script: ${scriptName}`}
                 />
                 <ListItemSecondaryAction>
                   <IconButton
-                    onClick={this.killTask(uuid)}
+                    onClick={this.killTask(pid)}
                     aria-label='Kill Process'
                   >
                     <ClearIcon />
                   </IconButton>
                   <IconButton
                     component={Link}
-                    to={`/task/${encodeURIComponent(uuid)}`}
+                    to={`/process/${encodeURIComponent(pid)}`}
                     aria-label='Open Process'
                   >
                     <InputIcon />

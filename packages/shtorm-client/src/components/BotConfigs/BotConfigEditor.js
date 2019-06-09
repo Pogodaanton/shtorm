@@ -234,7 +234,7 @@ class BotConfigEditor extends Component {
         autoComplete='off'
         onSubmit={this.postConfigData()}
       >
-        <div className='editor-header'>
+        <div className='editor-header bot-config-editor-header'>
           <TextValidator
             variant='filled'
             label='Config Name'

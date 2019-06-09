@@ -11,6 +11,10 @@
     margin: 0;
 
     ~ .editor-fieldsets {
+      padding-top: 10px;
+    }
+
+    &.bot-config-editor-header ~ .editor-fieldsets {
       padding-top: 20px;
     }
 
@@ -45,7 +49,7 @@
   .editor-submit {
     width: 100%;
     margin: 0;
-    padding: 0 15px;
+    //padding: 0 15px;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;

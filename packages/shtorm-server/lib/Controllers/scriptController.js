@@ -1,4 +1,4 @@
-import presetController from './presetController'
+import projectController from './projectController'
 import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'
@@ -81,15 +81,15 @@ class ScriptController {
 
   startProcess = (name, client) => {
     try {
-      const { preset, config } = presetController.getPreset(name)
-      if (preset && config) {
-        const scriptOptions = this.presetToScriptOptions(preset)
+      const { project, config } = projectController.getProject(name)
+      if (project && config) {
+        const scriptOptions = this.projectToScriptOptions(project)
         const uuid = shortid.generate()
 
-        this.tasks[uuid] = new Script(client, config, preset.script, scriptOptions)
+        this.tasks[uuid] = new Script(client, config, project.script, scriptOptions)
         client.emit('task.start.success', uuid)
       } else {
-        throw new Error('No preset found with name ' + name)
+        throw new Error('No project found with name ' + name)
       }
     } catch (err) {
       console.error(err)
@@ -129,13 +129,13 @@ class ScriptController {
     client.emit('task.request.success')
   }
 
-  presetToScriptOptions = (preset) => {
-    const newPreset = { ...preset } // Needs to be done, so that we don't mutate lowdb...
-    delete newPreset.name
-    delete newPreset.script
-    delete newPreset.config
-    delete newPreset.favicon
-    return newPreset
+  projectToScriptOptions = (project) => {
+    const newProject = { ...project } // Needs to be done, so that we don't mutate lowdb...
+    delete newProject.name
+    delete newProject.script
+    delete newProject.config
+    delete newProject.favicon
+    return newProject
   }
 }
 

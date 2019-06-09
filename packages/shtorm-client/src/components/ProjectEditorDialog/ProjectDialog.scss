@@ -1,0 +1,42 @@
+.project-editor-dialog {
+  .project-editor-dialog-stepper {
+    padding: {
+      top: 10px;
+      bottom: 0px;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  .project-editor-dialog-select-title {
+    margin-bottom: 10px;
+  }
+
+  .project-editor-dialog-select-config .MuiSelect-selectMenu {
+    display: flex;
+    align-items: center;
+  }
+
+  .project-editor-dialog-results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: {
+      top: 10px;
+    }
+
+    .project-editor-dialog-result {
+      margin-right: 20px;
+      margin-bottom: 10px;
+    }
+  }
+
+  .MuiButton-root > span svg {
+    margin-right: 5px;
+  }
+}
+
+.project-editor-dialog-select-config-item > div:first-child,
+.project-editor-dialog .project-editor-dialog-select-config > div > div > div > div:first-child {
+  min-width: 34px;
+}

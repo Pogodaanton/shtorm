@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import passport from 'passport'
 import configController, { validateConfig } from './Controllers/configController'
-import presetController from './Controllers/presetController'
+import projectController, { validateProject } from './Controllers/projectController'
 import scriptConfigController from './Controllers/scriptConfigController'
 import userController, { validateUser, validationHandler } from './Controllers/userController'
 
@@ -15,15 +15,15 @@ router.get(getPath('getAllConfigNames'), validateUser('createConfigs'), validati
 router.post(getPath('saveConfig'), validateConfig('saveConfig'), validationHandler, configController.requestSaveConfig)
 router.post(getPath('deleteConfig'), validateConfig('deleteConfig'), validationHandler, configController.requestDeleteConfig)
 
-// Presets
-router.get(getPath('getAllPresets'), validateUser('executePresets'), validationHandler, presetController.requestAllPresets)
-router.get(getPath('getPreset'), validateUser('executePresets'), validationHandler, presetController.requestPreset)
-router.post(getPath('deletePreset'), validateUser('createPresets'), validationHandler, presetController.requestDeletePreset)
-router.post(getPath('savePreset'), validateUser('createPresets'), validationHandler, presetController.requestSavePreset)
+// Projects
+router.get(getPath('getAllProjects'), validateUser('executeProjects'), validationHandler, projectController.requestAllProjects)
+router.get(getPath('getProject'), validateProject('getProject'), validationHandler, projectController.requestProject)
+router.post(getPath('deleteProject'), validateProject('deleteProject'), validationHandler, projectController.requestDeleteProject)
+router.post(getPath('saveProject'), validateProject('saveProject'), validationHandler, projectController.requestSaveProject)
 
 // Scripts
-router.get(getPath('getAllScripts'), validateUser('executePresets'), validationHandler, scriptConfigController.requestAllScripts)
-router.get(getPath('getScriptOptions'), validateUser('executePresets'), validationHandler, scriptConfigController.requestScriptOptions)
+router.get(getPath('getAllScripts'), validateUser('executeProjects'), validationHandler, scriptConfigController.requestAllScripts)
+router.get(getPath('getScriptOptions'), validateUser('executeProjects'), validationHandler, scriptConfigController.requestScriptOptions)
 
 // Users
 router.get(getPath('getAllUsers'), validateUser('admin'), validationHandler, userController.requestAllUsers)
@@ -35,7 +35,7 @@ router.post(getPath('deleteUser'), validateUser('deleteUser'), validationHandler
 // Authentication
 userController.configurePassport(passport)
 router.post(getPath('logIn'), userController.requestLogin(passport))
-router.get(getPath('logOut'), validateUser('executePresets'), validationHandler, userController.requestLogout(passport))
+router.get(getPath('logOut'), validateUser('executeProjects'), validationHandler, userController.requestLogout(passport))
 router.get(getPath('whoami'), userController.requestCurrentUser)
 
 export default router

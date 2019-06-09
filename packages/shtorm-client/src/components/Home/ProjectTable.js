@@ -2,12 +2,12 @@ import React, { Component, Fragment } from 'react'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import PlayIcon from '@material-ui/icons/PlayArrow'
-import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
+import FastForwardIcon from '@material-ui/icons/FastForward'
 import MaterialTable from '../MaterialTableVirtualized'
 import PropTypes from 'prop-types'
 
-export default class PresetTable extends Component {
+export default class ProjectTable extends Component {
   static propTypes = {
     rows: PropTypes.array.isRequired
   }
@@ -28,34 +28,41 @@ export default class PresetTable extends Component {
       row.favicon = (
         <img
           src={row.favicon}
-          alt={`Favicon for preset ${row.name}`}
+          alt={`Favicon for project ${row.name}`}
           width={16}
           height={16}
         />
       )
 
-      const urlFriendlyName = encodeURIComponent(row.name)
+      const { id } = row
+      const hasNoConfig = row.config === 'DELETED'
       row.buttons = (
         <Fragment>
-          <Tooltip title='Delete preset'>
+          <Tooltip title='Edit project'>
             <IconButton
               component={Link}
-              to={`/delete/${urlFriendlyName}`}
-            ><DeleteIcon /></IconButton>
-          </Tooltip>
-          <Tooltip title='Edit preset'>
-            <IconButton
-              component={Link}
-              to={`/edit/${urlFriendlyName}`}
+              to={`/projects/${id}`}
             ><EditIcon /></IconButton>
           </Tooltip>
-          <Button
-            color='secondary'
-            variant='outlined'
-            component={Link}
-            to={`/start/${urlFriendlyName}`}
-            style={{ marginLeft: 5 }}
-          ><PlayIcon style={{ marginRight: 10 }} /> Start</Button>
+          <Tooltip title={hasNoConfig ? 'The bot config for this project was deleted, please assign a new config for it first.' : ''}>
+            <div>
+              <Tooltip title='Start project with defaults'>
+                <IconButton
+                  component={Link}
+                  disabled={hasNoConfig}
+                  to={`/start/${id}?skip=1`}
+                ><FastForwardIcon /></IconButton>
+              </Tooltip>
+              <Button
+                color='secondary'
+                variant='outlined'
+                component={Link}
+                disabled={hasNoConfig}
+                to={`/start/${id}`}
+                style={{ marginLeft: 5 }}
+              ><PlayIcon style={{ marginRight: 10 }} />Start</Button>
+            </div>
+          </Tooltip>
         </Fragment>
       )
       return row
@@ -87,7 +94,7 @@ export default class PresetTable extends Component {
           },
           {
             width: 120,
-            label: 'Preset Name',
+            label: 'Project Name',
             dataKey: 'name',
             flexGrow: 1,
             flexShrink: 0.2

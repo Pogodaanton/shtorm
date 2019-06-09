@@ -175,8 +175,18 @@ class ConfigController {
     })
   }
 
+  getFavicon = (server) => {
+    return `https://proxy.duckduckgo.com/ip3/${server}.ico`
+  }
+
+  getFaviconFromConfig = (configName) => {
+    let { server } = (this.getConfig(configName) || {})
+    if (typeof server !== 'string') server = '404'
+    return this.getFavicon(server)
+  }
+
   getAllConfigs = () => {
-    return db.map(({ id, name }) => { return { id, name } }).value()
+    return db.map(({ id, name, server }) => { return { id, name, favicon: this.getFavicon(server) } }).value()
   }
 
   getConfig = (id) => {

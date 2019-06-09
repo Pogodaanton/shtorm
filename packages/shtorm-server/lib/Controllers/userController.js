@@ -51,14 +51,14 @@ export const validateUser = (type) => {
   switch (type) {
     case 'admin':
       return [ permission.checkOneOf(['isAdmin', 'isOriginal']) ]
-    case 'executePresets':
-      return [ permission.checkOneOf(['executePresets', 'modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
-    case 'modifyPresets':
-      return [ permission.checkOneOf(['modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
-    case 'createPresets':
-      return [ permission.checkOneOf(['createPresets', 'isAdmin', 'isOriginal']) ]
+    case 'executeProjects':
+      return [ permission.checkOneOf(['executeProjects', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
+    case 'modifyProjects':
+      return [ permission.checkOneOf(['modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
+    case 'createProjects':
+      return [ permission.checkOneOf(['createProjects', 'isAdmin', 'isOriginal']) ]
     case 'viewConfigs':
-      return [ permission.checkOneOf(['createConfigs', 'modifyPresets', 'createPresets', 'isAdmin', 'isOriginal']) ]
+      return [ permission.checkOneOf(['createConfigs', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'createConfigs':
       return [ permission.checkOneOf(['createConfigs', 'isAdmin', 'isOriginal']) ]
     case 'editOneself':
@@ -194,8 +194,10 @@ class UserController {
       username,
       password,
       isAdmin,
-      modifyPresets,
-      createPresets,
+      modifyProjects,
+      assignProjects,
+      seeAllProjects,
+      createProjects,
       createConfigs
     } = req.body
 
@@ -209,11 +211,13 @@ class UserController {
         id: newId,
         username,
         password: this.hashPassword(password),
-        executePresets: true,
+        executeProjects: true,
         isOriginal: false,
         isAdmin: (typeof isAdmin === 'boolean') ? isAdmin : false,
-        modifyPresets: (typeof modifyPresets === 'boolean') ? modifyPresets : false,
-        createPresets: (typeof createPresets === 'boolean') ? createPresets : false,
+        modifyProjects: (typeof modifyProjects === 'boolean') ? modifyProjects : false,
+        assignProjects: (typeof assignProjects === 'boolean') ? assignProjects : false,
+        seeAllProjects: (typeof seeAllProjects === 'boolean') ? seeAllProjects : false,
+        createProjects: (typeof createProjects === 'boolean') ? createProjects : false,
         createConfigs: (typeof createConfigs === 'boolean') ? createConfigs : false
       }).write()
 
@@ -228,10 +232,14 @@ class UserController {
     const existingUser = this.db.find({ id })
     const existingUserVal = existingUser.value()
     const canUserEditRights = req.user.permissions.isAdmin
+
+    // Make sure that the user editing is also allowed to change permissions; All permissions need to be typeof boolean!
     const newRights = canUserEditRights ? {
       isAdmin: existingUserVal.isOriginal || (typeof isAdmin === 'boolean') ? isAdmin : existingUserVal.isAdmin,
-      modifyPresets: existingUserVal.isOriginal || (typeof modifyPresets === 'boolean') ? modifyPresets : existingUserVal.modifyPresets,
-      createPresets: existingUserVal.isOriginal || (typeof createPresets === 'boolean') ? createPresets : existingUserVal.createPresets,
+      modifyProjects: existingUserVal.isOriginal || (typeof modifyProjects === 'boolean') ? modifyProjects : existingUserVal.modifyProjects,
+      assignProjects: existingUserVal.isOriginal || (typeof assignProjects === 'boolean') ? assignProjects : existingUserVal.assignProjects,
+      seeAllProjects: existingUserVal.isOriginal || (typeof seeAllProjects === 'boolean') ? seeAllProjects : existingUserVal.seeAllProjects,
+      createProjects: existingUserVal.isOriginal || (typeof createProjects === 'boolean') ? createProjects : existingUserVal.createProjects,
       createConfigs: existingUserVal.isOriginal || (typeof createConfigs === 'boolean') ? createConfigs : existingUserVal.modifcreateConfigsyConfigs
     } : {}
 
@@ -317,15 +325,28 @@ class UserController {
       if (typeof user === 'undefined' || !user) {
         done({ message: 'Invalid credentials.' }, null)
       } else {
-        const { id, username, executePresets, modifyPresets, createPresets, createConfigs, isAdmin, isOriginal } = user
+        const {
+          id,
+          username,
+          executeProjects,
+          modifyProjects,
+          createProjects,
+          assignProjects,
+          seeAllProjects,
+          createConfigs,
+          isAdmin,
+          isOriginal
+        } = user
         // the object is what will be available for 'request.user'
         done(null, {
           id,
           username,
           permissions: {
-            executePresets: executePresets || false,
-            modifyPresets: modifyPresets || false,
-            createPresets: createPresets || false,
+            executeProjects: executeProjects || false,
+            modifyProjects: modifyProjects || false,
+            assignProjects: assignProjects || false,
+            seeAllProjects: seeAllProjects || false,
+            createProjects: createProjects || false,
             createConfigs: createConfigs || false,
             isAdmin: isOriginal || isAdmin || false
           }

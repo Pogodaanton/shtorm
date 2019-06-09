@@ -13,7 +13,7 @@ class DatabaseController {
     this.db = low(this.adapter)
     this.db.defaults({
       configs: [],
-      presets: [],
+      projects: [],
       users: [
         {
           id: shortid.generate(),

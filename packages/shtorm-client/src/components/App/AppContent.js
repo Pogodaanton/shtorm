@@ -38,7 +38,7 @@ const AppContent = () => (
                         component={Home}
                       />
                       <Route
-                        path='/add'
+                        path='/projects/:id'
                         component={Home}
                       />
                       <Route
@@ -83,6 +83,10 @@ const AppContent = () => (
                     <Route
                       path='/'
                       exact
+                      component={Terminal}
+                    />
+                    <Route
+                      path='/projects/:id'
                       component={Terminal}
                     />
                     <Route

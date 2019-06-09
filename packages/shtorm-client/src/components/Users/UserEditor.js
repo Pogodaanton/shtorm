@@ -33,9 +33,11 @@ class UserEditor extends Component {
     newPassword: '',
     isAdmin: false,
     isOriginal: false,
-    executePresets: true,
-    modifyPresets: false,
-    createPresets: false,
+    executeProjects: true,
+    modifyProjects: false,
+    assignProjects: false,
+    seeAllProjects: false,
+    createProjects: false,
     createConfigs: false
   }
 
@@ -119,8 +121,10 @@ class UserEditor extends Component {
       password,
       isAdmin,
       newPassword,
-      modifyPresets,
-      createPresets,
+      modifyProjects,
+      assignProjects,
+      seeAllProjects,
+      createProjects,
       createConfigs
     } = this.state
 
@@ -133,8 +137,10 @@ class UserEditor extends Component {
         username,
         password: password || newPassword,
         isAdmin,
-        modifyPresets,
-        createPresets,
+        modifyProjects,
+        assignProjects,
+        seeAllProjects,
+        createProjects,
         createConfigs
       }, { withCredentials: true })
         .then((res) => {
@@ -200,9 +206,11 @@ class UserEditor extends Component {
       newPassword,
       password,
       loading,
-      executePresets,
-      modifyPresets,
-      createPresets,
+      executeProjects,
+      modifyProjects,
+      assignProjects,
+      seeAllProjects,
+      createProjects,
       createConfigs,
       isAdmin,
       isOriginal
@@ -271,30 +279,57 @@ class UserEditor extends Component {
             <FormGroup>
               <FormControlLabel
                 control={<Checkbox
-                  checked={executePresets}
+                  checked={executeProjects}
                   indeterminate={isAdmin}
-                  onChange={this.onInputChange('executePresets')}
+                  onChange={this.onInputChange('executeProjects')}
                 />}
-                label='Executing Presets'
+                label='Executing Projects'
                 disabled
               />
               <FormControlLabel
                 control={<Checkbox
-                  checked={modifyPresets}
+                  checked={modifyProjects}
                   indeterminate={isAdmin}
-                  onChange={this.onInputChange('modifyPresets')}
+                  onChange={this.onInputChange('modifyProjects')}
                 />}
                 disabled={loading || isAdmin || !isEditingUserAdmin}
-                label='Modifying Presets'
+                label='Modifying Projects'
               />
               <FormControlLabel
                 control={<Checkbox
-                  checked={createPresets}
+                  checked={createProjects || assignProjects}
                   indeterminate={isAdmin}
-                  onChange={this.onInputChange('createPresets')}
+                  onChange={this.onInputChange('createProjects')}
+                />}
+                disabled={loading || isAdmin || !isEditingUserAdmin || assignProjects}
+                label='Adding/Removing Projects'
+              />
+              <Tooltip
+                placement='left'
+                title={
+                  isEditingUserAdmin
+                    ? 'This user will have access to all usernames in the database.'
+                    : ''
+                }
+              >
+                <FormControlLabel
+                  control={<Checkbox
+                    checked={assignProjects}
+                    indeterminate={isAdmin}
+                    onChange={this.onInputChange('assignProjects')}
+                  />}
+                  disabled={loading || isAdmin || !isEditingUserAdmin}
+                  label='Assigning Projects to Users'
+                />
+              </Tooltip>
+              <FormControlLabel
+                control={<Checkbox
+                  checked={seeAllProjects}
+                  indeterminate={isAdmin}
+                  onChange={this.onInputChange('seeAllProjects')}
                 />}
                 disabled={loading || isAdmin || !isEditingUserAdmin}
-                label='Adding/Removing Presets'
+                label='Access to all Projects'
               />
               <FormControlLabel
                 control={<Checkbox
@@ -308,9 +343,11 @@ class UserEditor extends Component {
               <Tooltip
                 placement='left'
                 title={
-                  isOriginal
-                    ? 'This user is Owner and thus cannot have his permissions removed.'
-                    : 'This right makes the user an admin, thus they also obtain every other right.'
+                  isEditingUserAdmin
+                    ? isOriginal
+                      ? 'This user is Owner and thus cannot have his permissions removed.'
+                      : 'This right makes the user an admin, thus they also obtain every other right.'
+                    : ''
                 }
               >
                 <FormControlLabel

@@ -1,5 +1,5 @@
 import projectController from './projectController'
-import { permission } from './userController'
+// import { permission } from './userController'
 import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'

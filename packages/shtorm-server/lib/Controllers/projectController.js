@@ -1,5 +1,5 @@
 import DatabaseController from './databaseController'
-import { validateUser } from './userController'
+import userController, { validateUser } from './userController'
 import { check } from 'express-validator/check'
 import scriptConfigController from './scriptConfigController'
 import configController from './configController'
@@ -114,6 +114,7 @@ class ProjectController {
         name,
         script,
         config: configId,
+        origin: req.user.id,
         scriptOptions
       }).write()
 
@@ -150,16 +151,19 @@ class ProjectController {
   }
 
   getAllProjects = () => {
-    return db.map(({ id, name, script, config: configId }) => {
+    return db.map(({ id, name, script, config: configId, origin: originId }) => {
       const configObj = configController.getConfig(configId) || {}
+      const userObj = userController.getUser(originId) || {}
       let favicon = configController.getFavicon(configObj.server || '404')
       let config = configObj.name || 'DELETED'
+      let origin = userObj.username || 'DELETED'
 
       return {
         favicon,
         id,
         name,
         script,
+        origin,
         config
       }
     }).value()

@@ -92,7 +92,7 @@ class Home extends Component {
           <ProjectListFabs onUpdateListClick={this.updateProjectList} />
         </Paper>
         <Route
-          path='/projects/:id'
+          path='/projects/edit/:id'
           component={ProjectEditorDialog}
         />
       </DefaultGridItem>

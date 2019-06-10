@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Link } from 'react-router-dom'
-import PlayIcon from '@material-ui/icons/PlayArrow'
-import EditIcon from '@material-ui/icons/Edit'
-import FastForwardIcon from '@material-ui/icons/FastForward'
+import { PlayArrow, Edit, Share } from '@material-ui/icons'
 import MaterialTable from '../MaterialTableVirtualized'
 import PropTypes from 'prop-types'
 
@@ -41,17 +39,17 @@ export default class ProjectTable extends Component {
           <Tooltip title='Edit project'>
             <IconButton
               component={Link}
-              to={`/projects/${id}`}
-            ><EditIcon /></IconButton>
+              to={`/projects/edit/${id}`}
+            ><Edit /></IconButton>
           </Tooltip>
           <Tooltip title={hasNoConfig ? 'The bot config for this project was deleted, please assign a new config for it first.' : ''}>
             <div>
-              <Tooltip title='Start project with defaults'>
+              <Tooltip title='Share project'>
                 <IconButton
                   component={Link}
                   disabled={hasNoConfig}
-                  to={`/start/${id}/skip`}
-                ><FastForwardIcon /></IconButton>
+                  to={`/projects/share/${id}`}
+                ><Share /></IconButton>
               </Tooltip>
               <Button
                 color='secondary'
@@ -60,7 +58,7 @@ export default class ProjectTable extends Component {
                 disabled={hasNoConfig}
                 to={`/start/${id}`}
                 style={{ marginLeft: 5 }}
-              ><PlayIcon style={{ marginRight: 10 }} />Start</Button>
+              ><PlayArrow style={{ marginRight: 10 }} />Start</Button>
             </div>
           </Tooltip>
         </Fragment>
@@ -103,19 +101,28 @@ export default class ProjectTable extends Component {
             width: 90,
             label: 'Script',
             dataKey: 'script',
-            flexGrow: 1
+            flexGrow: 1,
+            flexShrink: 0.8
           },
           {
             width: 120,
             label: 'Config',
             dataKey: 'config',
-            flexGrow: 1
+            flexGrow: 1,
+            flexShrink: 3
           },
           {
-            width: 268,
+            width: 90,
+            label: 'Created by',
+            dataKey: 'origin',
+            flexGrow: 1,
+            flexShrink: 3
+          },
+          {
+            width: 250,
             label: '',
             dataKey: 'buttons',
-            flexShrink: 0.1
+            flexShrink: 0
           }
         ]}
       />

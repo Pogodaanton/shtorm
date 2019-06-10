@@ -39,15 +39,15 @@ const AppContent = () => (
                         component={Home}
                       />
                       <Route
-                        path='/projects/:id'
+                        path='/projects/edit/:id'
                         component={Home}
                       />
                       <Route
-                        path='/start/:id/:option'
-                        component={Start}
+                        path='/projects/share/:id'
+                        component={Home}
                       />
                       <Route
-                        path='/start/:id'
+                        path='/projects/start/:id'
                         component={Start}
                       />
                       <Route

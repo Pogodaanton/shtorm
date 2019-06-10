@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 export default class RouteDialog extends Component {
   static propTypes = {
+    open: PropTypes.bool,
     origin: PropTypes.string,
     history: PropTypes.object.isRequired,
     children: PropTypes.any
@@ -16,6 +17,16 @@ export default class RouteDialog extends Component {
 
   componentWillUnmount = () => {
     if (this.timeOut !== null) clearInterval(this.timeOut)
+  }
+
+  componentDidUpdate = (prevProps) => {
+    if (
+      prevProps.open !== this.props.open &&
+      typeof this.props.open === 'boolean' &&
+      !this.props.open
+    ) {
+      this.closeDialog()
+    }
   }
 
   closeDialog = () => {

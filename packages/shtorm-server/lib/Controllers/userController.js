@@ -57,6 +57,10 @@ export const validateUser = (type) => {
       return [ permission.checkOneOf(['modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'createProjects':
       return [ permission.checkOneOf(['createProjects', 'isAdmin', 'isOriginal']) ]
+    case 'assignProjects':
+      return [ permission.checkOneOf(['assignProjects', 'isAdmin', 'isOriginal']) ]
+    case 'seeAllProjects':
+      return [ permission.checkOneOf(['seeAllProjects', 'isAdmin', 'isOriginal']) ]
     case 'viewConfigs':
       return [ permission.checkOneOf(['createConfigs', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'createConfigs':

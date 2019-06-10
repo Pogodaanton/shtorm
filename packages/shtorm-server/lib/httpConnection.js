@@ -20,6 +20,9 @@ router.get(getPath('getAllProjects'), validateUser('executeProjects'), validatio
 router.get(getPath('getProject'), validateProject('getProject'), validationHandler, projectController.requestProject)
 router.post(getPath('deleteProject'), validateProject('deleteProject'), validationHandler, projectController.requestDeleteProject)
 router.post(getPath('saveProject'), validateProject('saveProject'), validationHandler, projectController.requestSaveProject)
+router.get(getPath('getAllProjectAssignees'), validateProject('getAllProjectAssignees'), validationHandler, projectController.requestAllProjectAssignees)
+router.post(getPath('addProjectAssignee'), validateProject('setProjectAssignee'), validationHandler, projectController.requestSetAssignee(false))
+router.post(getPath('deleteProjectAssignee'), validateProject('setProjectAssignee'), validationHandler, projectController.requestSetAssignee(true))
 
 // Scripts
 router.get(getPath('getAllScripts'), validateUser('executeProjects'), validationHandler, scriptConfigController.requestAllScripts)
@@ -27,7 +30,7 @@ router.get(getPath('getScriptOptions'), validateUser('executeProjects'), validat
 
 // Users
 router.get(getPath('getAllUsers'), validateUser('admin'), validationHandler, userController.requestAllUsers)
-router.get(getPath('getAllUsernames'), validateUser('admin'), validationHandler, userController.requestAllUsernames)
+router.get(getPath('getAllUsernames'), validateUser('assignProject'), validationHandler, userController.requestAllUsernames)
 router.get(getPath('getUser'), validateUser('getUser'), validationHandler, userController.requestUser)
 router.post(getPath('saveUser'), validateUser('saveUser'), validationHandler, userController.requestSaveUser)
 router.post(getPath('deleteUser'), validateUser('deleteUser'), validationHandler, userController.requestDeleteUser)

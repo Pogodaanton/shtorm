@@ -89,7 +89,7 @@ class UserEditor extends Component {
     axios.get(Api.getApiUrl('getAllUsernames'), { withCredentials: true })
       .then((res) => {
         if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
-        this.nameList = res.data.data
+        this.nameList = res.data.data.map(({ username }) => username)
       })
       .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }

@@ -83,11 +83,7 @@ const AppContent = () => (
                       component={Terminal}
                     />
                     <Route
-                      path='/projects/:id'
-                      component={Terminal}
-                    />
-                    <Route
-                      path='/start/:id'
+                      path='/projects/'
                       component={Terminal}
                     />
                     <Route

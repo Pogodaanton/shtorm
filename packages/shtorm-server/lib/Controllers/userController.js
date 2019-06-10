@@ -11,39 +11,65 @@ class Permission {
   _logInMessage = 'You need to log in first.'
   _notPermittedMessage = 'You are not permitted to do this.'
 
-  _checkCallback = (permission) => (req) => {
-    if (!req.user) throw new Error(this._logInMessage)
-    if (typeof permission === 'string' && req.user.permissions[permission] === false) throw new Error(this._notPermittedMessage)
+  _checkCallback = (permission, verbose = false) => (req) => {
+    if (!req.user) {
+      if (verbose) throw new Error(this._logInMessage)
+      else return false
+    }
+
+    if (typeof permission === 'string' && req.user.permissions[permission] === false) {
+      if (verbose) throw new Error(this._notPermittedMessage)
+      else return false
+    }
+
     return true
   }
 
-  _checkOneOfCallback = (permissions) => (req) => {
+  _checkOneOfCallback = (permissions, verbose = false) => (req) => {
     let permittedRights = 0
-    if (!req.user) throw new Error(this._logInMessage)
+    if (!req.user) {
+      if (verbose) throw new Error(this._logInMessage)
+      else return false
+    }
+
     if (Array.isArray(permissions)) {
       permissions.forEach((permission) => {
         if (req.user.permissions[permission] === true) permittedRights++
       })
-      if (permittedRights === 0) throw new Error(this._notPermittedMessage)
+      if (permittedRights === 0) {
+        if (verbose) throw new Error(this._notPermittedMessage)
+        else return false
+      }
     }
     return true
   }
 
-  _checkAllOfCallback = (permissions) => (req) => {
+  _checkAllOfCallback = (permissions, verbose = false) => (req) => {
     let permittedRights = 0
-    if (!req.user) throw new Error(this.logInMessage)
+    if (!req.user) {
+      if (verbose) throw new Error(this.logInMessage)
+      else return false
+    }
+
     if (Array.isArray(permissions)) {
       permissions.forEach((permission) => {
         if (req.user.permissions[permission] === true) permittedRights++
       })
-      if (permittedRights < permissions.length) throw new Error(this.notPermittedMessage)
+      if (permittedRights < permissions.length) {
+        if (verbose) throw new Error(this.notPermittedMessage)
+        else return false
+      }
     }
     return true
   }
 
-  check = (permission) => this._baseCheck(this._checkCallback(permission))
-  checkOneOf = (permissions) => this._baseCheck(this._checkOneOfCallback(permissions))
-  checkAllOf = (permissions) => this.baseCheck(this._checkAllOfCallback(permissions))
+  check = (permission) => this._baseCheck(this._checkCallback(permission, true))
+  checkOneOf = (permissions) => this._baseCheck(this._checkOneOfCallback(permissions, true))
+  checkAllOf = (permissions) => this.baseCheck(this._checkAllOfCallback(permissions, true))
+
+  has = (permission, req) => this._checkCallback(permission)(req)
+  hasOneOf = (permission, req) => this._checkOneOfCallback(permission)(req)
+  hasAllOf = (permission, req) => this._checkAllOfCallback(permission)(req)
 }
 
 export const permission = new Permission()
@@ -188,7 +214,7 @@ class UserController {
     return res.status(200).send({
       success: true,
       message: 'Users successfully requested.',
-      data: this.db.map(({ username }) => { return username }).value()
+      data: this.db.map(({ username, id, isAdmin }) => { return { username, id, isAdmin } }).value()
     })
   }
 
@@ -332,7 +358,6 @@ class UserController {
         const {
           id,
           username,
-          executeProjects,
           modifyProjects,
           createProjects,
           assignProjects,
@@ -346,7 +371,7 @@ class UserController {
           id,
           username,
           permissions: {
-            executeProjects: executeProjects || false,
+            executeProjects: true,
             modifyProjects: modifyProjects || false,
             assignProjects: assignProjects || false,
             seeAllProjects: seeAllProjects || false,
@@ -394,6 +419,30 @@ class UserController {
     }
 
     return user
+  }
+
+  getAllProjectAssignees = (projectId = '') => {
+    const allUsers = this.db.value()
+    const users = allUsers
+      .filter((user) => {
+        if (
+          typeof user.assignments === 'object' &&
+          user.assignments.findIndex((projectIdItem) => projectIdItem === projectId) > -1
+        ) return true
+        return false
+      })
+      .map(({ id, username, isAdmin }) => { return { id, username, isAdmin } })
+    return users
+  }
+
+  setProjectAssignee = (projectId = '', assignee = {}, shouldDelete = false) => {
+    const user = this.db.find({ id: assignee.id })
+    if (user.value()) {
+      const assignmentsSet = new Set(user.value().assignments || [])
+      if (shouldDelete) assignmentsSet.delete(projectId)
+      else assignmentsSet.add(projectId)
+      user.assign({ assignments: Array.from(assignmentsSet) }).write()
+    }
   }
 }
 

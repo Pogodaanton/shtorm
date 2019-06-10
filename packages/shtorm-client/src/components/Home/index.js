@@ -11,6 +11,7 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 import './home.scss'
 
+const Share = Loader(import('../Share'))
 const ProjectEditorDialog = Loader(import('../ProjectEditorDialog'), () => null)
 const ProjectsTable = Loader(import('./ProjectTable'), () => null)
 const ProjectListFabs = Loader(import('./ProjectListFabs'), () => null)
@@ -94,6 +95,10 @@ class Home extends Component {
         <Route
           path='/projects/edit/:id'
           component={ProjectEditorDialog}
+        />
+        <Route
+          path='/projects/share/:id'
+          component={Share}
         />
       </DefaultGridItem>
     )

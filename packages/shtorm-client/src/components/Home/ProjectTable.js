@@ -56,7 +56,7 @@ export default class ProjectTable extends Component {
                 variant='outlined'
                 component={Link}
                 disabled={hasNoConfig}
-                to={`/start/${id}`}
+                to={`/projects/start/${id}`}
                 style={{ marginLeft: 5 }}
               ><PlayArrow style={{ marginRight: 10 }} />Start</Button>
             </div>

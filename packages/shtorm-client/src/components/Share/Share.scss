@@ -1,0 +1,33 @@
+.project-share-dialog {
+  .psd-add {
+    display: flex;
+    position: relative;
+
+    > *:first-child {
+      flex-grow: 1;
+      margin: 0;
+      margin-right: 10px;
+    }
+
+    .psd-add-autocomplete-paper {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+    }
+  }
+
+  hr {
+    margin: 15px 0;
+  }
+
+  .psd-chip-pool {
+    min-height: 70px;
+    margin-left: 10px;
+
+    > * {
+      margin-right: 10px;
+    }
+  }
+}

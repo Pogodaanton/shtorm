@@ -1,4 +1,5 @@
 import projectController from './projectController'
+import { permission } from './userController'
 import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'
@@ -81,6 +82,11 @@ class ScriptController {
 
   startProcess = ({ id, scriptOptions }, client) => {
     try {
+      // TODO: Check REQ.User over Socket.io
+      console.log(client.request)
+      // if (!permission.hasOneOf(['isAdmin', 'isOriginal', 'seeAllProjects'])) {
+      // }
+
       const { project, config } = projectController.getProject(id)
       if (project && config) {
         const pid = shortid.generate()

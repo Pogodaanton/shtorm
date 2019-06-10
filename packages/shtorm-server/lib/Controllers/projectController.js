@@ -1,5 +1,5 @@
 import DatabaseController from './databaseController'
-import userController, { validateUser } from './userController'
+import userController, { validateUser, permission } from './userController'
 import { check } from 'express-validator/check'
 import scriptConfigController from './scriptConfigController'
 import configController from './configController'
@@ -71,6 +71,41 @@ export const validateProject = (type) => {
             return true
           })
       ]
+    case 'getAllProjectAssignees':
+      return [
+        ...validateUser('assignProjects'),
+        check('id')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('ID is required!')
+          .isString()
+          .withMessage('ID must be a string!')
+          .custom((id) => {
+            const existingProject = db.find({ id }).value()
+            if (!existingProject) throw new Error('Project was not found in database!')
+            return true
+          })
+      ]
+    case 'setProjectAssignee':
+      return [
+        ...validateUser('assignProjects'),
+        check('id')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('ID is required!')
+          .isString()
+          .withMessage('ID must be a string!')
+          .custom((id) => {
+            const existingProject = db.find({ id }).value()
+            if (!existingProject) throw new Error('Project was not found in database!')
+            return true
+          }),
+        check('user')
+          .exists({ checkFalsy: true, checkNull: true })
+          .withMessage('User is required!')
+          .custom(({ id }, { req }) => {
+            if (id === req.user.id) throw new Error('User cannot remove itself from the list!')
+            return true
+          })
+      ]
     default:
       return []
   }
@@ -94,12 +129,15 @@ class ProjectController {
   }
 
   requestAllProjects = (req, res) => {
+    const canUserSeeAllProjects = permission.has('seeAllProjects', req)
+    const canUserCreateProjects = permission.has('createProjects', req)
+
     return res.status(200).send({
       success: true,
       message: 'Projects successfully requested.',
       data: {
-        projects: this.getAllProjects(),
-        scripts: scriptConfigController.getAllScripts()
+        projects: canUserSeeAllProjects ? this.getAllProjects() : this.getAllUserProjects(req.user.id),
+        scripts: canUserCreateProjects ? scriptConfigController.getAllScripts() : []
       }
     })
   }
@@ -118,6 +156,7 @@ class ProjectController {
         scriptOptions
       }).write()
 
+      userController.setProjectAssignee(newId, req.user)
       return res.status(201).send({
         success: true,
         message: 'Project successfully added!',
@@ -150,8 +189,41 @@ class ProjectController {
     })
   }
 
+  requestAllProjectAssignees = (req, res) => {
+    const { id } = req.query
+    const assignees = userController.getAllProjectAssignees(id)
+    const project = this.getProject(id).project
+
+    return res.status(200).send({
+      success: true,
+      message: 'Project assignees successfully requested!',
+      data: { assignees, project }
+    })
+  }
+
+  requestSetAssignee = (shouldDelete) => (req, res) => {
+    const { id, user } = req.body
+    userController.setProjectAssignee(id, user, shouldDelete)
+
+    return res.status(200).send({
+      success: true,
+      message: 'Project assignee status successfully changed!'
+    })
+  }
+
   getAllProjects = () => {
-    return db.map(({ id, name, script, config: configId, origin: originId }) => {
+    return this.formatAllProjects(db).value()
+  }
+
+  getAllUserProjects = (userId = '') => {
+    const user = userController.getUser(userId)
+    const assignments = new Set(user.assignments)
+
+    return this.formatAllProjects(db.filter(({ id }) => assignments.has(id))).value()
+  }
+
+  formatAllProjects = (projects = []) => {
+    return projects.map(({ id, name, script, config: configId, origin: originId }) => {
       const configObj = configController.getConfig(configId) || {}
       const userObj = userController.getUser(originId) || {}
       let favicon = configController.getFavicon(configObj.server || '404')
@@ -166,7 +238,7 @@ class ProjectController {
         origin,
         config
       }
-    }).value()
+    })
   }
 
   getProject = (id = '') => {

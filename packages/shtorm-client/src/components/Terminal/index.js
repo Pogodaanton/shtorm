@@ -26,6 +26,8 @@ class Terminal extends Component {
     terminalHeight: 300
   }
 
+  forceUpdateTerminalWindow = () => null
+
   componentDidMount = () => {
     this.props.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
     this.props.socket.on('disconnect', (a) => this.addLine({ msg: `Disconnected from socket.` }))
@@ -60,7 +62,7 @@ class Terminal extends Component {
         key: timestamp,
         timestamp
       }]
-    })
+    }, () => this.forceUpdateTerminalWindow())
   }
 
   toggleTerminal = () => {
@@ -113,6 +115,10 @@ class Terminal extends Component {
     document.removeEventListener('mousemove', this.onHandleMouseMove)
   }
 
+  onForceUpdateRef = (r = () => null) => {
+    this.forceUpdateTerminalWindow = r
+  }
+
   render () {
     const { terminalLines } = this.state
     const isOpened = (this.state.terminalHeight <= minTerminalHeight)
@@ -157,6 +163,7 @@ class Terminal extends Component {
             <TerminalWindow
               rows={terminalLines}
               disableTransition
+              forceUpdateRef={this.onForceUpdateRef}
             />
           </Paper>
         </DefaultGridItem>

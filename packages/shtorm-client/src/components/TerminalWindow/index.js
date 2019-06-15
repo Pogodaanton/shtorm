@@ -12,7 +12,8 @@ const cache = new CellMeasurerCache({
 export default class index extends Component {
   static propTypes = {
     rows: PropTypes.array.isRequired,
-    disableTransition: PropTypes.bool
+    disableTransition: PropTypes.bool,
+    forceUpdateRef: PropTypes.func
   }
 
   resizeTimer = null
@@ -37,10 +38,12 @@ export default class index extends Component {
 
   componentDidMount = () => {
     window.addEventListener('resize', this.onWindowResize)
+    if (typeof this.props.forceUpdateRef === 'function') this.props.forceUpdateRef(this.forceUpdate)
   }
 
   componentWillUnmount = () => {
     window.removeEventListener('resize', this.onWindowResize)
+    if (typeof this.props.forceUpdateRef === 'function') this.props.forceUpdateRef(() => null)
   }
 
   onWindowResize = (e) => {

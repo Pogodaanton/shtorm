@@ -30,7 +30,17 @@ const AppContent = () => (
             {isUserLoggedIn ? (
               <Fragment>
                 <Header />
-                <div className='content content-flex'>
+                <div className='content'>
+                  <Switch>
+                    <Route
+                      path='/p'
+                      component={Terminal}
+                    />
+                    <Route
+                      path='/'
+                      component={() => null}
+                    />
+                  </Switch>
                   <DefaultGridContainer name='main'>
                     <Switch>
                       <Route
@@ -72,16 +82,6 @@ const AppContent = () => (
                       />
                     </Switch>
                   </DefaultGridContainer>
-                  <Switch>
-                    <Route
-                      path='/p'
-                      component={Terminal}
-                    />
-                    <Route
-                      path='/'
-                      component={() => null}
-                    />
-                  </Switch>
                 </div>
               </Fragment>
             ) : <Redirect to='/login' />}

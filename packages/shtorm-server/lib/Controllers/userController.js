@@ -67,9 +67,9 @@ class Permission {
   checkOneOf = (permissions) => this._baseCheck(this._checkOneOfCallback(permissions, true))
   checkAllOf = (permissions) => this.baseCheck(this._checkAllOfCallback(permissions, true))
 
-  has = (permission, req) => this._checkCallback(permission)(req)
-  hasOneOf = (permission, req) => this._checkOneOfCallback(permission)(req)
-  hasAllOf = (permission, req) => this._checkAllOfCallback(permission)(req)
+  has = (permission, req, verbose = false) => this._checkCallback(permission, verbose)(req)
+  hasOneOf = (permission, req, verbose = false) => this._checkOneOfCallback(permission, verbose)(req)
+  hasAllOf = (permission, req, verbose = false) => this._checkAllOfCallback(permission, verbose)(req)
 }
 
 export const permission = new Permission()
@@ -78,7 +78,7 @@ export const validateUser = (type) => {
     case 'admin':
       return [ permission.checkOneOf(['isAdmin', 'isOriginal']) ]
     case 'executeProjects':
-      return [ permission.checkOneOf(['executeProjects', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
+      return [ permission.checkOneOf(['executeProjects', 'assignProjects', 'seeAllProjects', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'modifyProjects':
       return [ permission.checkOneOf(['modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'createProjects':
@@ -181,9 +181,44 @@ export const validationHandler = (req, res, next) => {
   } else next()
 }
 
+export const deserializeUser = (id, done) => {
+  // find user in database
+  var user = db.find({ id }).value()
+
+  if (typeof user === 'undefined' || !user) {
+    done({ message: 'Invalid credentials.' }, null)
+  } else {
+    const {
+      id,
+      username,
+      modifyProjects,
+      createProjects,
+      assignProjects,
+      seeAllProjects,
+      createConfigs,
+      isAdmin,
+      isOriginal
+    } = user
+    // the object is what will be available for 'request.user'
+    done(null, {
+      id,
+      username,
+      permissions: {
+        executeProjects: true,
+        modifyProjects: modifyProjects || false,
+        assignProjects: assignProjects || false,
+        seeAllProjects: seeAllProjects || false,
+        createProjects: createProjects || false,
+        createConfigs: createConfigs || false,
+        isAdmin: isOriginal || isAdmin || false
+      }
+    })
+  }
+}
+
 class UserController {
   constructor () {
-    this.db = DatabaseController.getDatabase('users')
+    this.db = db
   }
 
   requestUser = (req, res) => {
@@ -348,40 +383,7 @@ class UserController {
 
     // for every request, the id is used to find the user, which will be restored
     // to req.user.
-    passport.deserializeUser((id, done) => {
-      // find user in database
-      var user = this.db.find({ id }).value()
-
-      if (typeof user === 'undefined' || !user) {
-        done({ message: 'Invalid credentials.' }, null)
-      } else {
-        const {
-          id,
-          username,
-          modifyProjects,
-          createProjects,
-          assignProjects,
-          seeAllProjects,
-          createConfigs,
-          isAdmin,
-          isOriginal
-        } = user
-        // the object is what will be available for 'request.user'
-        done(null, {
-          id,
-          username,
-          permissions: {
-            executeProjects: true,
-            modifyProjects: modifyProjects || false,
-            assignProjects: assignProjects || false,
-            seeAllProjects: seeAllProjects || false,
-            createProjects: createProjects || false,
-            createConfigs: createConfigs || false,
-            isAdmin: isOriginal || isAdmin || false
-          }
-        })
-      }
-    })
+    passport.deserializeUser(deserializeUser)
 
     passport.use(new Strategy(
       (username, password, done) => {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Route } from 'react-router-dom'
 import { Paper, Typography, Divider } from '@material-ui/core'
 import { withSnackbar } from 'notistack'
@@ -9,6 +9,7 @@ import Loader from '../Loader'
 import Api from '../Api'
 import axios from 'axios'
 import PropTypes from 'prop-types'
+import { NoProjects, NoProjectsCreatePrompt } from './NoProjects'
 import './home.scss'
 
 const Share = Loader(import('../Share'))
@@ -21,13 +22,6 @@ const QuickStartList = Loader(import('./QuickStartList'), () => (
     variant='body2'
   >Acquiring list...</Typography>
 ))
-
-const NoProjects = () => (
-  <div className='projects-list-empty spotlight'>
-    <Typography variant='h6'>Haven{'\''}t you started already?</Typography>
-    <Typography variant='subtitle1'>You have no projects, simplify your workflow by creating ones.</Typography>
-  </div>
-)
 
 class Home extends Component {
   static contextType = UserContext
@@ -68,6 +62,7 @@ class Home extends Component {
 
   render () {
     const { loading, scripts, projects } = this.state
+    const canCreateProjects = this.context.getUserPermission('createProjects')
 
     return (
       <DefaultGridItem name='home'>
@@ -76,19 +71,29 @@ class Home extends Component {
           <Typography variant='h5'>Welcome Back!</Typography>
           <Typography variant='subtitle1'>
             {
-              this.context.getUserPermission('createProjects')
+              canCreateProjects
                 ? 'Choose the next project you want to work on or create a new one from scratch.'
                 : 'Choose the next project you want to work on.'
             }
           </Typography>
           <Divider />
-          <div className='project-selector-scripts'>
-            <Typography variant='body1'>Quick start:</Typography>
-            <QuickStartList scripts={scripts} />
-          </div>
-          <Divider />
+          { canCreateProjects && (
+            <Fragment>
+              <div className='project-selector-scripts'>
+                <Typography variant='body1'>Quick start:</Typography>
+                <QuickStartList scripts={scripts} />
+              </div>
+              <Divider />
+            </Fragment>
+          )}
           <div className='project-selector-projects'>
-            {projects.length > 0 ? <ProjectsTable rows={projects} /> : <NoProjects />}
+            {
+              projects.length > 0
+                ? <ProjectsTable rows={projects} />
+                : canCreateProjects
+                  ? <NoProjectsCreatePrompt />
+                  : <NoProjects />
+            }
           </div>
           <ProjectListFabs onUpdateListClick={this.updateProjectList} />
         </Paper>

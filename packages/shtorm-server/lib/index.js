@@ -10,7 +10,7 @@ import session from 'express-session'
 import path from 'path'
 import NedbStore from 'nedb-session-store'
 // import passportSocketIo from 'passport.socketio'
-import wsConnection from './wsConnection'
+import wsConnection, { socketPassportMiddleware } from './wsConnection'
 import httpConnection from './httpConnection'
 import configChecker from './configChecker'
 
@@ -44,9 +44,7 @@ app
   .use(httpConnection)
 
 // Hooking passport info to socket.io; Wraps the express middleware
-io.use((socket, next) => {
-  sessionMiddleware(socket.request, {}, next)
-})
+io.use(socketPassportMiddleware(sessionMiddleware))
 
 // Sending connections to wsConnection
 io.on('connection', (client) => wsConnection(client, io))

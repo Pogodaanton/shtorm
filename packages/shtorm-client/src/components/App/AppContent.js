@@ -51,7 +51,7 @@ const AppContent = () => (
                         component={Start}
                       />
                       <Route
-                        path='/task/:uuid'
+                        path='/p/:uuid'
                         component={Task}
                       />
                       <Route
@@ -74,16 +74,7 @@ const AppContent = () => (
                   </DefaultGridContainer>
                   <Switch>
                     <Route
-                      path='/task'
-                      component={Terminal}
-                    />
-                    <Route
-                      path='/'
-                      exact
-                      component={Terminal}
-                    />
-                    <Route
-                      path='/projects/'
+                      path='/p'
                       component={Terminal}
                     />
                     <Route

@@ -129,8 +129,8 @@ class ProjectController {
   }
 
   requestAllProjects = (req, res) => {
-    const canUserSeeAllProjects = permission.has('seeAllProjects', req)
-    const canUserCreateProjects = permission.has('createProjects', req)
+    const canUserSeeAllProjects = permission.hasOneOf(['isOriginal', 'isAdmin', 'seeAllProjects'], req)
+    const canUserCreateProjects = permission.hasOneOf(['isOriginal', 'isAdmin', 'createProjects'], req)
 
     return res.status(200).send({
       success: true,
@@ -217,9 +217,16 @@ class ProjectController {
 
   getAllUserProjects = (userId = '') => {
     const user = userController.getUser(userId)
-    const assignments = new Set(user.assignments)
+    const assignments = new Set(user.assignments || [])
 
     return this.formatAllProjects(db.filter(({ id }) => assignments.has(id))).value()
+  }
+
+  hasUserProjectAssigned = (userId = '', projectId = '') => {
+    const user = userController.getUser(userId)
+    const assignments = new Set(user.assignments || [])
+
+    return assignments.has(projectId)
   }
 
   formatAllProjects = (projects = []) => {

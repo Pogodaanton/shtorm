@@ -3,9 +3,11 @@ import { Button, IconButton, Tooltip } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import { PlayArrow, Edit, Share } from '@material-ui/icons'
 import MaterialTable from '../MaterialTableVirtualized'
+import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 
 export default class ProjectTable extends Component {
+  static contextType = UserContext
   static propTypes = {
     rows: PropTypes.array.isRequired
   }
@@ -34,23 +36,36 @@ export default class ProjectTable extends Component {
 
       const { id } = row
       const hasNoConfig = row.config === 'DELETED'
+      const canCreateProjects = this.context.getUserPermission('createProjects')
       row.buttons = (
         <Fragment>
-          <Tooltip title='Edit project'>
-            <IconButton
-              component={Link}
-              to={`/projects/edit/${id}`}
-            ><Edit /></IconButton>
-          </Tooltip>
-          <Tooltip title={hasNoConfig ? 'The bot config for this project was deleted, please assign a new config for it first.' : ''}>
+          {canCreateProjects && (
+            <Tooltip title='Edit project'>
+              <IconButton
+                component={Link}
+                to={`/projects/edit/${id}`}
+              ><Edit /></IconButton>
+            </Tooltip>
+          )}
+          <Tooltip
+            title={
+              hasNoConfig
+                ? canCreateProjects
+                  ? 'The bot config for this project was deleted, please assign a new config for it first.'
+                  : 'The bot config for this project was deleted, it cannot be executed until a new config is assigned to it.'
+                : ''
+            }
+          >
             <div>
-              <Tooltip title='Share project'>
-                <IconButton
-                  component={Link}
-                  disabled={hasNoConfig}
-                  to={`/projects/share/${id}`}
-                ><Share /></IconButton>
-              </Tooltip>
+              {this.context.getUserPermission('assignProjects') && (
+                <Tooltip title='Share project'>
+                  <IconButton
+                    component={Link}
+                    disabled={hasNoConfig}
+                    to={`/projects/share/${id}`}
+                  ><Share /></IconButton>
+                </Tooltip>
+              )}
               <Button
                 color='secondary'
                 variant='outlined'

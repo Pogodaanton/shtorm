@@ -63,16 +63,18 @@ export default class ToolbarContent extends Component {
         )}
         <div className='flex-fill' />
         <div className='right-space'>
-          <div
-            id='toggleTasks'
-            ref={this.props.onProcessExplorerButtonRef}
-          >
-            <Tooltip title='Show running processes'>
-              <IconButton onClick={this.props.onProcessExplorerToggle} >
-                <Assignment />
-              </IconButton>
-            </Tooltip>
-          </div>
+          {this.context.getUserPermission('isAdmin') && (
+            <div
+              id='toggleTasks'
+              ref={this.props.onProcessExplorerButtonRef}
+            >
+              <Tooltip title='Show running processes'>
+                <IconButton onClick={this.props.onProcessExplorerToggle} >
+                  <Assignment />
+                </IconButton>
+              </Tooltip>
+            </div>
+          )}
           <div
             id='toggleProfile'
             ref={this.props.onProfileButtonRef}

@@ -1,14 +1,16 @@
-import presetController from './presetController'
+import projectController from './projectController'
+import { permission } from './userController'
 import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'
 
 class Script {
-  constructor (client, config, scriptName, scriptOptions = {}) {
+  constructor (client, config, scriptName, scriptOptions = {}, projectId = '') {
     this.config = config
     this.scriptName = scriptName
     this.scriptOptions = scriptOptions
     this.clientObj = null
+    this.projectId = projectId
 
     this.childProcess = cp.fork(path.join(__dirname, '../executeScript.js'), [scriptName], { stdio: 'pipe' })
     this.childProcess.on('message', this.messageHandler)
@@ -47,15 +49,20 @@ class Script {
 
   stop = () => this.childProcess.kill()
   exitHandler = () => {
+    this.unsetClient()
     console.log('Process killed.')
     scriptController.handleStop(this, this.client)
+  }
+
+  unsetClient = () => {
+    this.client.off('script.dialog.resolve', this.dialogHandler(false))
+    this.client.off('script.dialog.reject', this.dialogHandler(true))
   }
 
   setClient = (client) => {
     if (typeof client === 'undefined') return
     if (typeof this.client !== 'undefined') {
-      this.client.off('script.dialog.resolve', this.dialogHandler(false))
-      this.client.off('script.dialog.reject', this.dialogHandler(true))
+      this.unsetClient()
       this.client.emit('client.disconnect')
     }
 
@@ -77,65 +84,98 @@ class Script {
 }
 
 class ScriptController {
-  tasks = {}
+  processes = {}
 
-  startProcess = (name, client) => {
-    try {
-      const { preset, config } = presetController.getPreset(name)
-      if (preset && config) {
-        const scriptOptions = this.presetToScriptOptions(preset)
-        const uuid = shortid.generate()
-
-        this.tasks[uuid] = new Script(client, config, preset.script, scriptOptions)
-        client.emit('task.start.success', uuid)
-      } else {
-        throw new Error('No preset found with name ' + name)
-      }
-    } catch (err) {
-      console.error(err)
-      client.emit('task.start.error', err)
+  checkLoggedIn = (req) => permission.has('executeProjects', req, true)
+  checkProcessExecutionPermission = (req, projectId) => {
+    this.checkLoggedIn(req)
+    if (
+      !permission.hasOneOf(['isAdmin', 'isOriginal', 'seeAllProjects'], req) &&
+      !projectController.hasUserProjectAssigned(req.user.id, projectId)
+    ) {
+      throw new Error('You are not allowed to execute this project!')
     }
   }
 
-  killProcess = (uuid, client) => {
-    const proc = this.tasks[uuid]
-    if (proc) proc.stop()
-    else client.emit('task.kill.error', `Process ${uuid} does not exist!`)
+  startProcess = ({ id, scriptOptions }, client) => {
+    try {
+      this.checkProcessExecutionPermission(client.request, id)
+
+      const { project, config } = projectController.getProject(id)
+      if (!project || !config) throw new Error('No project found with id ' + id)
+
+      const pid = shortid.generate()
+      this.processes[pid] = new Script(client, config, project.script, scriptOptions, project.id)
+      client.emit('process.start.success', pid)
+    } catch (err) {
+      console.error(err)
+      client.emit('process.start.error', err)
+    }
   }
 
-  handleStop = (task, client) => {
-    const index = Object.values(this.tasks).findIndex((t) => t === task)
-    const uuid = Object.keys(this.tasks)[index]
-    delete this.tasks[uuid]
-    client.emit('task.killed', true)
+  handleStop = (processClass, client) => {
+    const index = Object.values(this.processes).findIndex((p) => p === processClass)
+
+    if (index > -1) {
+      const pid = Object.keys(this.processes)[index]
+      this.processes[pid].stop()
+      delete this.processes[pid]
+    }
+
+    client.emit('process.killed', true)
     this.getProcesses(client)
   }
 
   getProcesses = (client) => {
-    const tasks = Object.keys(this.tasks).map((uuid) => {
-      const scriptExecutionData = this.tasks[uuid].getScriptExecutionData()
-      return { uuid, ...scriptExecutionData }
-    })
-    client.emit('tasks.update', tasks)
-  }
-
-  setClientToProcess = (uuid, client) => {
-    const task = this.tasks[uuid]
-    if (!task) {
-      client.emit('task.request.error', `Process ${uuid} does not exist!`)
-      return
+    if (permission.hasOneOf(['isAdmin', 'isOriginal'], client.request)) {
+      const processes = Object.keys(this.processes).map((pid) => {
+        const scriptExecutionData = this.processes[pid].getScriptExecutionData()
+        return { pid, ...scriptExecutionData }
+      })
+      client.emit('processes.update', processes)
     }
-    task.setClient(client)
-    client.emit('task.request.success')
   }
 
-  presetToScriptOptions = (preset) => {
-    const newPreset = { ...preset } // Needs to be done, so that we don't mutate lowdb...
-    delete newPreset.name
-    delete newPreset.script
-    delete newPreset.config
-    delete newPreset.favicon
-    return newPreset
+  getProcess = (pid, client) => {
+    const proc = this.processes[pid]
+    if (!proc) {
+      if (typeof client === 'object') client.emit('process.request.error', `Process ${pid} does not exist!`)
+      return null
+    }
+    return proc
+  }
+
+  setClientToProcess = (pid, client) => {
+    const proc = this.getProcess(pid, client)
+    if (proc) {
+      try {
+        this.checkProcessExecutionPermission(client.request, proc.projectId)
+        proc.setClient(client)
+        client.emit('process.request.success')
+      } catch (err) {
+        console.error(err)
+        client.emit('process.request.error', err)
+      }
+    }
+  }
+
+  unsetClientFromProcess = (pid, client) => {
+    const proc = this.getProcess(pid, client)
+    if (proc) {
+      proc.unsetClient()
+      client.emit('process.request.success')
+    }
+  }
+
+  killProcess = (pid, client) => {
+    try {
+      permission.hasOneOf(['isAdmin', 'isOriginal'], client.request, true)
+      const proc = this.getProcess(pid, client)
+      if (proc) proc.stop()
+    } catch (err) {
+      console.error(err)
+      client.emit('process.kill.error', err)
+    }
   }
 }
 

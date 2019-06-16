@@ -1,4 +1,6 @@
+import React from 'react'
 import config from '../../config.json'
+import { Button } from '@material-ui/core'
 
 class Api {
   axiosCheckResponse (res) {
@@ -6,24 +8,42 @@ class Api {
     return false
   }
 
-  axiosErrorHandler (err) {
+  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history, fallbackPath) {
     let errMsg = err.toString()
-    if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined' && typeof err.response.data.message !== 'undefined') {
-      errMsg = err.response.data.message
+    let isAuthError = false
+    if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
+      if (typeof err.response.data.message === 'string') errMsg = err.response.data.message
+      if (typeof err.response.data.errors === 'object') {
+        err.response.data.errors.forEach(({ param }) => { if (param === 'permission') isAuthError = true })
+        errMsg = err.response.data.errors.map(({ msg }) => msg).join('\n')
+      }
     }
 
-    /*
-    this.setState({
-      snackbar: {
-        msg: errMsg + ' - See console for more info!',
-        isOpen: true
-      }
-    })
-    setTimeout(() => this.setState({ snackbar: { msg: this.state.snackbar.msg, isOpen: false } }), 10000)
-    */
-
     console.log(errMsg)
+
+    if (typeof enqueueSnackbar === 'function') {
+      const isSnackbarDismissable = (typeof closeSnackbar === 'function')
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: isSnackbarDismissable ? 20000 : 6000,
+        action: isSnackbarDismissable ? (key) => (
+          <Button
+            variant='outlined'
+            onClick={() => { closeSnackbar(key) }}
+          >
+              Dismiss
+          </Button>
+        ) : null
+      })
+    }
+
+    if (typeof history === 'object' && typeof history.replace === 'function') {
+      if (isAuthError) history.replace('/login')
+      else if (typeof fallbackPath === 'string') history.replace(fallbackPath)
+    }
   }
+
+  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history, fallbackPath) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history, fallbackPath)
 
   getApiUrl (controller) {
     return `${config.prefix}${config.socketAdress}${config.apiAdress}${controller}`

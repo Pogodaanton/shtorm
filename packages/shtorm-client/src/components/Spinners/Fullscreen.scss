@@ -2,9 +2,11 @@
   .spinner-content {
     display: flex;
     align-items: center;
+    padding: 15px 24px;
 
     > * {
       margin-right: 20px;
+      margin-bottom: 0;
       &:last-child { margin-right: 0 }
     }
   }

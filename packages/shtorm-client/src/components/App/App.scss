@@ -15,11 +15,8 @@ html, body, #root, .content {
     position: relative;
     max-height: 100%;
     padding: 10px 15px;
-
-    &.content-flex {
-      display: flex;
-      flex-direction: column;
-    }
+    display: flex;
+    flex-direction: column-reverse;
 
     .grid-container-main {
       height: 0px;
@@ -32,10 +29,20 @@ html, body, #root, .content {
       }
 
       > div, > div .paper {
-        height: calc(100% - 10px);
+        height: 100%;
         overflow: auto;
       }
     }
+  }
+
+  .MuiSnackbar-anchorOriginTopRight {
+    margin-top: 42px;
+
+    span { white-space: pre; }
+  }
+
+  .MuiDialogContent-root {
+    padding: 0px 24px 15px 24px;
   }
 }
 
@@ -43,7 +50,7 @@ a[role="button"]:hover {
   color: inherit;
 }
 
-.fill-space { flex-grow: 1 }
+.flex-fill { flex-grow: 1 }
 .js-focus-visible :focus:not(.focus-visible) { outline: none; }
 
 .spotlight {
@@ -53,11 +60,14 @@ a[role="button"]:hover {
   justify-content: center;
   opacity: .5;
   height: 100%;
+  padding: 40px;
+
+  &.spotlight-visible { opacity: 1; }
 }
 
 @media (min-width: 600px) {
   .content {
     // max-height: calc(100vh - #{$terminal-header-height + 64px});
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 48px);
   }
 }

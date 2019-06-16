@@ -1,13 +1,14 @@
-.popover-tasks > div {
+.popover-process-explorer > div {
   padding: 10px 0px 10px 5px;
   min-width: 280px;
 
-  .popover-tasks-list {
+  .popover-process-explorer-list {
     padding-right: 95px;
   }
 
   > span {
     text-align: center;
     padding-right: 5px;
+    display: block;
   }
 }

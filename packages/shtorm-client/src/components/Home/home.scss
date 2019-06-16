@@ -1,44 +1,38 @@
-.paper.paper-preset-selector {
+.grid-item-home .paper-project-selector {
   display: flex;
   flex-direction: column;
-  overflow: auto;
   position: relative;
-  padding: {
-    top: 15px;
-    bottom: 15px;
+
+  hr {
+    margin: {
+      top: 5px;
+      bottom: 5px;
+    };
   }
 
-  > * {
-    margin-bottom: 10px;
-    &:last-child { margin-bottom: 0; }
-  }
-  > h5 { margin-bottom: 0; }
-
-  .preset-selector-scripts {
-    min-height: 32px;
+  .project-selector-scripts {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
 
-    > p, .preset-selector-scripts-chip {
+    > p, .project-selector-scripts-chip {
       margin-right: 10px;
       &:last-child { margin-right: 0; }
       &.preset-selector-scripts-empty { opacity: .5; }
     }
   }
 
-  .preset-selector-presets {
+  .project-selector-projects {
     flex-grow: 1;
+    overflow: auto auto;
   }
 
-  > .preset-selector-fabs {
+  .project-selector-fabs {
     position: absolute;
-    right: 20px;
-    bottom: 15px;
+    bottom: 10px;
+    right: 10px;
 
     > * {
-      margin-right: 10px;
-      &:last-child { margin-right: 0; }
+      margin-left: 10px;
     }
   }
 }

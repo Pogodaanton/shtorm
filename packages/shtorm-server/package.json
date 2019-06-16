@@ -4,16 +4,24 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "start": "nodemon --exec babel-node lib/index.js",
+    "start": "nodemon --inspect --exec babel-node lib/index.js",
     "serve": "node dist/index.js"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.4",
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "express-validator": "^5.3.1",
     "intercept-stdout": "^0.1.2",
     "lowdb": "^1.0.0",
+    "nedb-session-store": "^1.1.2",
     "nodemw": "^0.12.2",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "passport.socketio": "^3.7.0",
     "shortid": "^2.2.14",
     "socket.io": "^2.2.0",
     "vm2": "^3.7.0"

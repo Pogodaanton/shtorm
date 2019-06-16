@@ -10,7 +10,7 @@ const DefaultGridContainer = (props) => {
       container
       justify='center'
       alignContent='stretch'
-      spacing={16}
+      spacing={2}
     >
       {props.children}
     </Grid>

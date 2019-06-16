@@ -10,16 +10,21 @@ import {
   DialogContentText,
   DialogTitle,
   MenuItem,
+  ListItemIcon,
   Stepper,
   Typography,
   Step,
   StepLabel,
   withWidth
 } from '@material-ui/core'
+import { Delete } from '@material-ui/icons'
+import { withSnackbar } from 'notistack'
 import axios from 'axios'
 import Api from '../Api'
-import './PresetDialog.scss'
+import Loader from '../Loader'
+import './ProjectDialog.scss'
 
+const ScriptOptionEditor = Loader(import('../ScriptOptionEditor'), () => 'Please Wait...')
 const stepperOrientation = {
   'xs': 'vertical',
   'sm': 'vertical',
@@ -28,72 +33,73 @@ const stepperOrientation = {
   'xl': 'horizontal'
 }
 
-class PresetDialog extends Component {
+class ProjectDialog extends Component {
   static propTypes = {
-    presetData: PropTypes.object.isRequired,
+    enqueueSnackbar: PropTypes.func,
+    closeSnackbar: PropTypes.func,
     history: PropTypes.object.isRequired,
+    match: PropTypes.object.isRequired,
     width: PropTypes.string.isRequired
   }
 
   shouldScriptOptionsUpdate = true
+  crawledOptions = {}
   state = {
-    open: false,
+    open: true,
     loading: true,
     scripts: [],
     configs: [],
     currentStep: 0,
     skippedSteps: {},
-    scriptOptions: [],
+    scriptOptions: {},
     options: {
-      key: '',
+      id: '',
       name: '',
       script: '',
       config: ''
     }
   };
 
+  componentDidMount = () => this.componentDidUpdate({})
+
   componentDidUpdate = (prevProps) => {
-    if (prevProps.presetData !== this.props.presetData) {
-      const combinedOptions = { ...this.state.options, ...this.props.presetData }
+    if (
+      prevProps.match !== this.props.match &&
+      typeof this.props.match.params === 'object' &&
+      typeof this.props.match.params.id !== 'undefined'
+    ) {
+      const { id } = this.props.match.params
+      if (id === 'add') this.setState({ options: { ...this.state.options, id } })
+      else this.getProjectData(id)
       this.getDropdownData()
-      this.setState({ options: { ...combinedOptions, key: combinedOptions.name } })
     }
   }
 
-  componentDidMount = () => {
-    const combinedOptions = { ...this.state.options, ...this.props.presetData }
-    this.getDropdownData()
-    this.setState({ open: true, options: { ...combinedOptions, key: combinedOptions.name } })
-  };
+  getProjectData = (id) => {
+    axios.get(Api.getApiUrl('getProject'), { params: { id }, withCredentials: true })
+      .then((res) => {
+        if (Api.axiosCheckResponse(res) && typeof res.data.data === 'object') {
+          const { data } = res.data
+          const projectOptions = { ...data }
+          delete projectOptions['scriptOptions']
+          this.setState({ options: projectOptions, scriptOptions: data.scriptOptions })
+        } else throw new Error('Wrong format received!')
+      })
+      .catch((err) => {
+        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.history.replace('/')
+      })
+  }
 
   getDropdownData = () => {
-    axios.get(Api.getApiUrl('getAllScripts'))
+    axios.get(Api.getApiUrl('getAllScripts'), { withCredentials: true })
       .then((res) => {
         if (Api.axiosCheckResponse(res)) {
           const { scripts, configs } = res.data.data
           this.setState({ scripts, configs, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandler)
-  }
-
-  getScriptOptions = () => {
-    this.setState({ loading: true })
-    axios.get(Api.getApiUrl('getScriptOptions'), { params: { script: this.state.options.script } })
-      .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
-          const { currentStep, skippedSteps, options } = this.state
-          let scriptOptions = res.data.data
-
-          if (scriptOptions.length <= 0) skippedSteps[currentStep + 1] = true
-          if (options.key) scriptOptions = this.setScriptOptions(scriptOptions)
-
-          this.shouldScriptOptionsUpdate = false
-          this.setState({ scriptOptions, skippedSteps, loading: false })
-          this.triggerNext()
-        }
-      })
-      .catch(Api.axiosErrorHandler)
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   setScriptOptions = (scriptOptions) => {
@@ -103,16 +109,20 @@ class PresetDialog extends Component {
     })
   }
 
-  savePreset = () => {
+  saveProject = () => {
+    const { options, scriptOptions } = this.state
     this.setState({ loading: true })
-    axios.post(Api.getApiUrl('savePreset'), { key: this.state.options.key, preset: this.getAllOptions() })
-      .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
-          console.log(res)
-          this.closeDialog()
-        }
-      })
-      .catch(Api.axiosErrorHandler)
+
+    axios.post(Api.getApiUrl('saveProject'), { ...options, scriptOptions }, { withCredentials: true })
+      .then((res) => this.closeDialog())
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+  }
+
+  deleteProject = () => {
+    this.setState({ loading: true })
+    axios.post(Api.getApiUrl('deleteProject'), { id: this.state.options.id }, { withCredentials: true })
+      .then((res) => this.closeDialog())
+      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
   }
 
   closeDialog = () => {
@@ -127,39 +137,36 @@ class PresetDialog extends Component {
     this.setState({ options })
   }
 
-  onScriptPreferenceChange = name => e => {
+  onScriptPreferenceUpdate = changes => {
     let { scriptOptions } = this.state
-    scriptOptions = scriptOptions.map((item) => {
-      if (item.name === name) item.value = e.target.value
-      return item
-    })
-    this.setState({ scriptOptions })
+    this.setState({ scriptOptions: { ...scriptOptions, ...changes } })
+  }
+
+  onEmptyScriptOptions = (value = false) => {
+    const { skippedSteps } = this.state
+    skippedSteps[1] = value
+    this.setState(skippedSteps)
   }
 
   onFormValidate = (e) => {
     const { currentStep } = this.state
-    if (currentStep === this.getSteps().length - 1) this.savePreset()
-    if (currentStep === 0 && this.shouldScriptOptionsUpdate) this.getScriptOptions()
+    if (currentStep === this.getSteps().length - 1) this.saveProject()
     else this.triggerNext(e)
   }
 
   getAllOptions = () => {
     const { scriptOptions } = this.state
-    const { name, script, config } = this.state.options
-    const allOptions = { name, script, config }
-    scriptOptions.forEach(({ name, value }) => { allOptions[name] = value })
-    return allOptions
+    const { name, script, config: configId } = this.state.options
+    const config = this.getConfigNameFromId(configId)
+
+    return { name, script, config, ...scriptOptions }
   }
 
-  getAllowedType = (proposedType) => {
-    switch (proposedType) {
-      case 'number':
-        return 'number'
-      case 'password':
-        return 'password'
-      default:
-        return 'text'
-    }
+  getConfigNameFromId = (configId) => {
+    return this.state.configs
+      .filter(({ id }) => id === configId)
+      .map(({ name }) => name)
+      .join('')
   }
 
   getSteps = () => {
@@ -172,7 +179,7 @@ class PresetDialog extends Component {
   }
 
   getStepContent = (step) => {
-    const { scripts, options, configs, scriptOptions } = this.state
+    const { scripts, options, configs } = this.state
     const { name, script, config } = options
     const scriptSelectDisabled = (scripts.length <= 0)
     const configSelectDisabled = (configs.length <= 0)
@@ -180,22 +187,22 @@ class PresetDialog extends Component {
       case 0:
         return (
           <Fragment>
-            <DialogContentText className='preset-add-dialog-select-title'>
-              First, give the preset a name and decide, which script and config you want to use for it.
+            <DialogContentText className='project-editor-dialog-select-title'>
+              First, give the project a name and decide, which script and config you want to use for it.
             </DialogContentText>
             <TextValidator
-              id='preset-add-dialog-select-name'
+              id='project-editor-dialog-select-name'
               variant='outlined'
               margin='dense'
               fullWidth
               value={name}
-              label='Preset name:'
+              label='Project name:'
               validators={['required']}
               errorMessages={['This field cannot be empty.']}
               onChange={this.onOptionValueChange('name')}
             />
             <SelectValidator
-              id='preset-add-dialog-select-script'
+              id='project-editor-dialog-select-script'
               select
               variant='outlined'
               label={scriptSelectDisabled ? 'No scripts available, create a script first.' : 'Select a script:'}
@@ -217,7 +224,7 @@ class PresetDialog extends Component {
               ))}
             </SelectValidator>
             <SelectValidator
-              id='preset-add-dialog-select-config'
+              className='project-editor-dialog-select-config'
               select
               variant='outlined'
               label={configSelectDisabled ? 'No configs available, create a config first.' : 'Select a config:'}
@@ -229,12 +236,21 @@ class PresetDialog extends Component {
               margin='dense'
               fullWidth
             >
-              {configs.map(option => (
+              {configs.map(({ id, name, favicon }) => (
                 <MenuItem
-                  key={option.name}
-                  value={option.name}
+                  key={id}
+                  value={id}
+                  className='project-editor-dialog-select-config-item'
                 >
-                  {option.name}
+                  <ListItemIcon>
+                    <img
+                      src={favicon}
+                      alt={`Favicon for config ${name}`}
+                      width={16}
+                      height={16}
+                    />
+                  </ListItemIcon>
+                  {name}
                 </MenuItem>
               ))}
             </SelectValidator>
@@ -243,27 +259,15 @@ class PresetDialog extends Component {
       case 1:
         return (
           <Fragment>
-            <DialogContentText className='preset-add-dialog-select-title'>
+            <DialogContentText className='project-editor-dialog-select-title'>
               Your script has some preferences which need to be set.
             </DialogContentText>
-            {scriptOptions.map(({ type, name, value }) => {
-              const inputType = this.getAllowedType(type)
-              return (
-                <TextValidator
-                  key={name}
-                  variant='outlined'
-                  type={inputType}
-                  margin='dense'
-                  fullWidth
-                  required
-                  value={value}
-                  label={name}
-                  validators={['required']}
-                  errorMessages={['This field cannot be empty.']}
-                  onChange={this.onScriptPreferenceChange(name)}
-                />
-              )
-            })}
+            <ScriptOptionEditor
+              defaultValues={this.state.scriptOptions}
+              scriptName={this.state.options.script}
+              onValuesUpdate={this.onScriptPreferenceUpdate}
+              onEmptyScriptOptions={this.onEmptyScriptOptions}
+            />
           </Fragment>
         )
       case 2:
@@ -271,23 +275,23 @@ class PresetDialog extends Component {
         return (
           <Fragment>
             <DialogContentText>
-              Alright, here&apos;s everything you set for this preset.
+              Alright, here&apos;s everything you&apos;ve set for this project.
             </DialogContentText>
-            <div className='preset-add-dialog-results'>
+            <div className='project-editor-dialog-results'>
               {Object.keys(allOptions).map((key, index) => {
                 const value = allOptions[key]
                 return (
                   <div
-                    className='preset-add-dialog-result'
+                    className='project-editor-dialog-result'
                     key={key}
                   >
                     <Typography
                       variant='button'
-                      className='preset-add-dialog-result-title'
+                      className='project-editor-dialog-result-title'
                     >{key}: </Typography>
                     <Typography
                       variant='body2'
-                      className='preset-add-dialog-result-value'
+                      className='project-editor-dialog-result-value'
                     >{value}</Typography>
                   </div>
                 )
@@ -321,25 +325,28 @@ class PresetDialog extends Component {
   };
 
   render () {
-    const { open, loading, currentStep } = this.state
+    const { open, loading, currentStep, options } = this.state
     const steps = this.getSteps()
 
     return (
       <Dialog
         open={open}
         onClose={this.closeDialog}
-        className='preset-add-dialog'
-        aria-labelledby='preset-add-dialog-title'
+        className='project-editor-dialog'
+        aria-labelledby='project-editor-dialog-title'
         maxWidth='md'
         fullWidth
       >
-        <ValidatorForm onSubmit={this.onFormValidate}>
-          <DialogTitle id='preset-add-dialog-title'>
-            {this.state.options.key ? 'Edit Preset' : 'Add Preset'}
+        <ValidatorForm
+          onSubmit={this.onFormValidate}
+          autoComplete='off'
+        >
+          <DialogTitle id='project-editor-dialog-title'>
+            {this.state.options.id === 'add' ? 'Add Project' : 'Edit Project'}
             <Stepper
               orientation={stepperOrientation[this.props.width]}
               activeStep={currentStep}
-              className='preset-add-dialog-stepper'
+              className='project-editor-dialog-stepper'
             >
               {steps.map((obj, index) => {
                 return (
@@ -375,6 +382,17 @@ class PresetDialog extends Component {
             <Fragment>
               <DialogContent>{this.getStepContent(currentStep)}</DialogContent>
               <DialogActions>
+                {(options.id && options.id !== 'add') && (
+                  <Button
+                    disabled={loading}
+                    onClick={this.deleteProject}
+                    color='primary'
+                  >
+                    <Delete />
+                    Delete Project
+                  </Button>
+                )}
+                <div className='flex-fill' />
                 <Button
                   disabled={loading || currentStep === 0}
                   onClick={this.triggerBack}
@@ -398,4 +416,4 @@ class PresetDialog extends Component {
   }
 }
 
-export default withWidth()(PresetDialog)
+export default withSnackbar(withWidth()(ProjectDialog))

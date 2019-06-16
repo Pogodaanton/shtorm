@@ -1,23 +1,29 @@
 @import '../variables.scss';
-.content .grid-container-terminal .grid-item-terminal {
-  padding-bottom: 0;
-
-  .paper {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    > header {
-      height: $terminal-header-height;
-      cursor: row-resize;
-      user-select: none;
+.content .grid-container-terminal {
+  .grid-item-terminal {
+    padding-bottom: 0;
+  
+    .paper {
+      height: 100%;
       display: flex;
-      align-items: center;
-      padding: 6px 15px;
-
-      > .spacing { flex-grow: 1; }
-      > svg { margin-right: 10px; }
+      flex-direction: column;
+      overflow: hidden;
+  
+      > header {
+        height: $terminal-header-height;
+        cursor: row-resize;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        padding: 6px 15px;
+  
+        > .spacing { flex-grow: 1; }
+        > svg { margin-right: 10px; }
+      }
     }
+  }
+
+  ~ .grid-container-main {
+    margin-bottom: 10px;
   }
 }

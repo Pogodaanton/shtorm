@@ -1,75 +1,49 @@
-import React, { Component } from 'react'
-import { Switch, Route, withRouter } from 'react-router-dom'
-import { MuiThemeProvider } from '@material-ui/core'
+import React from 'react'
+import { MuiThemeProvider, withStyles } from '@material-ui/core'
 import { theme } from '../../themes/dark'
-import TerminalContextProvider from '../../contexts/TerminalContext'
+import { SnackbarProvider } from 'notistack'
+import PropTypes from 'prop-types'
 import SocketContextProvider from '../../contexts/SocketContext'
-import DefaultGridContainer from '../DefaultGridContainer'
-import Header from '../Header'
-import Home from '../Home'
-import Task from '../Task'
-import NotFound from '../NotFound'
-import Terminal from '../Terminal'
-import BotConfigs from '../BotConfigs'
+import UserContextProvider from '../../contexts/UserContext'
+import Loader from '../Loader'
 import './App.scss'
 
-class App extends Component {
-  render () {
-    return (
-      <SocketContextProvider>
-        <MuiThemeProvider theme={theme}>
-          <Header />
-          <div className='content content-flex'>
-            <DefaultGridContainer name='main'>
-              <Switch>
-                <Route
-                  exact
-                  path='/'
-                  component={Home}
-                />
-                <Route
-                  path='/add'
-                  component={Home}
-                />
-                <Route
-                  path='/edit/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/delete/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/start/:name'
-                  component={Home}
-                />
-                <Route
-                  path='/task/:uuid'
-                  component={Task}
-                />
-                <Route
-                  path='/configs'
-                  component={BotConfigs}
-                  exact
-                />
-                <Route
-                  path='/configs/:name'
-                  component={BotConfigs}
-                />
-                <Route
-                  path='/'
-                  component={NotFound}
-                />
-              </Switch>
-            </DefaultGridContainer>
-            <TerminalContextProvider>
-              <Terminal />
-            </TerminalContextProvider>
-          </div>
-        </MuiThemeProvider>
-      </SocketContextProvider>
-    )
-  }
+const styles = {
+  success: { color: 'white' },
+  error: { color: 'white' },
+  info: { color: 'white' }
 }
 
-export default withRouter(App)
+const AppContent = Loader(import('./AppContent'))
+
+function App ({ classes }) {
+  return (
+    <SocketContextProvider>
+      <MuiThemeProvider theme={theme}>
+        <SnackbarProvider
+          maxSnack={4}
+          classes={{
+            variantSuccess: classes.success,
+            variantError: classes.error,
+            variantInfo: classes.info
+          }}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          autoHideDuration={3000}
+        >
+          <UserContextProvider>
+            <AppContent />
+          </UserContextProvider>
+        </SnackbarProvider>
+      </MuiThemeProvider>
+    </SocketContextProvider>
+  )
+}
+
+App.propTypes = {
+  classes: PropTypes.any.isRequired
+}
+
+export default withStyles(styles)(App)

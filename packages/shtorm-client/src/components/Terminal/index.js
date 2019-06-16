@@ -1,6 +1,5 @@
 import React, { Component, Fragment, createRef } from 'react'
 import { Paper, Typography, Button } from '@material-ui/core'
-import { TerminalContext } from '../../contexts/TerminalContext'
 import LineWeightIcon from '@material-ui/icons/LineWeight'
 import ClearAllIcon from '@material-ui/icons/ClearAll'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -15,36 +14,38 @@ import './Terminal.scss'
 let minTerminalHeight = 53
 class Terminal extends Component {
   static propTypes = {
-    context: PropTypes.object.isRequired
-  }
-
-  state = {
-    isOpened: false,
-    terminalLines: [],
-    isDraggingHeader: false
+    socket: PropTypes.object.isRequired
   }
 
   headerRef = createRef()
-
-  componentDidUpdate = (prevProps, prevState) => {
+  lastTerminalHeight: 300
+  state = {
+    isOpened: false,
+    terminalLines: [],
+    isDraggingHeader: false,
+    terminalHeight: 300
   }
 
+  forceUpdateTerminalWindow = () => null
+
   componentDidMount = () => {
-    this.props.context.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
-    this.props.context.socket.on('log_message', this.addLine)
+    this.props.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
+    this.props.socket.on('disconnect', (a) => this.addLine({ msg: `Disconnected from socket.` }))
+    this.props.socket.on('log_lifeline', (msg) => this.addLine({ msg }))
+    this.props.socket.on('log_message', this.addLine)
+    this.props.socket.emit('lifeline.ping')
 
     document.addEventListener('mousedown', this.onHandleMouseDown)
     document.addEventListener('mouseup', this.onHandleMouseUp)
   }
 
   componentWillUnmount = () => {
+    this.addLine({ msg: 'Terminal connection closed!' })
     document.removeEventListener('mousedown', this.onHandleMouseDown)
     document.removeEventListener('mouseup', this.onHandleMouseUp)
   }
 
-  getCurrentTimestamp = () => {
-    return new Date().getTime()
-  }
+  getCurrentTimestamp = () => new Date().getTime()
 
   addLine = ({ msg = 'N/A', type = 'CLIENT', timestamp = this.getCurrentTimestamp(), key = timestamp }) => {
     const { terminalLines } = this.state
@@ -61,14 +62,17 @@ class Terminal extends Component {
         key: timestamp,
         timestamp
       }]
-    })
+    }, () => this.forceUpdateTerminalWindow())
   }
 
   toggleTerminal = () => {
-    if (this.props.context.terminalHeight > minTerminalHeight) {
-      this.props.context.setDesiredTerminalHeight()
-      this.props.context.setTerminalHeight(minTerminalHeight)
-    } else this.props.context.setTerminalHeight(this.props.context.desiredTerminalHeight)
+    let terminalHeight = this.desiredTerminalHeight
+    if (this.state.terminalHeight > minTerminalHeight) {
+      this.desiredTerminalHeight = this.state.terminalHeight
+      terminalHeight = minTerminalHeight
+    }
+
+    this.setState({ terminalHeight })
   }
 
   checkElementIsHandlebar = ({ target }) => {
@@ -79,7 +83,7 @@ class Terminal extends Component {
   onHandleMouseDown = (e) => {
     if (this.checkElementIsHandlebar(e)) {
       document.addEventListener('mousemove', this.onHandleMouseMove)
-      this.mouseDownCapture = { y: e.clientY, terminalHeight: this.props.context.terminalHeight }
+      this.mouseDownCapture = { y: e.clientY, terminalHeight: this.state.terminalHeight }
     }
   }
 
@@ -92,30 +96,34 @@ class Terminal extends Component {
     const differenceY = y - clientY
     const boundaryTop = window.innerHeight - (document.getElementById('page-header').clientHeight + this.headerRef.current.clientHeight + 15)
     const newTerminalSize = Math.max(Math.min(terminalHeight + differenceY, boundaryTop), minTerminalHeight)
-    this.props.context.setTerminalHeight(newTerminalSize)
 
     this.setState({
-      isDraggingHeader: true
+      isDraggingHeader: true,
+      terminalHeight: newTerminalSize
     })
   }
 
   onHandleMouseUp = (e) => {
     if (this.state.isDraggingHeader) {
-      const { terminalHeight, setDesiredTerminalHeight } = this.props.context
-      if (terminalHeight > minTerminalHeight + 10) setDesiredTerminalHeight(terminalHeight)
+      const { terminalHeight } = this.state
+      if (terminalHeight > minTerminalHeight + 10) {
+        this.desiredTerminalHeight = terminalHeight
+      }
 
-      this.setState({
-        isDraggingHeader: false
-      })
+      this.setState({ isDraggingHeader: false })
     }
     document.removeEventListener('mousemove', this.onHandleMouseMove)
   }
 
+  onForceUpdateRef = (r = () => null) => {
+    this.forceUpdateTerminalWindow = r
+  }
+
   render () {
     const { terminalLines } = this.state
-    const isOpened = (this.props.context.terminalHeight <= minTerminalHeight)
+    const isOpened = (this.state.terminalHeight <= minTerminalHeight)
     const gridContainerStyle = {
-      flexBasis: this.props.context.terminalHeight
+      flexBasis: this.state.terminalHeight
     }
 
     return (
@@ -155,6 +163,7 @@ class Terminal extends Component {
             <TerminalWindow
               rows={terminalLines}
               disableTransition
+              forceUpdateRef={this.onForceUpdateRef}
             />
           </Paper>
         </DefaultGridItem>
@@ -163,17 +172,15 @@ class Terminal extends Component {
   }
 }
 
-export default function ContextCombiner (props) {
+export default function ContextAdder (props) {
   return (
-    <TerminalContext.Consumer>
-      {(tcontext) => (
-        <SocketContext.Consumer>
-          {(scontext) => <Terminal
-            {...props}
-            context={{ ...tcontext, ...scontext }}
-          />}
-        </SocketContext.Consumer>
+    <SocketContext.Consumer>
+      {(scontext) => (
+        <Terminal
+          {...props}
+          socket={scontext.socket}
+        />
       )}
-    </TerminalContext.Consumer>
+    </SocketContext.Consumer>
   )
 }

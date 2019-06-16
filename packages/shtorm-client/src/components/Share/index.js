@@ -116,7 +116,12 @@ class Share extends Component {
     return inputLength === 0 && !showEmpty
       ? []
       : this.allUsers.filter(({ username }) => {
-        const keep = count < 5 && deburr(username).slice(0, inputLength).toLowerCase() === inputValue && username !== this.context.currentUser.username
+        const keep = (
+          count < 5 &&
+          deburr(username).slice(0, inputLength).toLowerCase() === inputValue &&
+          username !== this.context.currentUser.username &&
+          this.state.assignees.findIndex(({ username: assigneeName }) => assigneeName === username) < 0
+        )
         if (keep) count += 1
         return keep
       })

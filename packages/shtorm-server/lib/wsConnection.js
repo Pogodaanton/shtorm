@@ -5,7 +5,9 @@ import { deserializeUser } from './Controllers/userController'
 export const socketPassportMiddleware = (sessionMiddleware) => (socket, next) => {
   sessionMiddleware(socket.request, socket.request.res, (err) => {
     if (!err) {
-      deserializeUser(socket.request.session.passport.user, (errObj, userObj) => {
+      const userId = typeof socket.request.session.passport === 'object' ? socket.request.session.passport.user : ''
+
+      deserializeUser(userId, (errObj, userObj) => {
         if (errObj || !userObj) next(new Error(errObj.message || errObj || 'An unknown error happened!'))
         else socket.request.user = userObj
         next()

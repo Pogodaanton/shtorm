@@ -5,7 +5,11 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "nodemon --inspect --exec babel-node lib/index.js",
-    "serve": "node dist/index.js"
+    "build": "babel lib --out-dir build --copy-files && babel-node ./build.js",
+    "serve": "node build/index.js"
+  },
+  "engines": {
+    "node": "10.15.3"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,25 +30,23 @@
     "socket.io": "^2.2.0",
     "vm2": "^3.7.0"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.4.3",
-    "@babel/core": "^7.4.3",
-    "@babel/node": "^7.2.2",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/preset-env": "^7.4.3",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.16.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "nodemon": "^1.18.10"
-  },
   "nodemonConfig": {
     "verbose": false,
     "watch": [
       "lib/"
+    ]
+  },
+  "pkg": {
+    "scripts": [
+      "node_modules/vm2/lib/**/*.js"
+    ],
+    "assets": [
+      "./build/**.json"
+    ],
+    "targets": [
+      "node10.15.3-macos-x64",
+      "node10.15.3-linux-x64",
+      "node10.15.3-win-x64"
     ]
   }
 }

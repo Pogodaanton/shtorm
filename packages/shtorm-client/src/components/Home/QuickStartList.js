@@ -14,7 +14,7 @@ const QuickStart = ({ scripts }) => {
     <Typography
       className='project-selector-scripts-empty'
       variant='body2'
-    >No files were found in the ./scripts directory.</Typography>
+    >No files were found in the scripts directory.</Typography>
   ) : scripts.map((scriptName, index) => (
     <Chip
       className='project-selector-scripts-chip'

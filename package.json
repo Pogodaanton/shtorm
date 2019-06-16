@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "lerna run --parallel start",
-    "build": "lerna run --no-bail build"
+    "build": "lerna run --parallel build"
   },
   "devDependencies": {
     "lerna": "^3.13.1"

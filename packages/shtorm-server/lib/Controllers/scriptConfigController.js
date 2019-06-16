@@ -3,11 +3,11 @@ import path from 'path'
 import configController from './configController'
 import { VM } from 'vm2'
 import { transformFileSync } from '@babel/core'
+import configChecker from '../configChecker'
 
-const scriptsFolder = path.join(__dirname, '../../scripts')
 class ScriptConfigController {
-  constructor () {
-    if (!fs.existsSync(scriptsFolder)) fs.mkdirSync(scriptsFolder)
+  constructor (scriptsDirectory) {
+    this.scriptsDirectory = scriptsDirectory
   }
 
   requestScriptOptions = (req, res) => {
@@ -67,16 +67,18 @@ class ScriptConfigController {
       { type: 'number', name: 'From page in category', value: 0 },
       { type: 'number', name: 'Amount of pages', value: 10 }
     ] */
-    const { code } = transformFileSync(path.join(scriptsFolder, `./${scriptName}`))
+    const { code } = transformFileSync(path.join(this.scriptsDirectory, `./${scriptName}`))
     const scriptOptions = vm.run(code).scriptOptions
     if (typeof scriptOptions !== 'object') return []
     return this.makeUnique(scriptOptions, 'name')
   }
 
   getAllScripts = () => {
-    return fs.readdirSync(scriptsFolder).map((name) => name.slice(-3) === '.js' && name)
+    return fs.readdirSync(this.scriptsDirectory).map((name) => name.slice(-3) === '.js' && name)
   }
 }
 
-const scriptController = new ScriptConfigController()
+const { scriptsDirectory } = configChecker(false, process)
+const scriptController = new ScriptConfigController(scriptsDirectory)
+
 export default scriptController

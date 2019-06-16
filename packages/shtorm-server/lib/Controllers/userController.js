@@ -78,9 +78,7 @@ export const validateUser = (type) => {
     case 'admin':
       return [ permission.checkOneOf(['isAdmin', 'isOriginal']) ]
     case 'executeProjects':
-      return [ permission.checkOneOf(['executeProjects', 'assignProjects', 'seeAllProjects', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
-    case 'modifyProjects':
-      return [ permission.checkOneOf(['modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
+      return [ permission.checkOneOf(['executeProjects', 'isAdmin', 'isOriginal']) ]
     case 'createProjects':
       return [ permission.checkOneOf(['createProjects', 'isAdmin', 'isOriginal']) ]
     case 'assignProjects':
@@ -88,7 +86,7 @@ export const validateUser = (type) => {
     case 'seeAllProjects':
       return [ permission.checkOneOf(['seeAllProjects', 'isAdmin', 'isOriginal']) ]
     case 'viewConfigs':
-      return [ permission.checkOneOf(['createConfigs', 'modifyProjects', 'createProjects', 'isAdmin', 'isOriginal']) ]
+      return [ permission.checkOneOf(['createConfigs', 'createProjects', 'isAdmin', 'isOriginal']) ]
     case 'createConfigs':
       return [ permission.checkOneOf(['createConfigs', 'isAdmin', 'isOriginal']) ]
     case 'editOneself':
@@ -191,7 +189,6 @@ export const deserializeUser = (id, done) => {
     const {
       id,
       username,
-      modifyProjects,
       createProjects,
       assignProjects,
       seeAllProjects,
@@ -205,7 +202,6 @@ export const deserializeUser = (id, done) => {
       username,
       permissions: {
         executeProjects: true,
-        modifyProjects: modifyProjects || false,
         assignProjects: assignProjects || false,
         seeAllProjects: seeAllProjects || false,
         createProjects: createProjects || false,
@@ -259,7 +255,6 @@ class UserController {
       username,
       password,
       isAdmin,
-      modifyProjects,
       assignProjects,
       seeAllProjects,
       createProjects,
@@ -279,7 +274,6 @@ class UserController {
         executeProjects: true,
         isOriginal: false,
         isAdmin: (typeof isAdmin === 'boolean') ? isAdmin : false,
-        modifyProjects: (typeof modifyProjects === 'boolean') ? modifyProjects : false,
         assignProjects: (typeof assignProjects === 'boolean') ? assignProjects : false,
         seeAllProjects: (typeof seeAllProjects === 'boolean') ? seeAllProjects : false,
         createProjects: (typeof createProjects === 'boolean') ? createProjects : false,
@@ -301,7 +295,6 @@ class UserController {
     // Make sure that the user editing is also allowed to change permissions; All permissions need to be typeof boolean!
     const newRights = canUserEditRights ? {
       isAdmin: existingUserVal.isOriginal || (typeof isAdmin === 'boolean') ? isAdmin : existingUserVal.isAdmin,
-      modifyProjects: existingUserVal.isOriginal || (typeof modifyProjects === 'boolean') ? modifyProjects : existingUserVal.modifyProjects,
       assignProjects: existingUserVal.isOriginal || (typeof assignProjects === 'boolean') ? assignProjects : existingUserVal.assignProjects,
       seeAllProjects: existingUserVal.isOriginal || (typeof seeAllProjects === 'boolean') ? seeAllProjects : existingUserVal.seeAllProjects,
       createProjects: existingUserVal.isOriginal || (typeof createProjects === 'boolean') ? createProjects : existingUserVal.createProjects,

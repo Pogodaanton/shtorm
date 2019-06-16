@@ -34,7 +34,6 @@ class UserEditor extends Component {
     isAdmin: false,
     isOriginal: false,
     executeProjects: true,
-    modifyProjects: false,
     assignProjects: false,
     seeAllProjects: false,
     createProjects: false,
@@ -121,7 +120,6 @@ class UserEditor extends Component {
       password,
       isAdmin,
       newPassword,
-      modifyProjects,
       assignProjects,
       seeAllProjects,
       createProjects,
@@ -137,7 +135,6 @@ class UserEditor extends Component {
         username,
         password: password || newPassword,
         isAdmin,
-        modifyProjects,
         assignProjects,
         seeAllProjects,
         createProjects,
@@ -207,7 +204,6 @@ class UserEditor extends Component {
       password,
       loading,
       executeProjects,
-      modifyProjects,
       assignProjects,
       seeAllProjects,
       createProjects,
@@ -285,15 +281,6 @@ class UserEditor extends Component {
                 />}
                 label='Executing Projects'
                 disabled
-              />
-              <FormControlLabel
-                control={<Checkbox
-                  checked={modifyProjects}
-                  indeterminate={isAdmin}
-                  onChange={this.onInputChange('modifyProjects')}
-                />}
-                disabled={loading || isAdmin || !isEditingUserAdmin}
-                label='Modifying Projects'
               />
               <FormControlLabel
                 control={<Checkbox

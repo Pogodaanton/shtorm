@@ -5,7 +5,11 @@
   "license": "GPL-3.0-or-later",
   "scripts": {
     "start": "nodemon --inspect --exec babel-node lib/index.js",
-    "serve": "node dist/index.js"
+    "build": "babel lib --out-dir build --copy-files && babel-node ./build.js",
+    "serve": "node build/index.js"
+  },
+  "engines": {
+    "node": "10.15.3"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -45,6 +49,19 @@
     "verbose": false,
     "watch": [
       "lib/"
+    ]
+  },
+  "pkg": {
+    "scripts": [
+      "node_modules/vm2/lib/**/*.js"
+    ],
+    "assets": [
+      "./build/**.json"
+    ],
+    "targets": [
+      "node10.15.3-macos-x64",
+      "node10.15.3-linux-x64",
+      "node10.15.3-win-x64"
     ]
   }
 }

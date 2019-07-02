@@ -51,6 +51,7 @@ typings/
 # compiled folders
 dist
 db
+packages/shtorm-server/build
 packages/shtorm-server/scripts/**
 !packages/shtorm-server/scripts/example.js
 

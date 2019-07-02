@@ -14,12 +14,14 @@ import wsConnection, { socketPassportMiddleware } from './wsConnection'
 import httpConnection from './httpConnection'
 import configChecker from './configChecker'
 
-const { port, clientUrl, sessionSecret } = configChecker()
+const { port, clientUrl, sessionSecret, databaseDirectory } = configChecker(false, process)
 const app = express()
 const httpServer = Server(app)
 const io = socketIo(httpServer)
 const sessionMiddleware = session({
-  store: new NedbStore(session)({ filename: path.join(__dirname, '../db/sessionStore.db') }),
+  store: new NedbStore(session)({
+    filename: path.join(databaseDirectory, './sessionStore.db')
+  }),
   key: 'shtorm.user.session',
   secret: sessionSecret,
   cookie: { secure: false },

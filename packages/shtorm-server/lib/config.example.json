@@ -1,5 +1,7 @@
 {
   "port": 8000,
   "clientUrl": "http://localhost:3000",
-  "sessionSecret": "insecureSecretPleaseChangeMeThanks"
+  "sessionSecret": "insecureSecretPleaseChangeMeThanks",
+  "scriptsDirectory": "../scripts",
+  "databaseDirectory": "../db"
 }

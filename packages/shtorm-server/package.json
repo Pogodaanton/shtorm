@@ -8,9 +8,6 @@
     "build": "babel lib --out-dir build --copy-files && babel-node ./build.js",
     "serve": "node build/index.js"
   },
-  "engines": {
-    "node": "10.15.3"
-  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.5.4",

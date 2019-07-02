@@ -50,6 +50,7 @@ typings/
 
 # compiled folders
 dist
+packages/shtorm-server/build
 db
 packages/shtorm-server/build
 packages/shtorm-server/scripts/**

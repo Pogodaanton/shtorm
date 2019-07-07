@@ -36,7 +36,7 @@ const start = () => new Promise((resolve, reject) => {
   })
 })
 
-exports = {
+module.exports = {
   default: start,
   scriptOptions
 }

@@ -1,7 +1,7 @@
 /* global process */
 import path from 'path'
 import { transformFile } from '@babel/core'
-import { VM } from 'vm2'
+import VM from './customVm'
 import NodeMw from 'nodemw'
 import Promise from 'bluebird'
 
@@ -41,15 +41,10 @@ function prepareVM () {
       updateClient,
       bot,
       console
-    },
-    require: {
-      external: true,
-      builtin: ['lowdb'],
-      root: './'
     }
   })
 
-  if (typeof vm.run(compiledCode).default !== 'function') {
+  if (typeof vm.getVm().run(compiledCode).default !== 'function') {
     errorExit('Failed to load script: exports.default needs to be a function that returns a Promise!')
     return
   }
@@ -59,7 +54,7 @@ function prepareVM () {
 
 function executeScript () {
   try {
-    vm.run(compiledCode).default()
+    vm.getVm().run(compiledCode).default()
       .then((finishedMessage) => {
         clientObj.finished = true
         updateClient({

@@ -1,8 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import configController from './configController'
-import { VM } from 'vm2'
-import { transformFileSync } from '@babel/core'
+import VM from '../customVm'
 import configChecker from '../configChecker'
 
 class ScriptConfigController {
@@ -54,31 +53,22 @@ class ScriptConfigController {
   }
 
   getScriptOptions = (scriptName) => {
-    const vm = new VM({
-      sandbox: { exports: {} },
-      require: {
-        external: false,
-        builtin: ['lowdb'],
-        root: './'
-      }
-    })
-    /* const scriptOptions = [
-      { type: 'text', name: 'Summary', value: 'Infobox --> Infobox_Waffen | Fragen: [[User:Pogodaanton|Pogodaanton]]' },
-      { type: 'number', name: 'From page in category', value: 0 },
-      { type: 'number', name: 'Amount of pages', value: 10 }
-    ] */
-    const { code } = transformFileSync(path.join(this.scriptsDirectory, `./${scriptName}`))
-    const scriptOptions = vm.run(code).scriptOptions
+    const scriptPath = path.join(this.scriptsDirectory, `./${scriptName}`)
+    const vm = new VM()
+
+    const code = vm.transformFileSync(scriptPath)
+    const { scriptOptions } = vm.getVm().run(code, scriptPath)
+
     if (typeof scriptOptions !== 'object') return []
     return this.makeUnique(scriptOptions, 'name')
   }
 
   getAllScripts = () => {
-    return fs.readdirSync(this.scriptsDirectory).map((name) => name.slice(-3) === '.js' && name)
+    return fs.readdirSync(this.scriptsDirectory).filter((name) => name.slice(-3) === '.js')
   }
 }
 
-const { scriptsDirectory } = configChecker(false, process)
+const { scriptsDirectory } = configChecker(false)
 const scriptController = new ScriptConfigController(scriptsDirectory)
 
 export default scriptController

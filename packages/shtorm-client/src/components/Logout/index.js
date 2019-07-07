@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { Paper } from '@material-ui/core'
 import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
 import SpotlightLinear from '../Spinners/SpotlightLinear'
 import DefaultGridItem from '../DefaultGridItem'
 
@@ -13,20 +13,20 @@ class Logout extends Component {
   static propTypes = {
     history: PropTypes.object.isRequired,
     updateCurrentUser: PropTypes.func.isRequired,
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func
+    enqueueSnackbar: PropTypes.func.isRequired,
+    api: PropTypes.object.isRequired
   }
 
   componentDidMount = () => this.requestLogout()
   requestLogout = () => {
-    axios.get(Api.getApiUrl('logOut'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('logOut'), { withCredentials: true })
       .then((res) => {
         this.props.enqueueSnackbar('Successfully logged out!')
         this.props.updateCurrentUser()
       })
       .catch((err) => {
         this.props.history.push('/')
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler()(err)
       })
   }
 
@@ -55,4 +55,4 @@ const ContextAdder = (props) => (
   </UserContext.Consumer>
 )
 
-export default withSnackbar(ContextAdder)
+export default withApi(withSnackbar(ContextAdder))

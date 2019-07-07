@@ -5,15 +5,15 @@ import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import { UserContext } from '../../contexts/UserContext'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
+import { withApi } from '../Api'
 import bg from './background.jpg'
 import './Login.scss'
 
 class Login extends Component {
   static propTypes = {
     updateCurrentUser: PropTypes.func.isRequired,
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func
+    enqueueSnackbar: PropTypes.func.isRequired,
+    api: PropTypes.object.isRequired
   }
 
   state = {
@@ -26,7 +26,7 @@ class Login extends Component {
     const { username, password } = this.state
     this.setState({ loading: true })
 
-    axios.post(Api.getApiUrl('logIn'), { username, password }, { withCredentials: true })
+    axios.post(this.props.api.getApiUrl('logIn'), { username, password }, { withCredentials: true })
       .then((res) => {
         this.setState({ loading: false })
         this.props.enqueueSnackbar('Successfully logged in!')
@@ -35,7 +35,7 @@ class Login extends Component {
       .catch((err) => {
         console.log(err.res)
         this.setState({ loading: false })
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler()(err)
       })
   }
 
@@ -101,4 +101,4 @@ const ContextAdder = (props) => (
   </UserContext.Consumer>
 )
 
-export default withSnackbar(ContextAdder)
+export default withApi(withSnackbar(ContextAdder))

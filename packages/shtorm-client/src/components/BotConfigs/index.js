@@ -1,11 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import { GridPaper } from '../DefaultGridItem'
 import BotConfigList from './BotConfigList'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
 import Loader from '../Loader'
 
 const BotConfigEditor = Loader(import('./BotConfigEditor'))
@@ -13,9 +12,8 @@ const BotConfigSelect = Loader(import('./BotConfigSelect'), () => null)
 
 class BotConfigs extends Component {
   static propTypes = {
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func,
-    history: PropTypes.object
+    history: PropTypes.object,
+    api: PropTypes.object.isRequired
   }
 
   state = {
@@ -29,15 +27,15 @@ class BotConfigs extends Component {
   }
 
   getAllConfigs = () => {
-    axios.get(Api.getApiUrl('getAllConfigs'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllConfigs'), { withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
           configList: res.data.data,
           loading: false
         })
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
+      .catch(this.props.api.axiosErrorHandler(false, this.props.history))
   }
 
   render () {
@@ -84,4 +82,4 @@ class BotConfigs extends Component {
   }
 }
 
-export default withSnackbar(BotConfigs)
+export default withApi(BotConfigs)

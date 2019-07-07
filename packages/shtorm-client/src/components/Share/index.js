@@ -17,9 +17,8 @@ import {
 } from '@material-ui/core'
 import { Send } from '@material-ui/icons'
 import { UserContext } from '../../contexts/UserContext'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import axios from 'axios'
-import Api from '../Api'
 import Downshift from 'downshift'
 import deburr from 'lodash.deburr'
 import find from 'lodash.find'
@@ -60,8 +59,7 @@ renderSuggestion.propTypes = {
 class Share extends Component {
   static contextType = UserContext
   static propTypes = {
-    enqueueSnackbar: PropTypes.func.isRequired,
-    closeSnackbar: PropTypes.func.isRequired,
+    api: PropTypes.object.isRequired,
     match: PropTypes.any.isRequired,
     history: PropTypes.any.isRequired
   }
@@ -77,32 +75,35 @@ class Share extends Component {
   componentDidMount = () => this.getAllAssignees()
 
   getAllAssignees = () => {
-    const { id } = this.props.match.params
+    const { api, match, history } = this.props
+    const { id } = match.params
 
     axios.all([
-      axios.get(Api.getApiUrl('getAllUsernames'), { withCredentials: true }),
-      axios.get(Api.getApiUrl('getAllProjectAssignees'), { params: { id }, withCredentials: true })
+      axios.get(api.getApiUrl('getAllUsernames'), { withCredentials: true }),
+      axios.get(api.getApiUrl('getAllProjectAssignees'), { params: { id }, withCredentials: true })
     ])
       .then(axios.spread((resOne, resTwo) => {
-        if (Api.axiosCheckResponse(resOne) && Api.axiosCheckResponse(resTwo)) {
+        if (api.axiosCheckResponse(resOne) && api.axiosCheckResponse(resTwo)) {
           this.allUsers = resOne.data.data
           const { assignees, project } = resTwo.data.data
           this.setState({ assignees, project, loading: false })
         }
       }))
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
+      .catch(api.axiosErrorHandler(true, history))
   }
 
   postSetAssignee = (user, shouldDelete = false) => {
-    const { id } = this.props.match.params
-    axios.post(Api.getApiUrl(`${shouldDelete ? 'delete' : 'add'}ProjectAssignee`), { id, user }, { withCredentials: true })
+    const { api, match } = this.props
+    const { id } = match.params
+
+    axios.post(api.getApiUrl(`${shouldDelete ? 'delete' : 'add'}ProjectAssignee`), { id, user }, { withCredentials: true })
       .then((res) => {
         const { assignees } = this.state
         if (shouldDelete) assignees.splice(assignees.findIndex((assignee) => assignee.id === user.id), 1)
         else assignees.push(user)
         this.setState({ assignees })
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(api.axiosErrorHandler(true))
   }
 
   /**
@@ -266,4 +267,4 @@ class Share extends Component {
   }
 }
 
-export default withSnackbar(Share)
+export default withApi(Share)

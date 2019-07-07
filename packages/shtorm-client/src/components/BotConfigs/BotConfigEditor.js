@@ -1,13 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { Prompt } from 'react-router-dom'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import { CloudUpload, CloudQueue, CloudDone, Delete, FileCopy } from '@material-ui/icons'
 import isEqual from 'lodash.isequal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
 import '../EditorHelpers/EditorHelper.scss'
 
 class BotConfigEditor extends Component {
@@ -15,8 +14,7 @@ class BotConfigEditor extends Component {
     onReloadRequest: PropTypes.func.isRequired,
     match: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func
+    api: PropTypes.object.isRequired
   }
 
   nameList = []
@@ -83,25 +81,25 @@ class BotConfigEditor extends Component {
   }
 
   getTakenConfigNames = () => {
-    axios.get(Api.getApiUrl('getAllConfigNames'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllConfigNames'), { withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.nameList = res.data.data
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   getConfigData = (id) => {
-    axios.get(Api.getApiUrl('getConfig'), { params: { id }, withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getConfig'), { params: { id }, withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
           loading: false,
           ...res.data.data
         }, this.setOrigState)
       })
       .catch((err) => {
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler(true)(err)
         this.props.history.replace('/configs')
       })
   }
@@ -129,7 +127,7 @@ class BotConfigEditor extends Component {
       saveState: 'Saving',
       loading: true
     }, () => {
-      axios.post(Api.getApiUrl('saveConfig'), {
+      axios.post(this.props.api.getApiUrl('saveConfig'), {
         id,
         name,
         protocol,
@@ -143,7 +141,7 @@ class BotConfigEditor extends Component {
         concurrency
       }, { withCredentials: true })
         .then((res) => {
-          if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+          if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
 
           if (typeof res.data.newId === 'string') {
             this.props.onReloadRequest()
@@ -157,7 +155,7 @@ class BotConfigEditor extends Component {
         })
         .catch((err) => {
           this.setState({ saveState: 'Save', loading: false })
-          Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+          this.props.api.axiosErrorHandler(true)(err)
         })
     })
   }
@@ -169,14 +167,14 @@ class BotConfigEditor extends Component {
       saveState: 'Deleting',
       loading: true
     }, () => {
-      axios.post(Api.getApiUrl('deleteConfig'), { id }, { withCredentials: true })
+      axios.post(this.props.api.getApiUrl('deleteConfig'), { id }, { withCredentials: true })
         .then((res) => {
           this.props.onReloadRequest()
           this.props.history.replace('/configs')
         })
         .catch((err) => {
           this.setState({ saveState: 'Save', loading: false })
-          Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+          this.props.api.axiosErrorHandler(true)(err)
         })
     })
   }
@@ -390,4 +388,4 @@ class BotConfigEditor extends Component {
   }
 }
 
-export default withSnackbar(BotConfigEditor)
+export default withApi(BotConfigEditor)

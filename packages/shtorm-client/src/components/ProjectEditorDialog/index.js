@@ -18,9 +18,8 @@ import {
   withWidth
 } from '@material-ui/core'
 import { Delete } from '@material-ui/icons'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import axios from 'axios'
-import Api from '../Api'
 import Loader from '../Loader'
 import './ProjectDialog.scss'
 
@@ -35,10 +34,9 @@ const stepperOrientation = {
 
 class ProjectDialog extends Component {
   static propTypes = {
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func,
     history: PropTypes.object.isRequired,
     match: PropTypes.object.isRequired,
+    api: PropTypes.object.isRequired,
     width: PropTypes.string.isRequired
   }
 
@@ -76,9 +74,9 @@ class ProjectDialog extends Component {
   }
 
   getProjectData = (id) => {
-    axios.get(Api.getApiUrl('getProject'), { params: { id }, withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getProject'), { params: { id }, withCredentials: true })
       .then((res) => {
-        if (Api.axiosCheckResponse(res) && typeof res.data.data === 'object') {
+        if (this.props.api.axiosCheckResponse(res) && typeof res.data.data === 'object') {
           const { data } = res.data
           const projectOptions = { ...data }
           delete projectOptions['scriptOptions']
@@ -86,20 +84,20 @@ class ProjectDialog extends Component {
         } else throw new Error('Wrong format received!')
       })
       .catch((err) => {
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler(true)(err)
         this.props.history.replace('/')
       })
   }
 
   getDropdownData = () => {
-    axios.get(Api.getApiUrl('getAllScripts'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllScripts'), { withCredentials: true })
       .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
+        if (this.props.api.axiosCheckResponse(res)) {
           const { scripts, configs } = res.data.data
           this.setState({ scripts, configs, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   setScriptOptions = (scriptOptions) => {
@@ -113,16 +111,16 @@ class ProjectDialog extends Component {
     const { options, scriptOptions } = this.state
     this.setState({ loading: true })
 
-    axios.post(Api.getApiUrl('saveProject'), { ...options, scriptOptions }, { withCredentials: true })
+    axios.post(this.props.api.getApiUrl('saveProject'), { ...options, scriptOptions }, { withCredentials: true })
       .then((res) => this.closeDialog())
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   deleteProject = () => {
     this.setState({ loading: true })
-    axios.post(Api.getApiUrl('deleteProject'), { id: this.state.options.id }, { withCredentials: true })
+    axios.post(this.props.api.getApiUrl('deleteProject'), { id: this.state.options.id }, { withCredentials: true })
       .then((res) => this.closeDialog())
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   closeDialog = () => {
@@ -416,4 +414,4 @@ class ProjectDialog extends Component {
   }
 }
 
-export default withSnackbar(withWidth()(ProjectDialog))
+export default withApi(withWidth()(ProjectDialog))

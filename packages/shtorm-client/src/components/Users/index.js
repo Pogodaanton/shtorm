@@ -1,11 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { withSnackbar } from 'notistack'
 import { GridPaper } from '../DefaultGridItem'
+import { withApi } from '../Api'
 import UsersList from './UsersList'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
 import Loader from '../Loader'
 import { UserContext } from '../../contexts/UserContext'
 
@@ -15,8 +14,7 @@ const UsersSelect = Loader(import('./UsersSelect'), () => null)
 class Users extends Component {
   static contextType = UserContext
   static propTypes = {
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func,
+    api: PropTypes.object.isRequired,
     history: PropTypes.object
   }
 
@@ -31,15 +29,15 @@ class Users extends Component {
   }
 
   getAllUsers = () => {
-    axios.get(Api.getApiUrl('getAllUsers'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllUsers'), { withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
           userList: res.data.data,
           loading: false
         })
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
+      .catch(this.props.api.axiosErrorHandler(true, this.props.history))
   }
 
   render () {
@@ -99,4 +97,4 @@ class Users extends Component {
   }
 }
 
-export default withSnackbar(Users)
+export default withApi(Users)

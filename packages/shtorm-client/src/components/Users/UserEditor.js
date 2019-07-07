@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import { Prompt } from 'react-router-dom'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider, Tooltip, Typography } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import { CloudUpload, CloudQueue, CloudDone, Delete } from '@material-ui/icons'
 import isEqual from 'lodash.isequal'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import Api from '../Api'
 import { UserContext } from '../../contexts/UserContext'
 import '../EditorHelpers/EditorHelper.scss'
 
@@ -18,7 +17,7 @@ class UserEditor extends Component {
     match: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
     enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func
+    api: PropTypes.object.isRequired
   }
 
   nameList = []
@@ -85,25 +84,25 @@ class UserEditor extends Component {
   }
 
   getTakenUsernames = () => {
-    axios.get(Api.getApiUrl('getAllUsernames'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllUsernames'), { withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.nameList = res.data.data.map(({ username }) => username)
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   getUserData = (id) => {
-    axios.get(Api.getApiUrl('getUser'), { params: { id }, withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getUser'), { params: { id }, withCredentials: true })
       .then((res) => {
-        if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+        if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
         this.setState({
           loading: false,
           ...res.data.data
         }, this.setOrigState)
       })
       .catch((err) => {
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler(true)(err)
         this.props.history.replace('/users')
       })
   }
@@ -130,7 +129,7 @@ class UserEditor extends Component {
       saveState: 'Saving',
       loading: true
     }, () => {
-      axios.post(Api.getApiUrl('saveUser'), {
+      axios.post(this.props.api.getApiUrl('saveUser'), {
         id,
         username,
         password: password || newPassword,
@@ -141,7 +140,7 @@ class UserEditor extends Component {
         createConfigs
       }, { withCredentials: true })
         .then((res) => {
-          if (!Api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
+          if (!this.props.api.axiosCheckResponse(res)) throw new Error('Wrong result received!')
 
           this.props.enqueueSnackbar('User successfully saved')
           if (typeof res.data.newId === 'string') {
@@ -156,7 +155,7 @@ class UserEditor extends Component {
         })
         .catch((err) => {
           this.setState({ saveState: 'Save', loading: false })
-          Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+          this.props.api.axiosErrorHandler(true)(err)
         })
     })
   }
@@ -168,14 +167,14 @@ class UserEditor extends Component {
       saveState: 'Deleting',
       loading: true
     }, () => {
-      axios.post(Api.getApiUrl('deleteUser'), { id }, { withCredentials: true })
+      axios.post(this.props.api.getApiUrl('deleteUser'), { id }, { withCredentials: true })
         .then((res) => {
           this.props.onReloadRequest()
           this.props.history.replace('/users')
         })
         .catch((err) => {
           this.setState({ saveState: 'Save', loading: false })
-          Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+          this.props.api.axiosErrorHandler(true)(err)
         })
     })
   }
@@ -379,4 +378,4 @@ class UserEditor extends Component {
   }
 }
 
-export default withSnackbar(UserEditor)
+export default withApi(UserEditor)

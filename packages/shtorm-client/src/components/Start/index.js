@@ -3,20 +3,18 @@ import { Paper, Button, Typography, Divider } from '@material-ui/core'
 import { PlayArrow, FastForward, ArrowBackIos } from '@material-ui/icons'
 import { Redirect, Link } from 'react-router-dom'
 import { ValidatorForm } from 'react-material-ui-form-validator'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import { SocketContext } from '../../contexts/SocketContext'
 import DefaultGridItem from '../DefaultGridItem'
 import PropTypes from 'prop-types'
 import ScriptOptionEditor from '../ScriptOptionEditor'
 import axios from 'axios'
-import Api from '../Api'
 import '../EditorHelpers/EditorHelper.scss'
 
 class Start extends Component {
   static contextType = SocketContext
   static propTypes = {
-    enqueueSnackbar: PropTypes.func,
-    closeSnackbar: PropTypes.func,
+    api: PropTypes.object.isRequired,
     match: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired
   }
@@ -52,15 +50,16 @@ class Start extends Component {
   }
 
   getScriptNameFromProject = (id) => {
-    axios.get(Api.getApiUrl('getProject'), { params: { id }, withCredentials: true })
+    const { api, history } = this.props
+    axios.get(api.getApiUrl('getProject'), { params: { id }, withCredentials: true })
       .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
-          const { script, scriptOptions } = res.data.data
+        if (api.axiosCheckResponse(res)) {
+          const { script: scriptName, scriptOptions } = res.data.data
           this.scriptOptionsDefaults = scriptOptions
-          this.setState({ scriptName: script, scriptOptions, loading: false })
+          this.setState({ scriptName, scriptOptions, loading: false })
         }
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar, this.props.history))
+      .catch(api.axiosErrorHandler(true, history))
   }
 
   onScriptPreferenceUpdate = (newState) => {
@@ -74,7 +73,7 @@ class Start extends Component {
     })
   }
 
-  processErrorHandler = Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)
+  processErrorHandler = this.props.api.axiosErrorHandler(true)
   processSuccessHandler = (id) => this.props.history.push(`/p/${encodeURIComponent(id)}`)
 
   render () {
@@ -141,4 +140,4 @@ class Start extends Component {
   }
 }
 
-export default withSnackbar(Start)
+export default withApi(Start)

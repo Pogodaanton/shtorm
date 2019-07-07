@@ -1,12 +1,11 @@
 import React, { Component, Fragment } from 'react'
 import { Route } from 'react-router-dom'
 import { Paper, Typography, Divider } from '@material-ui/core'
-import { withSnackbar } from 'notistack'
 import DefaultGridItem from '../DefaultGridItem/index'
 import Fullscreen from '../Spinners/Fullscreen'
 import { UserContext } from '../../contexts/UserContext'
 import Loader from '../Loader'
-import Api from '../Api'
+import { withApi } from '../Api'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { NoProjects, NoProjectsCreatePrompt } from './NoProjects'
@@ -27,8 +26,7 @@ class Home extends Component {
   static contextType = UserContext
   static propTypes = {
     location: PropTypes.object.isRequired,
-    enqueueSnackbar: PropTypes.func.isRequired,
-    closeSnackbar: PropTypes.func.isRequired
+    api: PropTypes.object.isRequired
   }
 
   state = {
@@ -47,16 +45,16 @@ class Home extends Component {
   }
 
   updateProjectList = () => {
-    axios.get(Api.getApiUrl('getAllProjects'), { withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getAllProjects'), { withCredentials: true })
       .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
+        if (this.props.api.axiosCheckResponse(res)) {
           const { projects, scripts } = res.data.data
           this.setState({ projects, scripts, loading: false })
         }
       })
       .catch((err) => {
         this.setState({ loading: false })
-        Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar)(err)
+        this.props.api.axiosErrorHandler(false)(err)
       })
   }
 
@@ -110,4 +108,4 @@ class Home extends Component {
   }
 }
 
-export default withSnackbar(Home)
+export default withApi(Home)

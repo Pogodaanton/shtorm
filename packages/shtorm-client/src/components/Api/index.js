@@ -1,14 +1,23 @@
-import React from 'react'
-import config from '../../config.json'
+import React, { Component } from 'react'
 import { Button } from '@material-ui/core'
+import { ConfigContext } from '../../contexts/ConfigContext'
+import { withSnackbar } from 'notistack'
+import PropTypes from 'prop-types'
 
-class Api {
-  axiosCheckResponse (res) {
+class Api extends Component {
+  static contextType = ConfigContext
+  static propTypes = {
+    children: PropTypes.func.isRequired,
+    enqueueSnackbar: PropTypes.func.isRequired,
+    closeSnackbar: PropTypes.func.isRequired
+  }
+
+  axiosCheckResponse = (res) => {
     if (typeof res !== 'undefined' && typeof res.data !== 'undefined' && typeof res.data.data !== 'undefined') return true
     return false
   }
 
-  axiosErrorHandler (err, enqueueSnackbar, closeSnackbar, history, fallbackPath) {
+  baseAxiosErrorHandler = (err = new Error('An unexpected error happened!'), isSnackbarDismissable, history, fallbackPath) => {
     let errMsg = err.toString()
     let isAuthError = false
     if (typeof err.response !== 'undefined' && typeof err.response.data !== 'undefined') {
@@ -20,9 +29,9 @@ class Api {
     }
 
     console.log(errMsg)
+    const { enqueueSnackbar, closeSnackbar } = this.props
 
     if (typeof enqueueSnackbar === 'function') {
-      const isSnackbarDismissable = (typeof closeSnackbar === 'function')
       enqueueSnackbar(errMsg, {
         variant: 'error',
         autoHideDuration: isSnackbarDismissable ? 20000 : 6000,
@@ -31,7 +40,7 @@ class Api {
             variant='outlined'
             onClick={() => { closeSnackbar(key) }}
           >
-              Dismiss
+            Dismiss
           </Button>
         ) : null
       })
@@ -43,11 +52,41 @@ class Api {
     }
   }
 
-  axiosErrorHandlerNotify = (enqueueSnackbar, closeSnackbar, history, fallbackPath) => (err) => this.axiosErrorHandler(err, enqueueSnackbar, closeSnackbar, history, fallbackPath)
+  axiosErrorHandler = (isSnackbarDismissable = false, history = {}, fallbackPath = '/') => (err) => this.axiosErrorHandler(err, isSnackbarDismissable, history, fallbackPath)
 
-  getApiUrl (controller) {
-    return `${config.prefix}${config.socketAdress}${config.apiAdress}${controller}`
+  getApiUrl = (controller) => {
+    return `${this.context.prefix}${this.context.socketAdress}${this.context.apiAdress}${controller}`
+  }
+
+  render () {
+    const {
+      axiosCheckResponse,
+      axiosErrorHandler,
+      getApiUrl
+    } = this
+
+    return this.props.children({
+      axiosCheckResponse,
+      axiosErrorHandler,
+      getApiUrl
+    })
   }
 }
 
-export default new Api()
+const ApiWithSnackbar = withSnackbar(Api)
+export default ApiWithSnackbar
+
+export const withApi = (Component) => {
+  return function ConnectedComponent (props) {
+    return (
+      <ApiWithSnackbar>
+        {(Api) => (
+          <Component
+            {...props}
+            api={Api}
+          />
+        )}
+      </ApiWithSnackbar>
+    )
+  }
+}

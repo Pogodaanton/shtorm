@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const NODEMODULES_DIR = path.resolve(__dirname, '../node_modules')
 const MONACO_DIR = path.resolve(__dirname, '../node_modules/monaco-editor')
+const clientConfigPathRelative = '../src/config.json'
 
 var config = {
   stats: 'errors-only',
@@ -47,6 +48,19 @@ var config = {
             }
           }
         ]
+      },
+      {
+        type: 'javascript/auto',
+        test: /\.json$/,
+        exclude: NODEMODULES_DIR,
+        use: [
+          {
+            loader: 'file-loader?name=[name].json',
+            options: {
+              outputPath: 'assets'
+            }
+          }
+        ]
       }
     ]
   },
@@ -77,7 +91,7 @@ var devConfig = {
 module.exports = (env, argv) => {
   var cfg = config
   const isDevServer = process.argv.some(s => s.match(/webpack-dev-server$/))
-  const clientCfgPath = path.join(__dirname, '../src/config.json')
+  const clientCfgPath = path.join(__dirname, clientConfigPathRelative)
 
   if (!fs.existsSync(clientCfgPath)) {
     console.error('You need to create a config.json in "packages/shtorm-client/src" first! There is an example file called config.example.json in that directory which you can modify and save as config.json.')

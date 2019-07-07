@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { TextValidator } from 'react-material-ui-form-validator'
-import { withSnackbar } from 'notistack'
+import { withApi } from '../Api'
 import axios from 'axios'
-import Api from '../Api'
 
 class ScriptOptionEditor extends Component {
   static propTypes = {
@@ -11,8 +10,7 @@ class ScriptOptionEditor extends Component {
     scriptName: PropTypes.string.isRequired,
     onEmptyScriptOptions: PropTypes.func,
     onValuesUpdate: PropTypes.func.isRequired,
-    enqueueSnackbar: PropTypes.func.isRequired,
-    closeSnackbar: PropTypes.func.isRequired,
+    api: PropTypes.object.isRequired,
     disabled: PropTypes.bool
   }
 
@@ -21,9 +19,9 @@ class ScriptOptionEditor extends Component {
   componentDidMount = () => this.getScriptOptions()
 
   getScriptOptions = () => {
-    axios.get(Api.getApiUrl('getScriptOptions'), { params: { script: this.props.scriptName }, withCredentials: true })
+    axios.get(this.props.api.getApiUrl('getScriptOptions'), { params: { script: this.props.scriptName }, withCredentials: true })
       .then((res) => {
-        if (Api.axiosCheckResponse(res)) {
+        if (this.props.api.axiosCheckResponse(res)) {
           let scriptOptions = res.data.data
 
           if (typeof this.props.onEmptyScriptOptions === 'function') {
@@ -40,7 +38,7 @@ class ScriptOptionEditor extends Component {
           }, () => this.props.onValuesUpdate(scriptOptionValues))
         }
       })
-      .catch(Api.axiosErrorHandlerNotify(this.props.enqueueSnackbar, this.props.closeSnackbar))
+      .catch(this.props.api.axiosErrorHandler(true))
   }
 
   onInputChange = (name) => ({ target }) => {
@@ -93,4 +91,4 @@ class ScriptOptionEditor extends Component {
   }
 }
 
-export default withSnackbar(ScriptOptionEditor)
+export default withApi(ScriptOptionEditor)

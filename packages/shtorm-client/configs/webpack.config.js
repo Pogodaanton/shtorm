@@ -44,7 +44,8 @@ var config = {
           {
             loader: 'file-loader',
             options: {
-              outputPath: 'assets'
+              outputPath: 'assets',
+              name: '[name].[hash].[ext]'
             }
           }
         ]
@@ -55,9 +56,10 @@ var config = {
         exclude: NODEMODULES_DIR,
         use: [
           {
-            loader: 'file-loader?name=[name].json',
+            loader: 'file-loader',
             options: {
-              outputPath: 'assets'
+              outputPath: 'assets',
+              name: '[name].[hash].[ext]'
             }
           }
         ]

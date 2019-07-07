@@ -340,7 +340,7 @@ class BotConfigEditor extends Component {
                 variant='outlined'
                 label='Parallel execution limit'
                 type='number'
-                helperText='How many API requests can be run in parallel (defaults to 3)'
+                helperText='Amount of API requests to run in parallel (defaults to 3)'
                 value={concurrency}
                 disabled={loading}
                 fullWidth

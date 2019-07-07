@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { List, ListItem, ListItemIcon, ListItemText, Divider, CircularProgress } from '@material-ui/core'
-import { Add, Dns } from '@material-ui/icons'
+import { Add } from '@material-ui/icons'
 import ActivatingListItem from '../ActivatingListItem'
 import PropTypes from 'prop-types'
 
@@ -28,12 +28,22 @@ export default class BotConfigList extends Component {
             <ListItemIcon><CircularProgress size={22} /></ListItemIcon>
             <ListItemText primary={'Requesting Configs...'} />
           </ListItem>
-        ) : list.map(({ name, id }, i) => (
+        ) : list.map(({ name, id, favicon }, i) => (
           <ActivatingListItem
             key={name}
             to={`/configs/${id}`}
           >
-            <ListItemIcon><Dns /></ListItemIcon>
+            <ListItemIcon>
+              <img
+                src={favicon}
+                alt={`Icon for project ${name}`}
+                width={20}
+                height={20}
+                style={{
+                  marginLeft: 3
+                }}
+              />
+            </ListItemIcon>
             <ListItemText
               primary={name}
             />

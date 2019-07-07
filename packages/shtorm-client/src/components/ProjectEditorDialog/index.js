@@ -143,7 +143,7 @@ class ProjectDialog extends Component {
   onEmptyScriptOptions = (value = false) => {
     const { skippedSteps } = this.state
     skippedSteps[1] = value
-    this.setState(skippedSteps)
+    this.setState(skippedSteps, value ? this.triggerNext : () => null)
   }
 
   onFormValidate = (e) => {

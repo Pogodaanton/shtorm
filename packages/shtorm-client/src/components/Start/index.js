@@ -67,6 +67,7 @@ class Start extends Component {
   }
 
   onSubmit = (defaults = false) => () => {
+    this.setState({ loading: true })
     this.context.socket.emit('process.start', {
       id: this.props.match.params.id,
       scriptOptions: defaults ? this.scriptOptionsDefaults : this.state.scriptOptions

@@ -89,7 +89,7 @@ export default class index extends Component {
       >
         <div
           className={`terminal-item terminal-item-${type.toLowerCase()}`}
-          key={timestamp}
+          key={key}
           style={style}
         >
           [{type}] {new Date(timestamp).toLocaleTimeString()} - {this.messageRenderer(msg)}

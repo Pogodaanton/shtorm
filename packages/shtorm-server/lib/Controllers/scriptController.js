@@ -64,10 +64,10 @@ class Script {
   exitHandler = () => {
     this.unsetClient()
     this.childProcess.kill()
-    console.log('----------------------')
-    console.log('==> Process killed')
-    console.log('==> Logging finished')
-    console.log('----------------------')
+    this.emitConsole('DEBUG')('-------------------------------')
+    console.log(`==> Process ${this.projectId} killed`)
+    this.emitConsole('DEBUG')('==> Logging halted')
+    this.emitConsole('DEBUG')('-------------------------------')
     scriptController.handleStop(this, this.client)
   }
 

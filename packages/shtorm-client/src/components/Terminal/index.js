@@ -56,13 +56,6 @@ class Terminal extends Component {
     const { msg: message } = obj
 
     if (typeof message !== 'undefined') {
-      console.log({
-        type: typeof message,
-        str: typeof message === 'string' ? message.trim().replace(/\r?\n|\r/g, '') : message,
-        has: jsonChecker.hasJsonStructure(message),
-        res: jsonChecker.safeJsonParse(message)
-      })
-
       if (jsonChecker.hasJsonStructure(message)) {
         const [err, parsedObject] = jsonChecker.safeJsonParse(message)
         if (!err) {

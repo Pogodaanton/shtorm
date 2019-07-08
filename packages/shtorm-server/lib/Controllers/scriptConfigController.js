@@ -56,8 +56,8 @@ class ScriptConfigController {
     const scriptPath = path.join(this.scriptsDirectory, `./${scriptName}`)
     const vm = new VM()
 
-    const code = vm.transformFileSync(scriptPath)
-    const { scriptOptions } = vm.getVm().run(code, scriptPath)
+    const code = vm.transformFileSync(scriptName)
+    const { scriptOptions } = vm.getVM().run(code, scriptPath)
 
     if (typeof scriptOptions !== 'object') return []
     return this.makeUnique(scriptOptions, 'name')

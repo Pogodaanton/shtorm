@@ -4,30 +4,29 @@ import path from 'path'
 import fs from 'fs'
 import { transformSync } from '@babel/core'
 
-const { scriptsDirectory } = configChecker(false)
-
 export default class CustomVm {
-  constructor (customOptions) {
+  constructor (customOptions, customScriptsDirectory = configChecker().scriptsDirectory) {
+    this.scriptsDirectory = customScriptsDirectory
     this.vm = new NodeVM({
       console: 'inherit',
-      sandbox: { exports: {} },
       require: {
         external: { transitive: true },
         context: 'sandbox',
-        root: scriptsDirectory,
+        root: this.scriptsDirectory,
         resolve: (moduleName, parentDirname) => {
           console.log({ moduleName, parentDirname })
-          return path.join(scriptsDirectory, './node_modules/', moduleName)
+          return path.join(this.scriptsDirectory, './node_modules/', moduleName)
         }
       },
       ...customOptions
     })
   }
 
-  getVm = () => this.vm
+  getVM = () => this.vm
+  getScriptPath = (fileName) => path.join(this.scriptsDirectory, fileName)
 
-  transformFileSync = (filePath) => {
-    const fileData = fs.readFileSync(filePath)
+  transformFileSync = (fileName) => {
+    const fileData = fs.readFileSync(this.getScriptPath(fileName))
     const transformedData = transformSync(fileData, { filename: 'executeScripts.js' })
 
     return transformedData.code

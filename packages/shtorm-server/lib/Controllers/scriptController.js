@@ -1,5 +1,6 @@
 import projectController from './projectController'
 import { permission } from './userController'
+import configChecker from '../configChecker'
 import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'
@@ -12,7 +13,7 @@ class Script {
     this.clientObj = null
     this.projectId = projectId
 
-    this.childProcess = cp.fork(path.join(__dirname, '../executeScript.js'), [scriptName], { stdio: 'pipe' })
+    this.childProcess = cp.fork(path.join(__dirname, '../executeScript.js'), [scriptName, configChecker().scriptsDirectory], { stdio: 'pipe' })
     this.childProcess.on('message', this.messageHandler)
     this.childProcess.on('exit', this.exitHandler)
     this.childProcess.stdout.on('data', this.emitConsole('DEBUG'))
@@ -23,6 +24,7 @@ class Script {
   }
 
   messageHandler = ({ type, data }) => {
+    console.log({ type, data })
     if (typeof type !== 'string') return
     switch (type) {
       case 'progress':

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Slide } from '@material-ui/core'
 import AcceptIcon from '@material-ui/icons/ThumbUp'
 import RejectIcon from '@material-ui/icons/ThumbDown'
@@ -7,12 +7,13 @@ import SubmitIcon from '@material-ui/icons/Send'
 import PropTypes from 'prop-types'
 import { Editor, EditorDiff } from './TaskDialogEditor'
 
-function SlideTransition (props) {
+const SlideTransition = React.forwardRef(function Transition (props, ref) {
   return <Slide
     direction='up'
+    ref={ref}
     {...props}
   />
-}
+})
 
 export default class TaskDialog extends Component {
   static propTypes = {
@@ -77,25 +78,27 @@ export default class TaskDialog extends Component {
           disableBackdropClick
           disableEscapeKeyDown
         >
-          <DialogTitle>Your script has something to say!</DialogTitle>
-          <DialogContent>
-            <DialogContentText>{dialog.msg}</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={this.rejectPromptDialog}
-              disabled={loading}
-            >
-            Cancel
-            </Button>
-            <Button
-              color='primary'
-              onClick={this.resolvePromptDialog}
-              disabled={loading}
-            >
-            OK
-            </Button>
-          </DialogActions>
+          <Fragment>
+            <DialogTitle>Your script has something to say!</DialogTitle>
+            <DialogContent>
+              <DialogContentText>{dialog.msg}</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={this.rejectPromptDialog}
+                disabled={loading}
+              >
+              Cancel
+              </Button>
+              <Button
+                color='primary'
+                onClick={this.resolvePromptDialog}
+                disabled={loading}
+              >
+              OK
+              </Button>
+            </DialogActions>
+          </Fragment>
         </Dialog>
       )
     }
@@ -109,42 +112,44 @@ export default class TaskDialog extends Component {
           disableBackdropClick
           disableEscapeKeyDown
         >
-          <DialogTitle>Check your changes!</DialogTitle>
-          <DialogContent>
-            <EditorDiff
-              language={dialog.language || 'xml'}
-              code={dialog.code}
-              diffCode={dialog.diffCode}
-              onChange={this.handleMonacoChange}
-            />
-          </DialogContent>
-          <DialogActions className='task-dialog-actions'>
-            <Button
-              onClick={handleHide}
-              disabled={loading}
-            >
-              <MinimizeIcon />
-              Hide Dialog
-            </Button>
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.rejectDiffDialog}
-              disabled={loading}
-            >
-              <RejectIcon />
-              Reject Changes
-            </Button>
-            <Button
-              color='secondary'
-              variant='contained'
-              onClick={this.resolveMonacoDialog}
-              disabled={loading}
-            >
-              <AcceptIcon />
-              Accept Changes
-            </Button>
-          </DialogActions>
+          <Fragment>
+            <DialogTitle>Check your changes!</DialogTitle>
+            <DialogContent>
+              <EditorDiff
+                language={dialog.language || 'xml'}
+                code={dialog.code}
+                diffCode={dialog.diffCode}
+                onChange={this.handleMonacoChange}
+              />
+            </DialogContent>
+            <DialogActions className='task-dialog-actions'>
+              <Button
+                onClick={handleHide}
+                disabled={loading}
+              >
+                <MinimizeIcon />
+                Hide Dialog
+              </Button>
+              <Button
+                color='primary'
+                variant='outlined'
+                onClick={this.rejectDiffDialog}
+                disabled={loading}
+              >
+                <RejectIcon />
+                Reject Changes
+              </Button>
+              <Button
+                color='secondary'
+                variant='contained'
+                onClick={this.resolveMonacoDialog}
+                disabled={loading}
+              >
+                <AcceptIcon />
+                Accept Changes
+              </Button>
+            </DialogActions>
+          </Fragment>
         </Dialog>
       )
     }
@@ -158,32 +163,34 @@ export default class TaskDialog extends Component {
           disableBackdropClick
           disableEscapeKeyDown
         >
-          <DialogTitle>{dialog.msg}</DialogTitle>
-          <DialogContent>
-            <Editor
-              language={dialog.language || 'xml'}
-              code={dialog.code}
-              onChange={this.handleMonacoChange}
-            />
-          </DialogContent>
-          <DialogActions className='task-dialog-actions'>
-            <Button
-              onClick={handleHide}
-              disabled={loading}
-            >
-              <MinimizeIcon />
-              Hide Dialog
-            </Button>
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.resolveMonacoDialog}
-              disabled={loading}
-            >
-              <SubmitIcon />
-              Submit
-            </Button>
-          </DialogActions>
+          <Fragment>
+            <DialogTitle>{dialog.msg}</DialogTitle>
+            <DialogContent>
+              <Editor
+                language={dialog.language || 'xml'}
+                code={dialog.code}
+                onChange={this.handleMonacoChange}
+              />
+            </DialogContent>
+            <DialogActions className='task-dialog-actions'>
+              <Button
+                onClick={handleHide}
+                disabled={loading}
+              >
+                <MinimizeIcon />
+                Hide Dialog
+              </Button>
+              <Button
+                color='primary'
+                variant='outlined'
+                onClick={this.resolveMonacoDialog}
+                disabled={loading}
+              >
+                <SubmitIcon />
+                Submit
+              </Button>
+            </DialogActions>
+          </Fragment>
         </Dialog>
       )
     }

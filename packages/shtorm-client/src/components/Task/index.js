@@ -28,28 +28,28 @@ export default class Start extends Component {
   }
 
   componentWillUnmount = () => {
-    this.context.socket.off('task.request.success', this.handleSuccess)
-    this.context.socket.off('task.request.error', this.handleError)
-    this.context.socket.off('task.killed', this.handleKilled)
+    this.context.socket.off('process.request.success', this.handleSuccess)
+    this.context.socket.off('process.request.error', this.handleError)
+    this.context.socket.off('process.killed', this.handleKilled)
     this.context.socket.off('script.progress', this.updateProgress)
     this.context.socket.off('client.disconnect', this.handleDisconnect)
   }
 
   componentDidMount = () => {
     this.uuid = decodeURIComponent(this.props.match.params.uuid)
-    this.context.socket.on('task.request.success', this.handleSuccess)
-    this.context.socket.on('task.request.error', this.handleError)
-    this.context.socket.on('task.killed', this.handleKilled)
+    this.context.socket.on('process.request.success', this.handleSuccess)
+    this.context.socket.on('process.request.error', this.handleError)
+    this.context.socket.on('process.killed', this.handleKilled)
     this.context.socket.on('script.progress', this.updateProgress)
     this.context.socket.on('client.disconnect', this.handleDisconnect)
 
-    this.context.socket.emit('task.request', this.uuid)
+    this.context.socket.emit('process.request', this.uuid)
   }
 
   handleSuccess = () => this.setState({ connecting: false, error: null })
   handleError = (error) => this.setState({ error })
   updateProgress = ({ progress, progressText, finished, dialog }) => this.setState({ progress, progressText, finished, dialog })
-  handleDisconnect = () => this.setState({ error: 'You have been disconnected from the task socket, as a new client connected to it.' })
+  handleDisconnect = () => this.setState({ error: 'You have been disconnected from the bot process, as a new client connected to it.' })
   handleKilled = () => !this.state.finished && this.setState({ error: 'You have been disconnected from the process socket, as it was killed.' })
 
   handleDialogClose = () => this.setState({ dialog: {}, dialogOpen: true })

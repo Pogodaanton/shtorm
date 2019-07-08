@@ -9,6 +9,7 @@ import DefaultGridItem from '../DefaultGridItem/index'
 import TerminalWindow from '../TerminalWindow'
 import DefaultGridContainer from '../DefaultGridContainer/index'
 import { SocketContext } from '../../contexts/SocketContext'
+import jsonChecker from './jsonChecker'
 import './Terminal.scss'
 
 let minTerminalHeight = 53
@@ -18,7 +19,7 @@ class Terminal extends Component {
   }
 
   headerRef = createRef()
-  lastTerminalHeight: 300
+  lastTerminalHeight = 300
   state = {
     isOpened: false,
     terminalLines: [],
@@ -29,10 +30,10 @@ class Terminal extends Component {
   forceUpdateTerminalWindow = () => null
 
   componentDidMount = () => {
-    this.props.socket.on('connect', (a) => this.addLine({ msg: `Connected to socket.` }))
-    this.props.socket.on('disconnect', (a) => this.addLine({ msg: `Disconnected from socket.` }))
-    this.props.socket.on('log_lifeline', (msg) => this.addLine({ msg }))
-    this.props.socket.on('log_message', this.addLine)
+    this.props.socket.on('connect', this.addConnectedLine)
+    this.props.socket.on('disconnect', this.addDisconnectedLine)
+    this.props.socket.on('log_lifeline', this.addLine)
+    this.props.socket.on('log_message', this.checkForNewLines)
     this.props.socket.emit('lifeline.ping')
 
     document.addEventListener('mousedown', this.onHandleMouseDown)
@@ -40,18 +41,57 @@ class Terminal extends Component {
   }
 
   componentWillUnmount = () => {
-    this.addLine({ msg: 'Terminal connection closed!' })
+    this.props.socket.off('connect', this.addConnectedLine)
+    this.props.socket.off('disconnect', this.addDisconnectedLine)
+    this.props.socket.off('log_lifeline', this.addLine)
+    this.props.socket.off('log_message', this.checkForNewLines)
+
     document.removeEventListener('mousedown', this.onHandleMouseDown)
     document.removeEventListener('mouseup', this.onHandleMouseUp)
   }
 
   getCurrentTimestamp = () => new Date().getTime()
 
+  checkForNewLines = (obj = {}) => {
+    const { msg: message } = obj
+
+    if (typeof message !== 'undefined') {
+      console.log({
+        type: typeof message,
+        str: typeof message === 'string' ? message.trim().replace(/\r?\n|\r/g, '') : message,
+        has: jsonChecker.hasJsonStructure(message),
+        res: jsonChecker.safeJsonParse(message)
+      })
+
+      if (jsonChecker.hasJsonStructure(message)) {
+        const [err, parsedObject] = jsonChecker.safeJsonParse(message)
+        if (!err) {
+          obj.msg = parsedObject
+          this.addLine(obj)
+          return
+        }
+      }
+
+      const splitMessages = message
+        .split('\n')
+        .filter((msg) => msg.trim() !== '')
+        .map((msg) => { return { ...obj, msg } })
+
+      splitMessages.forEach((msgObj) => this.addLine(msgObj))
+      return
+    }
+
+    this.addLine(obj)
+  }
+
   addLine = ({ msg = 'N/A', type = 'CLIENT', timestamp = this.getCurrentTimestamp(), key = timestamp }) => {
     const { terminalLines } = this.state
     terminalLines.push({ msg, type, timestamp, key })
     this.setState({ terminalLines })
   }
+
+  addConnectedLine = () => this.addLine({ msg: `Connected to socket.` })
+  addDisconnectedLine = () => this.addLine({ msg: `Disconnected to socket.` })
 
   emptyList = () => {
     const timestamp = this.getCurrentTimestamp()
@@ -62,7 +102,7 @@ class Terminal extends Component {
         key: timestamp,
         timestamp
       }]
-    }, () => this.forceUpdateTerminalWindow())
+    }, this.forceUpdateTerminalWindow)
   }
 
   toggleTerminal = () => {
@@ -117,6 +157,7 @@ class Terminal extends Component {
 
   onForceUpdateRef = (r = () => null) => {
     this.forceUpdateTerminalWindow = r
+    this.forceUpdateTerminalWindow()
   }
 
   render () {

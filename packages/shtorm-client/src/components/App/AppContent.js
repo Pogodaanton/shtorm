@@ -33,7 +33,7 @@ const AppContent = () => (
                 <div className='content'>
                   <Switch>
                     <Route
-                      path='/p'
+                      path='/p/'
                       component={Terminal}
                     />
                     <Route

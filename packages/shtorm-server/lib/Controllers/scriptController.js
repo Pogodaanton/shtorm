@@ -38,26 +38,42 @@ class Script {
 
   emitProgress = () => this.clientObj !== null && this.client.emit('script.progress', this.clientObj)
   dialogHandler = (isRejected) => (newText) => {
-    if (!this.childProcess.killed) this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
+    if (this.childProcess.connected) {
+      try {
+        this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
+      } catch (err) {
+        console.log('==> An error happened while trying to communicate with the bot process!')
+        console.log(err)
+        console.log('-----')
+      }
+    } else {
+      console.log('==> Unable to communicate with bot process, you might have lost connection to it.')
+    }
   }
 
-  emitConsole = (type) => (data) => this.client.emit('log_message', {
-    type,
-    key: shortid.generate(),
-    timestamp: new Date().getTime(),
-    msg: `${data}`
-  })
+  emitConsole = (type) => (data) => {
+    this.client.emit('log_message', {
+      type,
+      key: shortid.generate(),
+      timestamp: new Date().getTime(),
+      msg: data.toString('utf8')
+    })
+  }
 
   stop = () => this.childProcess.kill()
   exitHandler = () => {
     this.unsetClient()
-    console.log('Process killed.')
+    this.childProcess.kill()
+    console.log('----------------------')
+    console.log('==> Process killed')
+    console.log('==> Logging finished')
+    console.log('----------------------')
     scriptController.handleStop(this, this.client)
   }
 
   unsetClient = () => {
-    this.client.off('script.dialog.resolve', this.dialogHandler(false))
-    this.client.off('script.dialog.reject', this.dialogHandler(true))
+    this.client.removeAllListeners('script.dialog.resolve')
+    this.client.removeAllListeners('script.dialog.reject')
   }
 
   setClient = (client) => {

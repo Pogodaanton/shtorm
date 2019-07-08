@@ -22,5 +22,5 @@ export default (client, io) => {
   client.on('process.kill', (pid) => scriptController.killProcess(pid, client))
   client.on('processes.request', () => scriptController.getProcesses(client))
   client.on('process.request', (pid) => scriptController.setClientToProcess(pid, client))
-  client.on('lifeline.ping', () => client.emit('log_lifeline', 'Terminal connection established!'))
+  client.on('lifeline.ping', () => client.emit('log_lifeline', { msg: 'Terminal connection established!' }))
 }

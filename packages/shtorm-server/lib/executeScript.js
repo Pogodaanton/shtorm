@@ -127,6 +127,7 @@ const scriptExecutor = {
             progressText: (typeof finishedMessage === 'string' ? finishedMessage : 'Script executed successfully.'),
             dialog: {}
           })
+          process.exit()
         })
         .catch((err) => {
           scriptExecutor.errorExit('Failed to successfully execute the script.', err)

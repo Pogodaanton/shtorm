@@ -1,6 +1,7 @@
 import React, { Component, createRef } from 'react'
 import { AutoSizer, List, CellMeasurerCache, CellMeasurer } from 'react-virtualized'
 import PropTypes from 'prop-types'
+import ReactJson from 'react-json-view'
 import AnsiParser from './AnsiParser'
 import './TerminalWindow.scss'
 
@@ -12,7 +13,6 @@ const cache = new CellMeasurerCache({
 export default class index extends Component {
   static propTypes = {
     rows: PropTypes.array.isRequired,
-    disableTransition: PropTypes.bool,
     forceUpdateRef: PropTypes.func
   }
 
@@ -32,10 +32,6 @@ export default class index extends Component {
     }
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.disableTransition !== this.props.disableTransition) this.onWindowResize()
-  }
-
   componentDidMount = () => {
     window.addEventListener('resize', this.onWindowResize)
     if (typeof this.props.forceUpdateRef === 'function') this.props.forceUpdateRef(this.forceUpdate)
@@ -49,6 +45,29 @@ export default class index extends Component {
   onWindowResize = (e) => {
     if (this.resizeTimer) clearTimeout(this.resizeTimer)
     this.resizeTimer = setTimeout(this.forceUpdate, 200)
+  }
+
+  messageRenderer = (msg) => {
+    switch (typeof msg) {
+      case 'object':
+        return (
+          <div
+            onClick={() => setTimeout(this.forceUpdate, 10)}
+            style={{ display: 'inline-block' }}
+          >
+            <ReactJson
+              src={msg}
+              collapsed
+              iconStyle='triangle'
+              theme='monokai'
+              style={{ background: 'black' }}
+            />
+          </div>
+        )
+
+      default:
+        return <AnsiParser>{msg}</AnsiParser>
+    }
   }
 
   rowRenderer = ({
@@ -73,7 +92,7 @@ export default class index extends Component {
           key={timestamp}
           style={style}
         >
-          [{type}] {new Date(timestamp).toLocaleTimeString()} - <AnsiParser>{msg}</AnsiParser>
+          [{type}] {new Date(timestamp).toLocaleTimeString()} - {this.messageRenderer(msg)}
         </div>
       </CellMeasurer>
     )

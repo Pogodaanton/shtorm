@@ -24,7 +24,6 @@ class Script {
   }
 
   messageHandler = ({ type, data }) => {
-    console.log({ type, data })
     if (typeof type !== 'string') return
     switch (type) {
       case 'progress':

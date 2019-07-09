@@ -1205,6 +1205,13 @@ ansi-regex@^4.1.0:
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-4.1.0.tgz#8b9f8f08cf1acb843756a839ca8c7e3168c51997"
   integrity sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg==
 
+ansi-style-parser@^1.0.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-style-parser/-/ansi-style-parser-1.1.0.tgz#70d24afdc78937b54b3077cb95a4e63863802146"
+  integrity sha1-cNJK/ceJN7VLMHfLlaTmOGOAIUY=
+  dependencies:
+    ansi-regex "^2.0.0"
+
 ansi-styles@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-2.2.1.tgz#b432dd3358b634cf75e1e4664368240533c1ddbe"
@@ -3471,10 +3478,20 @@ gaze@^1.0.0:
   dependencies:
     globule "^1.0.0"
 
+gen-css-identifier@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/gen-css-identifier/-/gen-css-identifier-1.0.0.tgz#b448b5d7f949cde6bd93fbc8fc114dab4072a342"
+  integrity sha1-tEi11/lJzea9k/vI/BFNq0Byo0I=
+
 get-caller-file@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.3.tgz#f978fa4c90d1dfe7ff2d6beda2a515e713bdcf4a"
   integrity sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w==
+
+get-node-dimensions@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/get-node-dimensions/-/get-node-dimensions-1.2.1.tgz#fb7b4bb57060fb4247dd51c9d690dfbec56b0823"
+  integrity sha512-2MSPMu7S1iOTL+BOa6K1S62hB2zUAYNF/lV0gSVlOaacd087lc6nR1H1r0e3B1CerTo+RceOmi1iJW+vp21xcQ==
 
 get-stdin@^4.0.1:
   version "4.0.1"
@@ -3997,6 +4014,11 @@ inquirer@^6.2.2:
     strip-ansi "^5.0.0"
     through "^2.3.6"
 
+insert-css@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/insert-css/-/insert-css-0.2.0.tgz#d15789971662d9899c28977fb6220d5381d2451a"
+  integrity sha1-0VeJlxZi2YmcKJd/tiINU4HSRRo=
+
 internal-ip@^4.2.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/internal-ip/-/internal-ip-4.3.0.tgz#845452baad9d2ca3b69c635a137acb9a0dad0907"
@@ -4311,6 +4333,14 @@ js-levenshtein@^1.1.3:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
   integrity sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==
+
+js-managed-css@^1.4.1:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/js-managed-css/-/js-managed-css-1.4.2.tgz#5e0b3222a1b9a264b604976782b85bbf15bfe96e"
+  integrity sha1-XgsyIqG5omS2BJdngrhbvxW/6W4=
+  dependencies:
+    gen-css-identifier "^1.0.0"
+    insert-css "^0.2.0"
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -5969,6 +5999,14 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-ansi-style@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-ansi-style/-/react-ansi-style-1.0.0.tgz#9b1d4c8eedfc56f4dcf359a3962184658c3e8c09"
+  integrity sha1-mx1Mju38VvTc81mjliGEZYw+jAk=
+  dependencies:
+    ansi-style-parser "^1.0.1"
+    js-managed-css "^1.4.1"
+
 react-base16-styling@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/react-base16-styling/-/react-base16-styling-0.6.0.tgz#ef2156d66cf4139695c8a167886cb69ea660792c"
@@ -6039,6 +6077,16 @@ react-material-ui-form-validator@^2.0.7:
   integrity sha512-gUlLgK0j3D7/zNKd3gH1EUYqMbplHxtATeaOyp5s2xHHmSBisiOd/RZygStv2/ClWvGtdXNix0/pnYhMyWrFAw==
   dependencies:
     react-form-validator-core "0.6.2"
+
+react-measure@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/react-measure/-/react-measure-2.3.0.tgz#75835d39abec9ae13517f35a819c160997a7a44e"
+  integrity sha512-dwAvmiOeblj5Dvpnk8Jm7Q8B4THF/f1l1HtKVi0XDecsG6LXwGvzV5R1H32kq3TW6RW64OAf5aoQxpIgLa4z8A==
+  dependencies:
+    "@babel/runtime" "^7.2.0"
+    get-node-dimensions "^1.2.1"
+    prop-types "^15.6.2"
+    resize-observer-polyfill "^1.5.0"
 
 react-monaco-editor@^0.25.1:
   version "0.25.1"
@@ -6348,6 +6396,11 @@ requires-port@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
+
+resize-observer-polyfill@^1.5.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
+  integrity sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==
 
 resolve-cwd@^2.0.0:
   version "2.0.0"

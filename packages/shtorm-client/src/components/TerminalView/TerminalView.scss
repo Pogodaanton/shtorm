@@ -1,0 +1,41 @@
+.terminal-window {
+  display: flex;
+  flex-direction: column;
+  background: black;
+  height: 100%;
+  font-family: "Lucida Console", Monaco, monospace;
+  width: 100%;
+
+  .terminal-item {
+    font-size: 15px;
+    padding: 5px 15px;
+    display: flex;
+
+    > span {
+      display: inline-block;
+
+      &.terminal-item-info {
+        flex-shrink: 0;
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+@each $suggestedColor in black, red, yellow, blue, magenta, cyan, white, gray {
+  .react-ansi-style-#{$suggestedColor} {
+    color: $suggestedColor;
+  }
+}
+
+@each $suggestedColor in Black, Red, Yellow, Blue, Magenta, Cyan, White, Gray {
+  .react-ansi-style-bg#{$suggestedColor} {
+    background-color: #{$suggestedColor};
+  }
+}
+
+.react-ansi-style-green { color: #00b100; }
+.react-ansi-style-bgGreen { background-color: #00b100; }
+
+.react-ansi-style-blue { color: #6f6fff; }
+.react-ansi-style-bgBlue { background-color: #6f6fff; }

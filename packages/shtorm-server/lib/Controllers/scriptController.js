@@ -5,6 +5,17 @@ import shortid from 'shortid'
 import cp from 'child_process'
 import path from 'path'
 
+/**
+ * Parses Buffers to a string or to a valid JSON-Object if possible
+ * @param {Buffer} data Buffer encoded in utf8 (default for console buffers)
+ * @returns {object|string} Formatted output
+ */
+/*
+function parseConsoleLog (data = new Buffer('N/A')) {
+  const msg = data.toString('utf8')
+}
+*/
+
 class Script {
   constructor (client, config, scriptName, scriptOptions = {}, projectId = '') {
     this.config = config
@@ -16,8 +27,8 @@ class Script {
     this.childProcess = cp.fork(path.join(__dirname, '../executeScript.js'), [scriptName, configChecker().scriptsDirectory], { stdio: 'pipe' })
     this.childProcess.on('message', this.messageHandler)
     this.childProcess.on('exit', this.exitHandler)
-    this.childProcess.stdout.on('data', this.emitConsole('DEBUG'))
-    this.childProcess.stderr.on('data', this.emitConsole('ERROR'))
+    this.childProcess.stdout.on('data', this.handleConsoleBuffer('DEBUG'))
+    this.childProcess.stderr.on('data', this.handleConsoleBuffer('ERROR'))
 
     this.setClient(client)
     this.childProcess.send({ type: 'options', data: { config, scriptOptions } })
@@ -27,8 +38,17 @@ class Script {
     if (typeof type !== 'string') return
     switch (type) {
       case 'progress':
-        this.clientObj = data
+        this.clientObj = { ...this.clientObj, ...data }
         this.emitProgress()
+        break
+      case 'consoleObject':
+        if (
+          typeof data === 'object' &&
+          typeof data.prefix === 'string' &&
+          typeof data.obj === 'object'
+        ) {
+          this.emitConsole(data.prefix)(data.obj)
+        }
         break
 
       default:
@@ -42,21 +62,33 @@ class Script {
       try {
         this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
       } catch (err) {
-        console.log('==> An error happened while trying to communicate with the bot process!')
-        console.log(err)
-        console.log('-----')
+        this.emitConsole('ERROR')('==> An error happened while trying to communicate with the bot process!')
+        this.emitConsole('ERROR')(err.toString())
+        this.emitConsole('ERROR')('-----')
       }
     } else {
-      console.log('==> Unable to communicate with bot process, you might have lost connection to it.')
+      this.emitConsole('ERROR')('==> Unable to communicate with bot process, you might have lost connection to it.')
     }
   }
 
-  emitConsole = (type) => (data) => {
+  /**
+   * Processes console buffer and splits it at each newline
+   */
+  handleConsoleBuffer = (prefix) => (data) => {
+    const message = data.toString('utf8')
+    const splitMessages = message
+      .split('\n')
+      .filter((msg) => msg.trim() !== '')
+
+    splitMessages.forEach((msg) => this.emitConsole(prefix)(msg))
+  }
+
+  emitConsole = (prefix = 'DEBUG') => (msg) => {
     this.client.emit('log_message', {
-      type,
+      prefix,
       key: shortid.generate(),
       timestamp: new Date().getTime(),
-      msg: data.toString('utf8')
+      msg
     })
   }
 

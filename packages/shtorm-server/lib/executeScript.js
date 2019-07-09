@@ -11,6 +11,31 @@ const clientObj = {
   dialog: {}
 }
 
+/*
+ * Adding object detection logic to console
+ * Then raw objects can be sent to the client
+ */
+const { log: oldConsoleLog, error: oldConsoleError } = console
+const logInjector = (prefix, oldFunction) => (...args) => {
+  args.forEach((arg) => {
+    if (typeof arg === 'object') {
+      process.send({
+        type: 'consoleObject',
+        data: {
+          prefix,
+          obj: arg
+        }
+      })
+      return
+    }
+
+    oldFunction(arg)
+  })
+}
+
+console.log = logInjector('DEBUG', oldConsoleLog)
+console.error = logInjector('ERROR', oldConsoleError)
+
 const scriptRelays = {
   updateClient: (updateObj) => {
     if (typeof updateObj !== 'object') {

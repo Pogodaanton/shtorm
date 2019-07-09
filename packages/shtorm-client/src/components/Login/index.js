@@ -33,7 +33,6 @@ class Login extends Component {
         this.props.updateCurrentUser()
       })
       .catch((err) => {
-        console.log(err.res)
         this.setState({ loading: false })
         this.props.api.axiosErrorHandler()(err)
       })

@@ -112,7 +112,7 @@ export default class ProcessExplorer extends PureComponent {
             ))}
           </List>
         ) : (
-          <Typography variant='subtitle1'>Requesting running processes...</Typography>
+          <Typography variant='caption'>Requesting running processes...</Typography>
         )}
       </Popover>
     )

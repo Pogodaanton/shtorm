@@ -333,7 +333,7 @@ class UserController {
     }
 
     if (!user) {
-      return res.status(402).send({
+      return res.status(401).send({
         success: false,
         message: info.message || 'Invalid credentials.'
       })

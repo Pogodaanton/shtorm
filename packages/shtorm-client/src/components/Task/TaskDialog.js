@@ -36,6 +36,7 @@ export default class TaskDialog extends Component {
       else if (dialog.type === 'prompt' && typeof dialog.msg !== 'string') this.rejectWithError(new Error('The dialog type "prompt" needs the key "msg" of type "String".'))
       else if (dialog.type === 'diff' && (typeof dialog.code !== 'string' || typeof dialog.diffCode !== 'string')) this.rejectWithError(new Error('The dialog type "diff" needs the keys "code" and "diffCode", both are of type "String".'))
       else if (dialog.type === 'code' && (typeof dialog.code !== 'string' || typeof dialog.msg !== 'string')) this.rejectWithError(new Error('The dialog type "code" needs the keys "code" and "msg", both are of type "String".'))
+      if (typeof dialog.code === 'string' && dialog.code !== prevProps.dialog.code) this.code = dialog.code
     }
   }
 

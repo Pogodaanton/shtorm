@@ -4,6 +4,8 @@ import NodeMW from 'nodemw'
 import promise from 'bluebird'
 
 var scriptDialogResolveFunction = null
+var scriptDialogRejectFunction = null
+
 const clientObj = {
   finished: false,
   progress: 0,
@@ -50,6 +52,7 @@ const scriptRelays = {
       return new Promise((resolve, reject) => {
         clientObj.dialog = dialog
         scriptDialogResolveFunction = resolve
+        scriptDialogRejectFunction = reject
         scriptRelays.emitProgress()
       })
     }
@@ -75,14 +78,19 @@ const scriptRelays = {
         break
 
       case 'dialog':
+        const { data: res, isRejected } = data
         const resolve = scriptDialogResolveFunction
+        const reject = scriptDialogRejectFunction
 
-        if (typeof resolve === 'function') {
-          resolve(data)
-
-          clientObj.dialog = {}
-          scriptDialogResolveFunction = null
+        if (isRejected && typeof reject === 'function') {
+          reject(res)
+        } else if (typeof resolve === 'function') {
+          resolve(res)
         }
+
+        clientObj.dialog = {}
+        scriptDialogResolveFunction = null
+        scriptDialogRejectFunction = null
         break
 
       default:

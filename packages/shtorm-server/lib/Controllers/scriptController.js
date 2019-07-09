@@ -57,10 +57,10 @@ class Script {
   }
 
   emitProgress = () => this.clientObj !== null && this.client.emit('script.progress', this.clientObj)
-  dialogHandler = (isRejected) => (newText) => {
+  dialogHandler = (isRejected) => (data) => {
     if (this.childProcess.connected) {
       try {
-        this.childProcess.send({ type: 'dialog', data: { isRejected, newText } })
+        this.childProcess.send({ type: 'dialog', data: { isRejected, data } })
       } catch (err) {
         this.emitConsole('ERROR')('==> An error happened while trying to communicate with the bot process!')
         this.emitConsole('ERROR')(err.toString())

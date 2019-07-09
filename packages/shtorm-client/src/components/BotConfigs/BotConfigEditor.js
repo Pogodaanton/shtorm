@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Prompt } from 'react-router-dom'
+import { withSnackbar } from 'notistack'
 import { withApi } from '../Api'
 import { FormGroup, FormControlLabel, FormControl, FormLabel, Checkbox, Button, Divider } from '@material-ui/core'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
@@ -388,4 +389,4 @@ class BotConfigEditor extends Component {
   }
 }
 
-export default withApi(BotConfigEditor)
+export default withApi(withSnackbar(BotConfigEditor))

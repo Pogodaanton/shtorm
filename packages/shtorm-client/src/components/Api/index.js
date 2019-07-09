@@ -31,20 +31,18 @@ class Api extends Component {
     console.log(errMsg)
     const { enqueueSnackbar, closeSnackbar } = this.props
 
-    if (typeof enqueueSnackbar === 'function') {
-      enqueueSnackbar(errMsg, {
-        variant: 'error',
-        autoHideDuration: isSnackbarDismissable ? 20000 : 6000,
-        action: isSnackbarDismissable ? (key) => (
-          <Button
-            variant='outlined'
-            onClick={() => { closeSnackbar(key) }}
-          >
-            Dismiss
-          </Button>
-        ) : null
-      })
-    }
+    enqueueSnackbar(errMsg, {
+      variant: 'error',
+      autoHideDuration: isSnackbarDismissable ? 20000 : 6000,
+      action: isSnackbarDismissable ? (key) => (
+        <Button
+          variant='outlined'
+          onClick={() => { closeSnackbar(key) }}
+        >
+          Dismiss
+        </Button>
+      ) : null
+    })
 
     if (typeof history === 'object' && typeof history.replace === 'function') {
       if (isAuthError) history.replace('/login')
@@ -52,7 +50,7 @@ class Api extends Component {
     }
   }
 
-  axiosErrorHandler = (isSnackbarDismissable = false, history = {}, fallbackPath = '/') => (err) => this.axiosErrorHandler(err, isSnackbarDismissable, history, fallbackPath)
+  axiosErrorHandler = (isSnackbarDismissable = false, history = {}, fallbackPath = '/') => (err) => this.baseAxiosErrorHandler(err, isSnackbarDismissable, history, fallbackPath)
 
   getApiUrl = (controller) => {
     return `${this.context.prefix}${this.context.socketAdress}${this.context.apiAdress}${controller}`

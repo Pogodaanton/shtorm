@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { Prompt, Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { Paper, Typography, Button } from '@material-ui/core'
@@ -83,19 +83,24 @@ export default class Start extends Component {
                 to='/'
               ><HomeIcon />Go back to Dashboard</Button>
             </div>
-          ) : hasDialogKeys ? (
-            <div className='spotlight spotlight-task-has-dialog'>
-              <Typography variant='h5' >Your script needs something from you!</Typography>
-              <Button
-                color='primary'
-                onClick={this.toggleDialog}
-              ><OpenInBrowserIcon />Open Dialog</Button>
-            </div>
           ) : (
-            <SpotlightLinear
-              value={progress}
-              msg={connecting ? 'Connecting to Socket' : progressText || 'Please wait while the script is doing its thing.'}
-            />
+            <Fragment>
+              <SpotlightLinear
+                value={progress}
+                msg={connecting ? 'Connecting to Socket' : hasDialogKeys ? 'The bot needs input from you!' : progressText || 'Please wait while the script is doing its thing.'}
+              >
+                {hasDialogKeys ? (
+                  <Button
+                    color='primary'
+                    onClick={this.toggleDialog}
+                    className='dialogButton'
+                  >
+                    <OpenInBrowserIcon />
+                    Open Dialog
+                  </Button>
+                ) : null}
+              </SpotlightLinear>
+            </Fragment>
           )}
           <TaskDialog
             open={hasDialogKeys && dialogOpen}

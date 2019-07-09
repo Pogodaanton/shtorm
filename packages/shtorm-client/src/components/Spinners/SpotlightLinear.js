@@ -7,7 +7,8 @@ export default class Fullscreen extends PureComponent {
   static propTypes = {
     value: PropTypes.number,
     msg: PropTypes.string,
-    color: PropTypes.string
+    color: PropTypes.string,
+    children: PropTypes.any
   }
 
   visibilityTimeout = null
@@ -24,7 +25,7 @@ export default class Fullscreen extends PureComponent {
   }
 
   render () {
-    const { value, color, msg } = this.props
+    const { value, color, msg, children } = this.props
     return this.state.visibility ? (
       <div className='spotlight spinner spinner-spotlight-linear'>
         <Typography
@@ -38,6 +39,7 @@ export default class Fullscreen extends PureComponent {
           value={value}
           valueBuffer={0}
         />
+        {children || null}
       </div>
     ) : null
   }

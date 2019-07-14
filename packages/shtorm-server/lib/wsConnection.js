@@ -5,18 +5,21 @@ import { deserializeUser } from './Controllers/userController'
 export const socketPassportMiddleware = (sessionMiddleware) => (socket, next) => {
   sessionMiddleware(socket.request, socket.request.res, (err) => {
     if (!err) {
-      const userId = typeof socket.request.session.passport === 'object' ? socket.request.session.passport.user : ''
+      const passport = socket.request.session.passport || socket.conn.request.session.passport
+      const userId = typeof passport === 'object' ? passport.user : ''
 
       deserializeUser(userId, (errObj, userObj) => {
         if (errObj || !userObj) next(new Error(errObj.message || errObj || 'An unknown error happened!'))
         else socket.request.user = userObj
+
+        if (typeof socket.request.user.permissions === 'undefined') next(new Error('You need to log in first!'))
         next()
       })
     } else next(err)
   })
 }
 
-export default (client, io) => {
+export default (client) => {
   client.on('disconnect', () => {})
   client.on('process.start', (data) => scriptController.startProcess(data, client))
   client.on('process.kill', (pid) => scriptController.killProcess(pid, client))

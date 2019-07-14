@@ -49,7 +49,7 @@ app
 io.use(socketPassportMiddleware(sessionMiddleware))
 
 // Sending connections to wsConnection
-io.on('connection', (client) => wsConnection(client, io))
+io.on('connection', wsConnection)
 
 // Start server
 httpServer.listen(port, () => console.log(`Listening on *:${port}`))

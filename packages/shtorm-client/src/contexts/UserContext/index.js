@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 import Axios from 'axios'
 import { withApi } from '../../components/Api'
 import FullscreenSpinner from '../../components/Spinners/Fullscreen'
+import { SocketContext } from '../SocketContext'
 
 export const UserContext = createContext()
 class UserContextProvider extends Component {
+  static contextType = SocketContext
   static propTypes = {
     api: PropTypes.object.isRequired,
     children: PropTypes.node
@@ -20,6 +22,9 @@ class UserContextProvider extends Component {
           this.setState({
             currentUser: res.data.data,
             loading: false
+          }, () => {
+            if (typeof res.data.data.permissions === 'undefined') this.context.socket.disconnect()
+            else this.context.socket.connect()
           })
         } else throw new Error('Wrong answer received!')
       })

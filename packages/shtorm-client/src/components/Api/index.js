@@ -28,6 +28,11 @@ class Api extends Component {
       }
     }
 
+    if (errMsg === '[object Object]') {
+      if (typeof err.stack === 'string') errMsg = err.stack
+      else errMsg = JSON.stringify(err)
+    }
+
     console.log(errMsg)
     const { enqueueSnackbar, closeSnackbar } = this.props
 

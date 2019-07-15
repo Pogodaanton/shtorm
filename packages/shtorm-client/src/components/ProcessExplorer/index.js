@@ -102,7 +102,7 @@ export default class ProcessExplorer extends PureComponent {
                   </IconButton>
                   <IconButton
                     component={Link}
-                    to={`/process/${encodeURIComponent(pid)}`}
+                    to={`/p/${encodeURIComponent(pid)}`}
                     aria-label='Open Process'
                   >
                     <InputIcon />

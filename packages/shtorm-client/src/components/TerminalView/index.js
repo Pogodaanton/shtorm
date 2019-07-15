@@ -16,6 +16,7 @@ export default class TerminalView extends Component {
     terminalLines: PropTypes.array.isRequired
   }
 
+  shouldAutoScroll = true
   List = createRef()
   state = {
   }
@@ -28,6 +29,14 @@ export default class TerminalView extends Component {
     window.removeEventListener('resize', this.onWindowResize)
   }
 
+  componentDidUpdate = (prevProps) => {
+    const { terminalLines } = this.props
+    const { terminalLines: prevLines } = prevProps
+    if (terminalLines.length !== prevLines.length && this.shouldAutoScroll) {
+      this.List.current.scrollToRow(terminalLines.length)
+    }
+  }
+
   onWindowResize = (e) => {
     if (this.resizeTimer) clearTimeout(this.resizeTimer)
     this.resizeTimer = setTimeout(() => {
@@ -37,6 +46,13 @@ export default class TerminalView extends Component {
         this.List.current.forceUpdateGrid()
       }
     }, 200)
+  }
+
+  onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
+    if (scrollHeight > 0) {
+      if ((scrollHeight - clientHeight - 5) > scrollTop) this.shouldAutoScroll = false
+      else this.shouldAutoScroll = true
+    }
   }
 
   forceUpdate = (index) => () => {
@@ -114,6 +130,7 @@ export default class TerminalView extends Component {
               deferredMeasurementCache={terminalLineCache}
               rowHeight={terminalLineCache.rowHeight}
               rowRenderer={this.rowRenderer}
+              onScroll={this.onScroll}
               style={{
                 marginTop: 5
               }}

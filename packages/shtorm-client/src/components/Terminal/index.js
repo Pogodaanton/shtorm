@@ -33,11 +33,12 @@ class TerminalSocketController extends Component {
   addDisconnectedLine = () => this.addLine({ msg: `Disconnected to socket.` })
   getCurrentTimestamp = () => new Date().getTime()
 
-  addLine = ({ prefix = 'CLIENT', timestamp = this.getCurrentTimestamp(), key = timestamp, msg = 'N/A' }) => {
-    const { terminalLines } = this.state
-    terminalLines.push({ prefix, timestamp, key, msg })
-    this.setState({ terminalLines })
-  }
+  addLine = ({ prefix = 'CLIENT', timestamp = this.getCurrentTimestamp(), key = timestamp, msg = 'N/A' }) => this.setState((state) => ({
+    terminalLines: [
+      ...state.terminalLines,
+      { prefix, timestamp, key, msg }
+    ]
+  }))
 
   removeAllLines = () => {
     const timestamp = this.getCurrentTimestamp()

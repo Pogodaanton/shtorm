@@ -63,7 +63,7 @@ class Start extends Component {
   }
 
   onScriptPreferenceUpdate = (newState) => {
-    this.setState({ scriptOptions: { ...this.state.scriptOptions, newState } })
+    this.setState({ scriptOptions: { ...this.state.scriptOptions, ...newState } })
   }
 
   onSubmit = (defaults = false) => () => {

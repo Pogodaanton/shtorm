@@ -39,7 +39,7 @@ class UserContextProvider extends Component {
   }
 
   state = {
-    currentUser: {},
+    currentUser: null,
     updateCurrentUser: this.updateCurrentUser,
     getUserPermission: this.getUserPermission,
     loading: false

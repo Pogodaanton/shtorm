@@ -3,6 +3,7 @@ import React, { Fragment } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import Loader from '../Loader'
 import { UserContext } from '../../contexts/UserContext'
+import FullscreenLoader from '../Spinners/Fullscreen'
 
 const Home = Loader(import('../Home'))
 const Task = Loader(import('../Task'))
@@ -19,6 +20,7 @@ const DefaultGridContainer = Loader(import('../DefaultGridContainer'))
 const AppContent = () => (
   <UserContext.Consumer>
     {({ currentUser }) => {
+      if (currentUser === null) return <FullscreenLoader msg='Establishing connection to server...' />
       const isUserLoggedIn = (Object.keys(currentUser).length > 0)
       return (
         <Switch>

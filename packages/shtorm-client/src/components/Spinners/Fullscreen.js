@@ -1,8 +1,13 @@
 import React, { PureComponent, Fragment } from 'react'
 import { Dialog, DialogContent, DialogContentText, CircularProgress } from '@material-ui/core'
+import PropTypes from 'prop-types'
 import './Fullscreen.scss'
 
 export default class Fullscreen extends PureComponent {
+  static propTypes = {
+    msg: PropTypes.string
+  }
+
   openTimeout = null
   state = {
     open: false
@@ -17,6 +22,7 @@ export default class Fullscreen extends PureComponent {
   }
 
   render () {
+    const { msg } = this.props
     return (
       <Fragment>
         <div className='anti-pointer' />
@@ -33,7 +39,7 @@ export default class Fullscreen extends PureComponent {
               className='spinner-progress'
             />
             <DialogContentText id='spinner-fullscreen-description'>
-        Loading the unloadable...
+              {msg || 'Loading the unloadable...'}
             </DialogContentText>
           </DialogContent>
         </Dialog>

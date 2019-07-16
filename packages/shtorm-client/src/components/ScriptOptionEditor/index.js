@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react'
+import { FormControlLabel, Checkbox } from '@material-ui/core'
 import PropTypes from 'prop-types'
 import { TextValidator } from 'react-material-ui-form-validator'
 import { withApi } from '../Api'
@@ -30,7 +31,14 @@ class ScriptOptionEditor extends Component {
 
           let scriptOptionValues = {}
           scriptOptions.forEach(({ name, value }) => { scriptOptionValues[name] = value })
-          if (this.props.defaultValues) scriptOptionValues = { ...scriptOptionValues, ...this.props.defaultValues }
+
+          // Eliminating obsolete keys from other scripts
+          if (this.props.defaultValues) {
+            const { defaultValues } = this.props
+            const scriptOptionKeys = Object.keys(scriptOptionValues)
+            Object.keys(defaultValues).forEach(key => scriptOptionKeys.includes(key) || delete defaultValues[key])
+            scriptOptionValues = { ...scriptOptionValues, ...defaultValues }
+          }
 
           this.setState({
             scriptOptions,
@@ -41,8 +49,8 @@ class ScriptOptionEditor extends Component {
       .catch(this.props.api.axiosErrorHandler(true))
   }
 
-  onInputChange = (name) => ({ target }) => {
-    const updateObj = { [name]: target.value }
+  onInputChange = (name, isCheckbox) => ({ target }) => {
+    const updateObj = { [name]: target[isCheckbox ? 'checked' : 'value'] }
     this.setState(updateObj, () => this.props.onValuesUpdate(updateObj))
   }
 
@@ -68,6 +76,24 @@ class ScriptOptionEditor extends Component {
             ? 'There are no custom settings available for this script.'
             : scriptOptions.map(({ type, name }) => {
               const inputType = this.getAllowedType(type)
+
+              if (type === 'boolean') {
+                return (
+                  <FormControlLabel
+                    key={name}
+                    control={
+                      <Checkbox
+                        checked={this.state[name]}
+                        onChange={this.onInputChange(name, true)}
+                        disabled={!!this.props.disabled}
+                        color='primary'
+                      />
+                    }
+                    label={name}
+                  />
+                )
+              }
+
               return (
                 <TextValidator
                   key={name}

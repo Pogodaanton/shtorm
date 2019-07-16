@@ -83,7 +83,7 @@ class ScriptOptionEditor extends Component {
                     key={name}
                     control={
                       <Checkbox
-                        checked={this.state[name]}
+                        checked={!!this.state[name]}
                         onChange={this.onInputChange(name, true)}
                         disabled={!!this.props.disabled}
                         color='primary'

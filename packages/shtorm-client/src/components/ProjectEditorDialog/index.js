@@ -40,8 +40,6 @@ class ProjectDialog extends Component {
     width: PropTypes.string.isRequired
   }
 
-  shouldScriptOptionsUpdate = true
-  crawledOptions = {}
   state = {
     open: true,
     loading: true,
@@ -128,23 +126,19 @@ class ProjectDialog extends Component {
     setTimeout(() => this.props.history.push('/'), 205)
   }
 
-  onOptionValueChange = name => e => {
-    const { options } = this.state
-    if (name === 'script') this.shouldScriptOptionsUpdate = true
-    options[name] = e.target.value
-    this.setState({ options })
-  }
+  onOptionValueChange = name => e => this.setState(({ options }) => {
+    options[name] = e.targetvalue
+    return { options }
+  })
 
-  onScriptPreferenceUpdate = changes => {
-    let { scriptOptions } = this.state
-    this.setState({ scriptOptions: { ...scriptOptions, ...changes } })
-  }
+  onScriptPreferenceUpdate = changes => this.setState(({ scriptOptions }) => {
+    return { scriptOptions: { ...scriptOptions, ...changes } }
+  })
 
-  onEmptyScriptOptions = (value = false) => {
-    const { skippedSteps } = this.state
+  onEmptyScriptOptions = (value = false) => this.setState(({ skippedSteps }) => {
     skippedSteps[1] = value
-    this.setState(skippedSteps, value ? this.triggerNext : () => null)
-  }
+    return skippedSteps
+  }, value ? this.triggerNext : () => null)
 
   onFormValidate = (e) => {
     const { currentStep } = this.state
@@ -286,11 +280,11 @@ class ProjectDialog extends Component {
                     <Typography
                       variant='button'
                       className='project-editor-dialog-result-title'
-                    >{key}: </Typography>
+                    >{key}:</Typography>
                     <Typography
                       variant='body2'
                       className='project-editor-dialog-result-value'
-                    >{value}</Typography>
+                    >{`${value}`}</Typography>
                   </div>
                 )
               })}

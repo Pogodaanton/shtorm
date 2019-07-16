@@ -44,8 +44,8 @@ class ScriptConfigController {
    */
   makeUnique = (arr, uniqueId) => {
     const unique = arr
-      .map(e => e[uniqueId])
-      .map((e, i, final) => e !== 'script' && e !== 'config' && e !== 'name' && final.indexOf(e) === i && i) // store the keys of the unique objects
+      .map(item => item[uniqueId])
+      .map((uniqueItem, i, final) => uniqueItem !== 'script' && uniqueItem !== 'config' && uniqueItem !== 'name' && final.indexOf(uniqueItem) === i && i) // store the keys of the unique objects
       .filter(e => arr[e]) // eliminate the dead keys & store unique objects
       .map(e => arr[e])
 

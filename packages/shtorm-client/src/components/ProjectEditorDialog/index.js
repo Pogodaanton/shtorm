@@ -126,10 +126,11 @@ class ProjectDialog extends Component {
     setTimeout(() => this.props.history.push('/'), 205)
   }
 
-  onOptionValueChange = name => e => this.setState(({ options }) => {
-    options[name] = e.targetvalue
-    return { options }
-  })
+  onOptionValueChange = name => e => {
+    const { options } = this.state
+    options[name] = e.target.value
+    this.setState({ options })
+  }
 
   onScriptPreferenceUpdate = changes => this.setState(({ scriptOptions }) => {
     return { scriptOptions: { ...scriptOptions, ...changes } }

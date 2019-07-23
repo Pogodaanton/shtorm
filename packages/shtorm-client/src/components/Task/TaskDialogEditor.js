@@ -2,11 +2,17 @@ import React from 'react'
 import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor'
 import PropTypes from 'prop-types'
 
+const baseOptions = {
+  minimap: { enabled: false },
+  wordWrap: 'on'
+}
+
 const EditorDiff = ({ language, code, diffCode, onChange }) => {
   const options = {
     renderSideBySide: true,
-    minimap: { enabled: false }
+    ...baseOptions
   }
+
   return (
     <MonacoDiffEditor
       language={language}
@@ -27,16 +33,13 @@ EditorDiff.propTypes = {
 }
 
 const Editor = ({ language, code, onChange }) => {
-  const options = {
-    minimap: { enabled: false }
-  }
   return (
     <MonacoEditor
       language={language}
       theme='vs-dark'
       value={code}
       onChange={onChange}
-      options={options}
+      options={baseOptions}
     />
   )
 }

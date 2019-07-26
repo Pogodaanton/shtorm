@@ -439,6 +439,40 @@ class UserController {
       user.assign({ assignments: Array.from(assignmentsSet) }).write()
     }
   }
+
+  /**
+   * Saves **_user-specific_** changes to the script options of a project.
+   * This function should be executed if the user enabled saving his changes and modified the script options before starting a project.
+   *
+   * @param {String} projectId Shortid of the project whose scriptOptions have been modified.
+   * @param {String} userId Shortid of the user who has modified the scriptOptions.
+   * @param scriptOptions Project which scriptOptions have been modified.
+   * @param {Boolean} shouldDelete If true, the custom options will be deleted instead. In such cases, only args **project** and **user** are needed.
+   */
+  setCustomProjectScriptOptions = (projectId, userId, scriptOptions = {}, shouldDelete = false) => {
+    const dbUser = this.db.find({ id: userId })
+    if (dbUser.value()) {
+      const customScriptOptions = dbUser.value().customScriptOptions || {}
+      if (shouldDelete) delete customScriptOptions[projectId]
+      else customScriptOptions[projectId] = scriptOptions
+      dbUser.assign({ customScriptOptions }).write()
+    }
+  }
+
+  /**
+   * Requests the **_user-specific_** changes to the script options of a project.
+   *
+   * @param {String} projectId Shortid of the project whose scriptOptions might have been modified.
+   * @param {String} userId Shortid of the user who might have modified the scriptOptions.
+   * @returns {Object} Object in form of scriptOptions. Returns an empty object if there are no custom options.
+   * @memberof UserController
+   */
+  getCustomProjectScriptOptions = (projectId, userId) => {
+    const dbUser = this.db.find({ id: userId }).value()
+    const customScriptOptions = dbUser.customScriptOptions || {}
+
+    return customScriptOptions[projectId] || {}
+  }
 }
 
 const userController = new UserController()

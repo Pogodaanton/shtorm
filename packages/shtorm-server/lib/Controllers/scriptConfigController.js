@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import configController from './configController'
+import userController from './userController'
+import projectController from './projectController'
 import VM from '../customVm'
 import configChecker from '../configChecker'
 
@@ -11,6 +13,22 @@ class ScriptConfigController {
 
   requestScriptOptions = (req, res) => {
     const data = this.getScriptOptions(req.query.script)
+    if (data) {
+      return res.status(200).send({
+        success: true,
+        message: 'Script options successfully requested.',
+        data
+      })
+    } else {
+      return res.status(410).send({
+        success: false,
+        message: 'The requested script was not found!'
+      })
+    }
+  }
+
+  requestCustomScriptOptions = (req, res) => {
+    const data = this.getCustomScriptOptionsFromProject(req.query.project, req.query.user)
     if (data) {
       return res.status(200).send({
         success: true,
@@ -59,8 +77,22 @@ class ScriptConfigController {
     const code = vm.transformFileSync(scriptName)
     const { scriptOptions } = vm.getVM().run(code, scriptPath)
 
-    if (typeof scriptOptions !== 'object') return []
-    return this.makeUnique(scriptOptions, 'name')
+    return typeof scriptOptions === 'object' ? this.makeUnique(scriptOptions, 'name') : []
+  }
+
+  getCustomScriptOptionsFromProject = (projectId = '', userId) => {
+    const { project } = projectController.getProject(projectId)
+    const user = userController.getUser(userId)
+
+    if (project && user) {
+      return {
+        scriptName: project.script,
+        defaultOptions: project.scriptOptions,
+        customOptions: userController.getCustomProjectScriptOptions(project.id, user.id)
+      }
+    }
+
+    return null
   }
 
   getAllScripts = () => {

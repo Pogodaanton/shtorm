@@ -1,5 +1,5 @@
 import projectController from './projectController'
-import { permission } from './userController'
+import userController, { permission } from './userController'
 import configChecker from '../configChecker'
 import shortid from 'shortid'
 import cp from 'child_process'
@@ -146,8 +146,9 @@ class ScriptController {
     }
   }
 
-  startProcess = ({ id, scriptOptions }, client) => {
+  startProcess = ({ id, scriptOptions, saveCustomOptions }, client) => {
     try {
+      userController.setCustomProjectScriptOptions(id, client.request.user.id, scriptOptions, !saveCustomOptions)
       this.checkProcessExecutionPermission(client.request, id)
 
       const { project, config } = projectController.getProject(id)

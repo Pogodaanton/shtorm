@@ -357,7 +357,7 @@ class UserEditor extends Component {
             type='submit'
             color='primary'
             variant={(saveState === 'Saved' || saveState === 'Deleting') ? 'outlined' : 'contained'}
-            disabled={loading}
+            disabled={loading || isOriginal}
           >
             <Cloud />
             {saveState}

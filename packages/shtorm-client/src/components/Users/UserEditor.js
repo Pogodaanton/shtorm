@@ -250,21 +250,23 @@ class UserEditor extends Component {
                 fullWidth
                 validators={['notEmpty', 'wordBlacklist', 'minStringLength:3']}
                 errorMessages={['This field cannot be empty!', 'This name is already taken!', 'The name needs to be at least 3 chars long!']}
-                disabled={loading}
+                disabled={loading || isOriginal}
                 onChange={this.onInputChange('username')}
               />
-              <TextValidator
-                variant='outlined'
-                label={isNew ? 'Password' : 'Change Password'}
-                type='password'
-                value={isNew ? newPassword : password}
-                validators={isNew ? ['notEmpty', 'minStringLength:3'] : []}
-                errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : []}
-                disabled={loading}
-                required={isNew}
-                fullWidth
-                onChange={this.onInputChange(isNew ? 'newPassword' : 'password')}
-              />
+              {!isOriginal && (
+                <TextValidator
+                  variant='outlined'
+                  label={isNew ? 'Password' : 'Change Password'}
+                  type='password'
+                  value={isNew ? newPassword : password}
+                  validators={isNew ? ['notEmpty', 'minStringLength:3'] : []}
+                  errorMessages={isNew ? ['This field cannot be empty!', 'Password needs to be at least 3 chars long!'] : []}
+                  disabled={loading}
+                  required={isNew}
+                  fullWidth
+                  onChange={this.onInputChange(isNew ? 'newPassword' : 'password')}
+                />
+              )}
             </FormGroup>
           </FormControl>
           <FormControl component='fieldset'>

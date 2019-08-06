@@ -143,11 +143,11 @@ export const validateUser = (type) => {
           .custom((id) => {
             if (id !== 'add') {
               const existingUser = db.find({ id }).value()
-              if (!existingUser) return false
+              if (!existingUser) throw new Error('User was not found in database!')
+              if (existingUser.isOriginal === true) throw new Error('You are unauthorized to change this users data!')
             }
             return true
           })
-          .withMessage('User was not found in database!')
       ]
     case 'deleteUser':
       return [

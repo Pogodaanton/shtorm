@@ -225,6 +225,7 @@ class UserEditor extends Component {
     }
 
     const isEditingUserAdmin = this.context.getUserPermission('isAdmin')
+    const isEditingUserOriginal = this.context.getUserPermission('isOriginal')
 
     return (
       <ValidatorForm
@@ -250,10 +251,10 @@ class UserEditor extends Component {
                 fullWidth
                 validators={['notEmpty', 'wordBlacklist', 'minStringLength:3']}
                 errorMessages={['This field cannot be empty!', 'This name is already taken!', 'The name needs to be at least 3 chars long!']}
-                disabled={loading || isOriginal}
+                disabled={loading || (isOriginal && !isEditingUserOriginal)}
                 onChange={this.onInputChange('username')}
               />
-              {!isOriginal && (
+              {(!isOriginal || isEditingUserOriginal) && (
                 <TextValidator
                   variant='outlined'
                   label={isNew ? 'Password' : 'Change Password'}
@@ -357,7 +358,7 @@ class UserEditor extends Component {
             type='submit'
             color='primary'
             variant={(saveState === 'Saved' || saveState === 'Deleting') ? 'outlined' : 'contained'}
-            disabled={loading || isOriginal}
+            disabled={loading || (isOriginal && !isEditingUserOriginal)}
           >
             <Cloud />
             {saveState}

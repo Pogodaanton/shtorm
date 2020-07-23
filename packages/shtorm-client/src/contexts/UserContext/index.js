@@ -34,7 +34,7 @@ class UserContextProvider extends Component {
   getUserPermission = (permission) => {
     const { currentUser } = this.state
     if (typeof currentUser.permissions === 'undefined') return false
-    if (currentUser.permissions.isAdmin) return true
+    if (permission !== 'isOriginal' && currentUser.permissions.isAdmin) return true
     return currentUser.permissions[permission] || false
   }
 

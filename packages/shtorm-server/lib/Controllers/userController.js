@@ -140,11 +140,11 @@ export const validateUser = (type) => {
           .withMessage('ID must be a string!')
           .custom((id) => shortid.isValid(id) || id === 'add')
           .withMessage('ID does not seem to be in the right format!')
-          .custom((id) => {
+          .custom((id, { req }) => {
             if (id !== 'add') {
               const existingUser = db.find({ id }).value()
               if (!existingUser) throw new Error('User was not found in database!')
-              if (existingUser.isOriginal === true) throw new Error('You are unauthorized to change this users data!')
+              if (existingUser.isOriginal === true && !permission._checkOneOfCallback(['isOriginal'])(req)) throw new Error('You are unauthorized to change this users data!')
             }
             return true
           })
@@ -206,7 +206,8 @@ export const deserializeUser = (id, done) => {
         seeAllProjects: seeAllProjects || false,
         createProjects: createProjects || false,
         createConfigs: createConfigs || false,
-        isAdmin: isOriginal || isAdmin || false
+        isAdmin: isOriginal || isAdmin || false,
+        isOriginal: isOriginal || false
       }
     })
   }

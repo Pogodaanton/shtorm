@@ -149,6 +149,9 @@ type updateClient = ({
 
 # Installation
 
+Shtorm is using [Lerna](https://lerna.js.org/) to manage its two main components - the server and the client.
+You can find them in their respective folders inside of `packages`.
+
 ## Requirements
 
 - Node.js (v10.15.3)

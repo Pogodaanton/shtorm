@@ -3,6 +3,7 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "scripts": {
+    "serve": "lerna run --parallel start",
     "start": "lerna run --parallel start",
     "build": "lerna run --parallel build"
   },

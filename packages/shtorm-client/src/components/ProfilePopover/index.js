@@ -40,14 +40,20 @@ export default class TasksPopover extends PureComponent {
         }}
       >
         <List dense>
-          <Typography variant='subtitle2'>Hello, {username}</Typography>
+          <Typography variant='subtitle2'>
+            Hello, {username}
+          </Typography>
           <Divider />
           <ActivatingListItem to={`/users/${id}`}>
-            <ListItemIcon><AssignmentInd /></ListItemIcon>
+            <ListItemIcon>
+              <AssignmentInd />
+            </ListItemIcon>
             <ListItemText primary='Edit Profile' />
           </ActivatingListItem>
           <ActivatingListItem to='/logout'>
-            <ListItemIcon><ExitToApp /></ListItemIcon>
+            <ListItemIcon>
+              <ExitToApp />
+            </ListItemIcon>
             <ListItemText primary='Log out' />
           </ActivatingListItem>
         </List>

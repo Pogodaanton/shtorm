@@ -198,7 +198,7 @@ The contents of this build directory can be directly uploaded to a static server
 
 - Note that the code has not been tested on Windows yet
 - Make sure to use the right node.js version (v10.15.3). [NVM](https://github.com/nvm-sh/nvm) might save your day...
-- `Error: Node Sass does not yet support your current environment:` often means that an error occured during the installation of node-sass. Try removing `node_modules` in the directory `shtorm-client` and reinstall the dependencies.
+- `Error: Node Sass does not yet support your current environment:` often means that an error occured during the installation of node-sass or that the system it has run on has been changed since its last use. Try removing `node_modules` in the directory `shtorm-client` and reinstall the dependencies.
 
 > Feel free to create an [issue](https://github.com/Pogodaanton/shtorm/issues) if these advices couldn't solve your installation troubles.
 

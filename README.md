@@ -62,12 +62,12 @@ $ shtorm-server [scriptsDirPath] [databaseDirPath]
 ## Client
 
 The first user will always be called "Admin" with the password "password".
-Change this data **on first login** by heading over to "User Manager" and selecting "Admin".
+Change this data **on first login** by heading over to "Users" and selecting "Admin".
 
-- You can add and edit users in the "User Manager"
-- Add and edit bot configurations in the "Bot Manager"
+- You can add and edit users in the section "Users"
+- Add and edit bot configurations in the section "Bot Configs"
 - Add and edit projects on the homepage
-- Open or stop running tasks
+- Open or stop running tasks by pressing the clipboard icon in the upper right corner
 
 ## Scripting API
 

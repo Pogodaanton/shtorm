@@ -1,4 +1,4 @@
-# ⚡️ Shtorm - The semi-automatic scriptable wiki bot
+# ⚡️ Shtorm - The semi-automatic scriptable wiki bot runner
 
 Wiki-Bots are made to aid the user in editing their wiki's contents. Some of them have complex GUIs which allow you to automate some, but not all tasks. On the other hand, raw editing APIs naturally make your code prone to bugs which could ultimately mess up your articles.
 

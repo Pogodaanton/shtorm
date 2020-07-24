@@ -52,7 +52,7 @@ Since Shtorm is able to run multiple script instances simultaneously, a feature 
 
 ## Server
 
-There are two essential directories for the server: A folder containing all scripts and a folder for the server database.
+There are two essential directories for the server: A folder containing each executable script and a folder for the server database.
 Thus, the following arguments can be added when starting the server:
 
 ```sh

@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Typography, CircularProgress, Button } from '@material-ui/core'
+import React, { Component, PureComponent } from 'react'
+import { Typography, CircularProgress, Button, Link, Popover, IconButton } from '@material-ui/core'
 import { withSnackbar } from 'notistack'
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator'
 import { UserContext } from '../../contexts/UserContext'
@@ -8,6 +8,53 @@ import axios from 'axios'
 import { withApi } from '../Api'
 import bg from './background.jpg'
 import './Login.scss'
+import { CameraAlt } from '@material-ui/icons'
+
+/**
+ * Popover for spotlight BG information
+ */
+class SpotlightAboutPopover extends PureComponent {
+  static propTypes = {
+    open: PropTypes.bool.isRequired,
+    anchor: PropTypes.any.isRequired,
+    requestClose: PropTypes.func.isRequired
+  }
+
+  render () {
+    const { open, anchor, requestClose } = this.props
+    return (
+      <Popover
+        open={!!open}
+        anchorEl={anchor}
+        onClose={requestClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+      >
+        <Typography
+          style={{
+            padding: '10px 20px'
+          }}
+        >
+          Photo by <Link
+            href='https://unsplash.com/@markusspiske?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText'
+            target='_blank'
+            rel='noopener'
+          >Markus Spiske</Link> on <Link
+            href='https://unsplash.com/s/photos/programming?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText'
+            target='_blank'
+            rel='noopener'
+          >Unsplash</Link>
+        </Typography>
+      </Popover>
+    )
+  }
+};
 
 class Login extends Component {
   static propTypes = {
@@ -19,7 +66,8 @@ class Login extends Component {
   state = {
     username: '',
     password: '',
-    loading: false
+    loading: false,
+    aboutPopoverOpen: false
   }
 
   postLogin = () => {
@@ -43,6 +91,13 @@ class Login extends Component {
     if (e.target.type === 'checkbox') val = e.target.checked
     this.setState({ [input]: val })
   }
+
+  toggleAboutPopover = (e) => {
+    this.setState({ aboutPopoverOpen: !this.state.aboutPopoverOpen })
+  }
+
+  aboutButtonRef = null;
+  setRef = (r) => { this.aboutButtonRef = r }
 
   render () {
     const { username, password, loading } = this.state
@@ -84,6 +139,17 @@ class Login extends Component {
           className='login-background'
           style={{ backgroundImage: `url("${bg}")` }}
         />
+        <IconButton
+          className='spotlight-about'
+          ref={this.setRef}
+          onClick={this.toggleAboutPopover}
+          about='About the background image'
+        ><CameraAlt /></IconButton>
+        {this.aboutButtonRef && <SpotlightAboutPopover
+          anchor={this.aboutButtonRef}
+          open={this.state.aboutPopoverOpen}
+          requestClose={this.toggleAboutPopover}
+        />}
       </div>
     )
   }

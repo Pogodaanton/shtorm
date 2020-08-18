@@ -1,4 +1,4 @@
-# ⚡️ Shtorm - The semi-automatic scriptable wiki bot
+# ⚡️ Shtorm - The semi-automatic scriptable wiki-bot runner
 
 Wiki-Bots are made to aid the user in editing their wiki's contents. Some of them have complex GUIs which allow you to automate some, but not all tasks. On the other hand, raw editing APIs naturally make your code prone to bugs which could ultimately mess up your articles.
 
@@ -52,7 +52,7 @@ Since Shtorm is able to run multiple script instances simultaneously, a feature 
 
 ## Server
 
-There are two essential directories for the server: A folder containing all scripts and a folder for the server database.
+There are two essential directories for the server: A folder containing each executable script and a folder for the server database.
 Thus, the following arguments can be added when starting the server:
 
 ```sh

@@ -128,16 +128,21 @@ type updateClient = ({
     /**
      * Code: Single code editor the user may edit
      * Diff: Diff view with right-side editor marked as user-editable
+     * Prompt: Dialog with a custom message and OK/Cancel buttons
      */
-    type: "code" | "diff",
+    type: "code" | "diff" | "prompt",
     /**
-     * Title of the dialog
+     * Title of the dialog or prompt message
      */
     msg: string,
     /**
      * Predefined input
      */
     code: string,
+    /**
+     * Language parameter for the code editor's syntax highlighter 
+     */
+    language: string = "xml",
     /**
      * Used in conjunction with `type: "diff"`.
      * Predefined input in the right-side editor

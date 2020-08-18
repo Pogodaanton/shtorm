@@ -114,10 +114,10 @@ export default class TaskDialog extends Component {
           disableEscapeKeyDown
         >
           <Fragment>
-            <DialogTitle>Check your changes!</DialogTitle>
+            <DialogTitle>{typeof dialog.msg === 'string' ? dialog.msg : 'Check your changes!'}</DialogTitle>
             <DialogContent>
               <EditorDiff
-                language={dialog.language || 'xml'}
+                language={(typeof dialog.language === 'string' && dialog.language) || 'xml'}
                 code={dialog.code}
                 diffCode={dialog.diffCode}
                 onChange={this.handleMonacoChange}
@@ -165,10 +165,10 @@ export default class TaskDialog extends Component {
           disableEscapeKeyDown
         >
           <Fragment>
-            <DialogTitle>{dialog.msg}</DialogTitle>
+            <DialogTitle>{typeof dialog.msg === 'string' ? dialog.msg : 'Check your changes!'}</DialogTitle>
             <DialogContent>
               <Editor
-                language={dialog.language || 'xml'}
+                language={(typeof dialog.language === 'string' && dialog.language) || 'xml'}
                 code={dialog.code}
                 onChange={this.handleMonacoChange}
               />
